@@ -4,6 +4,7 @@ import { PropsWithChildren } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/auth';
 import DashboardPage from '../pages/dashboard';
+import ForgotPasswordPage from '../pages/forgotPassword';
 import LoginPage from '../pages/login';
 
 const router = createBrowserRouter([
@@ -19,13 +20,17 @@ const router = createBrowserRouter([
     path: '/login',
     element: <LoginPage />,
   },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+  },
 ]);
 
 function RequireAuth(props: PropsWithChildren) {
   const { isLoggedIn } = useAuth();
 
   if (!isLoggedIn) {
-    <Navigate to="/login" />;
+    return <Navigate to="/login" />;
   } else {
     return props.children;
   }

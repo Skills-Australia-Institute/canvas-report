@@ -4,7 +4,7 @@ import SAILogo from '../assets/sai-logo.png';
 import ErrorAlert from '../components/errorAlert';
 import { useSupabase } from '../hooks/auth';
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const supabase = useSupabase();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,14 +47,14 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.currentTarget.value)}
         />
         <div className="flex justify-between">
-          <a href="/forgot-password" className="underline">
-            Forgot password?
+          <a href="/login" className="underline">
+            Back to login
           </a>
           <button
             type="submit"
             className="border-solid  bg-blue-400 rounded-md mb-4 py-1 px-4 text-white font-medium"
           >
-            Login
+            Request password
           </button>
         </div>
         {errMsg && <ErrorAlert msg={errMsg} />}

@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { useEffect, useMemo, useState } from 'react';
-import { getUserFromSession, User } from '../entities/user';
+import { User, getUserFromSession } from '../entities/user';
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_KEY;
