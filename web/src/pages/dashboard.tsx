@@ -1,7 +1,9 @@
-export default function DashboardPage() {
+import TopNavBar from '../components/topNavBar';
+
+export default function Dashboard() {
   return (
-    <div>
-      <h1>DashboardPage</h1>
-    </div>
+    <>
+      <TopNavBar />
+    </>
   );
 }

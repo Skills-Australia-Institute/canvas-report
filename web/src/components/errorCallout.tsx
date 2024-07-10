@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export default function ErrorAlert({ msg }: { msg: string }) {
+export default function ErrorCallout({ msg }: { msg: string }) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {

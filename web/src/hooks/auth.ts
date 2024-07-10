@@ -1,46 +1,19 @@
-import { createClient } from '@supabase/supabase-js';
-import { useEffect, useMemo, useState } from 'react';
-import { User, getUserFromSession } from '../entities/user';
-
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_KEY;
-
-const supabase = createClient(url, key);
+import { useContext } from 'react';
+import { getUserFromSession } from '../entities/user';
+import { SessionContext } from '../providers/session';
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const isLoggedIn = user === null ? false : true;
+  const session = useContext(SessionContext);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        setUser(null);
-      } else {
-        setUser(getUserFromSession(session));
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        setUser(null);
-      } else {
-        setUser(getUserFromSession(session));
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
+  if (!session) {
+    return {
+      user: null,
+      isLoggedIn: false,
     };
-  }, []);
+  }
 
   return {
-    currentUser: user,
-    isLoggedIn: isLoggedIn,
+    user: getUserFromSession(session),
+    isLoggedIn: true,
   };
-}
-
-export function useSupabase() {
-  return useMemo(() => supabase, []);
 }

@@ -1,63 +1,119 @@
-import { FormEvent, FormEventHandler, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, Text, TextField } from '@radix-ui/themes';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
 import SAILogo from '../assets/sai-logo.png';
-import ErrorAlert from '../components/errorAlert';
-import { useSupabase } from '../hooks/auth';
+import ErrorCallout from '../components/errorCallout';
+import { useSupabase } from '../hooks/supabase';
 
-export default function ForgotPasswordPage() {
+const formSchema = z.object({
+  email: z
+    .string()
+    .email({ message: 'Please enter valid email.' })
+    .min(1, { message: 'Email is required.' }),
+});
+
+const redirect = (await import.meta.env.BASE_URL) + 'reset-password';
+
+export default function ForgotPassword() {
   const supabase = useSupabase();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errMsg, setErrMsg] = useState('Something went wrong. Try again.');
+  const [errMsg, setErrMsg] = useState('');
+  const [success, setSuccess] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+  } = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: 'john@skillsaustralia.edu.au',
+    },
+  });
 
-  const navigate = useNavigate();
-
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (
-    e: FormEvent
-  ) => {
-    e.preventDefault();
+  async function onSubmit({ email }: z.infer<typeof formSchema>) {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirect,
       });
 
       if (!error) {
-        navigate('/');
+        return setSuccess(true);
       }
+
+      setErrMsg(error.message);
     } catch (err) {
       setErrMsg('Something went wrong. Try again.');
     }
-  };
+  }
+
+  if (success) {
+    return (
+      <div className="flex flex-col items-center mt-24">
+        <img src={SAILogo} className="h-20 mb-4" />
+        <div className="w-96 p-2">
+          <p className="mb-4">
+            A password reset link has been emailed. This link will redirect you
+            to password reset page.
+          </p>
+          <p className="mb-4">
+            If <span className="font-bold">{getValues('email')}</span> is not
+            your email. Try again by clicking below button.
+          </p>
+          <div className="flex justify-between items-center">
+            <a href="/login" className="underline">
+              Back to login
+            </a>
+            <Button
+              type="button"
+              className="cursor-pointer"
+              variant="surface"
+              onClick={() => setSuccess(false)}
+            >
+              Forgot password
+            </Button>
+          </div>
+          {errMsg && <ErrorCallout msg={errMsg} />}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center mt-24">
       <img src={SAILogo} className="h-20 mb-4" />
-      <form onSubmit={handleSubmit} className="w-96 p-2">
-        <label className="block">Email</label>
-        <input
-          type="email"
-          className="border-solid border-2 border-gray-400 rounded mb-4 w-full px-2 py-1"
-          onChange={(e) => setEmail(e.currentTarget.value)}
+      <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
+        <div className="mb-4">
+          <Text size="2">
+            Enter your email and we'll send you a link to change your password.
+          </Text>
+        </div>
+        <Controller
+          name="email"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => (
+            <div className="mb-4">
+              <Text>Email</Text>
+              <TextField.Root {...field}></TextField.Root>
+              {errors.email && (
+                <Text color="red" size="2">
+                  {errors.email.message}
+                </Text>
+              )}
+            </div>
+          )}
         />
-        <label className="block">Password</label>
-        <input
-          type="password"
-          className="border-solid border-2 border-gray-400 rounded mb-4 w-full px-2 py-1"
-          onChange={(e) => setPassword(e.currentTarget.value)}
-        />
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center mb-4">
           <a href="/login" className="underline">
             Back to login
           </a>
-          <button
-            type="submit"
-            className="border-solid  bg-blue-400 rounded-md mb-4 py-1 px-4 text-white font-medium"
-          >
+          <Button type="submit" className="cursor-pointer" variant="surface">
             Request password
-          </button>
+          </Button>
         </div>
-        {errMsg && <ErrorAlert msg={errMsg} />}
+        {errMsg && <ErrorCallout msg={errMsg} />}
       </form>
     </div>
   );

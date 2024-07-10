@@ -1,28 +1,35 @@
-import { RouterProvider as RP } from 'react-router-dom';
-
 import { PropsWithChildren } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider as RP,
+} from 'react-router-dom';
 import { useAuth } from '../hooks/auth';
-import DashboardPage from '../pages/dashboard';
-import ForgotPasswordPage from '../pages/forgotPassword';
-import LoginPage from '../pages/login';
+import Dashboard from '../pages/dashboard';
+import ForgotPassword from '../pages/forgotPassword';
+import Login from '../pages/login';
+import ResetPassword from '../pages/resetPassword';
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: (
-      <RequireAuth>
-        <DashboardPage />
-      </RequireAuth>
-    ),
-  },
-  {
     path: '/login',
-    element: <LoginPage />,
+    element: <Login />,
   },
   {
     path: '/forgot-password',
-    element: <ForgotPasswordPage />,
+    element: <ForgotPassword />,
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPassword />,
+  },
+  {
+    path: '/',
+    element: <Dashboard />,
+  },
+  {
+    path: '/hello',
+    element: <RequireAuth></RequireAuth>,
   },
 ]);
 

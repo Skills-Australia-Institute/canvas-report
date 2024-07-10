@@ -9,19 +9,27 @@ import SAILogo from '../assets/sai-logo.png';
 import ErrorCallout from '../components/errorCallout';
 import { useSupabase } from '../hooks/supabase';
 
-const formSchema = z.object({
-  email: z
-    .string()
-    .email({ message: 'Please enter valid email.' })
-    .min(1, { message: 'Email is required.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
-});
+const formSchema = z
+  .object({
+    password: z.string().min(1, { message: 'Password is required.' }),
+    confirmPassword: z.string().min(1, { message: 'Password is required.' }),
+  })
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'The passwords did not match.',
+        path: ['confirmPassword'],
+      });
+    }
+  });
 
-export default function Login() {
+export default function ResetPassword() {
   const supabase = useSupabase();
   const [errMsg, setErrMsg] = useState('');
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
     control,
     handleSubmit,
@@ -29,15 +37,14 @@ export default function Login() {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: 'john@skillsaustralia.edu.au',
       password: '',
+      confirmPassword: '',
     },
   });
 
-  async function onSubmit({ email, password }: z.infer<typeof formSchema>) {
+  async function onSubmit({ password }: z.infer<typeof formSchema>) {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email,
+      const { error } = await supabase.auth.updateUser({
         password: password,
       });
 
@@ -51,28 +58,10 @@ export default function Login() {
     }
   }
 
-  console.log(errors);
-
   return (
     <div className="flex flex-col items-center mt-24">
-      <img src={SAILogo} className="h-20 mb-6" />
+      <img src={SAILogo} className="h-20 mb-4" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
-        <Controller
-          name="email"
-          control={control}
-          rules={{ required: true }}
-          render={({ field }) => (
-            <div className="mb-4">
-              <Text>Email</Text>
-              <TextField.Root {...field}></TextField.Root>
-              {errors.email && (
-                <Text color="red" size="2">
-                  {errors.email.message}
-                </Text>
-              )}
-            </div>
-          )}
-        />
         <Controller
           name="password"
           control={control}
@@ -103,12 +92,42 @@ export default function Login() {
             </div>
           )}
         />
+        <Controller
+          name="confirmPassword"
+          control={control}
+          render={({ field }) => (
+            <div className="mb-4">
+              <Text>Confirm password</Text>
+              <TextField.Root
+                {...field}
+                type={showConfirmPassword ? 'text' : 'password'}
+              >
+                <TextField.Slot
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  side="right"
+                  className="cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeOpenIcon height="16" width="16" />
+                  ) : (
+                    <EyeNoneIcon height="16" width="16" />
+                  )}
+                </TextField.Slot>
+              </TextField.Root>
+              {errors.confirmPassword && (
+                <Text color="red" size="2">
+                  {errors.confirmPassword.message}
+                </Text>
+              )}
+            </div>
+          )}
+        />
         <div className="flex justify-between items-center mb-4">
-          <a href="/forgot-password" className="underline">
-            Forgot password?
+          <a href="/login" className="underline">
+            Back to login
           </a>
           <Button type="submit" className="cursor-pointer" variant="surface">
-            Login
+            Reset password
           </Button>
         </div>
         {errMsg && <ErrorCallout msg={errMsg} />}
