@@ -23,3 +23,7 @@ export const getDateTimeString = () => {
 
   return dateString;
 };
+
+export const getFormattedName = (name: string) => {
+  return name.trim().replace(/\s+/g, '_').replace(/,/g, '');
+};

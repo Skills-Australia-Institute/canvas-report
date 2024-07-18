@@ -1,9 +1,9 @@
-import { Button, ScrollArea, Table, Text } from '@radix-ui/themes';
+import { Badge, Button, ScrollArea, Table, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getAssignmentsResultsByUserID } from '../../api/assignments';
 import { User } from '../../entities/supabase/user';
-import { getDateTimeString } from '../../utils';
+import { getDateTimeString, getFormattedName } from '../../utils';
 import Callout from '../callout';
 import Loading from '../loading';
 
@@ -16,6 +16,7 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
     queryKey: ['users', user.id, 'assignments-results'],
     queryFn: () => getAssignmentsResultsByUserID(user.id),
   });
+  const name = getFormattedName(user.name);
 
   if (isLoading) {
     return <Loading />;
@@ -57,6 +58,9 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
                 <Table.ColumnHeaderCell className="text-xs">
                   Status
                 </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell className="text-xs">
+                  Enrollment
+                </Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -89,6 +93,17 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
                     </Text>
                   </Table.Cell>
                   <Table.Cell className="text-xs">{d.status}</Table.Cell>
+                  <Table.Cell className="text-xs">
+                    {d.course_name !== 'Total' && (
+                      <Badge
+                        color={
+                          d.enrollment_state === 'active' ? 'green' : 'blue'
+                        }
+                      >
+                        {d.enrollment_state}
+                      </Badge>
+                    )}
+                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -100,7 +115,7 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
           <CSVLink
             data={data}
             headers={headers}
-            filename={`${name}-enrollments_results-${getDateTimeString()}`}
+            filename={`${name}-assignments_results-${getDateTimeString()}`}
           >
             <Button className="cursor-pointer" color="teal">
               Download
@@ -115,7 +130,7 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
 const headers = [
   {
     label: 'SIS ID',
-    key: 'sis_id',
+    key: 'user_sis_id',
   },
   {
     label: 'Name',
@@ -134,27 +149,43 @@ const headers = [
     key: 'section',
   },
   {
-    label: 'Enrollment State',
-    key: 'enrollment_state',
+    label: 'Assignment',
+    key: 'title',
+  },
+  {
+    label: 'Points Possible',
+    key: 'points_possible',
+  },
+  {
+    label: 'Score',
+    key: 'score',
+  },
+  {
+    label: 'Discrepancy',
+    key: 'discrepancy',
+  },
+  {
+    label: 'Submitted At',
+    key: 'submitted_at',
+  },
+  {
+    label: 'Status',
+    key: 'status',
+  },
+  {
+    label: 'Due At',
+    key: 'due_at',
   },
   {
     label: 'Course State',
     key: 'course_state',
   },
   {
-    label: 'Current Grade',
-    key: 'current_grade',
-  },
-  {
-    label: 'Current Score',
-    key: 'current_score',
-  },
-  {
     label: 'Enrollment Role',
     key: 'enrollment_role',
   },
   {
-    label: 'Grades URL',
-    key: 'grades_url',
+    label: 'Enrollment State',
+    key: 'enrollment_state',
   },
 ];

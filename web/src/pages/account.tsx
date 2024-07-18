@@ -36,7 +36,7 @@ export default function Account() {
   }
 
   return (
-    <div>
+    <div className="w-full">
       <OutletHeader title="Accounts" subTitle={data?.name} />
       <Tabs.Root>
         <Tabs.List>
