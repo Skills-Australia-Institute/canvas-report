@@ -2,11 +2,15 @@ package main
 
 import (
 	"canvas-admin/api"
+	"canvas-admin/canvas"
+	"canvas-admin/supabase"
 	"context"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -14,6 +18,8 @@ import (
 )
 
 func main() {
+
+	// Canvas envs
 	canvasOAuth2ClientID := os.Getenv("CANVAS_OAUTH2_CLIENT_ID")
 	if canvasOAuth2ClientID == "" {
 		log.Panic("missing env: CANVAS_OAUTH2_CLIENT_ID")
@@ -29,9 +35,14 @@ func main() {
 		log.Panic("missing env: CANVAS_BASE_URL")
 	}
 
-	apiAddr := os.Getenv("API")
-	if apiAddr == "" {
-		apiAddr = ":8080"
+	canvasPageSizeStr := os.Getenv("CANVAS_PAGE_SIZE")
+	if canvasPageSizeStr == "" {
+		log.Panic("missing env: CANVAS_PAGE_SIZE")
+	}
+
+	canvasPageSize, err := strconv.Atoi(canvasPageSizeStr)
+	if err != nil {
+		log.Panic("invalid env: CANVAS_PAGE_SIZE")
 	}
 
 	adminUrl := os.Getenv("CANVAS_ADMIN_URL")
@@ -39,11 +50,32 @@ func main() {
 		adminUrl = "http://localhost:5173"
 	}
 
+	apiAddr := os.Getenv("API")
+	if apiAddr == "" {
+		apiAddr = ":8080"
+	}
+
+	canavasAccessToken := os.Getenv("CANVAS_ACCESS_TOKEN")
+
+	supabaseJwtSecret := os.Getenv("SUPABASE_JWT_SECRET")
+	if supabaseJwtSecret == "" {
+		log.Panic("missing env: SUPABASE_JWT_SECRET")
+	}
+
 	client := &http.Client{
 		Timeout: time.Second * 5,
 	}
 
-	apiController := api.NewAPIController(canvasOAuth2ClientID, canavsOAuth2ClientSecret, canvasBaseUrl, apiAddr, client)
+	canvasHtmlUrl := strings.TrimSuffix(canvasBaseUrl, "/api/v1")
+
+	canvas := canvas.New(canvasBaseUrl, canavasAccessToken, canvasPageSize, canvasHtmlUrl)
+
+	supabase, err := supabase.New("", "", "")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	apiController := api.NewAPIController(canvasOAuth2ClientID, canavsOAuth2ClientSecret, canvasBaseUrl, apiAddr, client, canvas, supabase)
 
 	router := api.NewRouter(apiController, adminUrl)
 

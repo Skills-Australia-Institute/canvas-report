@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { getUserFromSession } from '../entities/user';
+import { getUserFromSession } from '../entities/supabase/sessionUser';
 import { SessionContext } from '../providers/session';
 
 export function useAuth() {

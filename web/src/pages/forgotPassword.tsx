@@ -10,8 +10,8 @@ import { useSupabase } from '../hooks/supabase';
 const formSchema = z.object({
   email: z
     .string()
-    .email({ message: 'Please enter valid email.' })
-    .min(1, { message: 'Email is required.' }),
+    .email({ message: 'Valid email is required.' })
+    .min(1, { message: 'Valid email is required.' }),
 });
 
 const redirect = (await import.meta.env.BASE_URL) + 'reset-password';

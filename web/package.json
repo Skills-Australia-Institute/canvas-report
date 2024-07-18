@@ -1,7 +1,7 @@
 {
   "name": "canvas-admin",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --open",
@@ -16,7 +16,8 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/themes": "^3.1.1",
     "@supabase/supabase-js": "^2.44.3",
-    "@tanstack/react-query": "^5.49.2",
+    "@tanstack/react-query": "^5.51.1",
+    "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.407.0",

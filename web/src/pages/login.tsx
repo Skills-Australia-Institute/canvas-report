@@ -12,8 +12,8 @@ import { useSupabase } from '../hooks/supabase';
 const formSchema = z.object({
   email: z
     .string()
-    .email({ message: 'Please enter valid email.' })
-    .min(1, { message: 'Email is required.' }),
+    .email({ message: 'Valid email is required.' })
+    .min(1, { message: 'Valid email is required.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
 });
 
@@ -50,8 +50,6 @@ export default function Login() {
       setErrMsg('Something went wrong. Try again.');
     }
   }
-
-  console.log(errors);
 
   return (
     <div className="flex flex-col items-center mt-24">
