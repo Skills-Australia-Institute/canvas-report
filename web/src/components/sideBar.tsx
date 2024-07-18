@@ -18,12 +18,7 @@ const navs = [
 export default function SideBar() {
   return (
     <Flex direction="column" gap="5">
-      <Avatar
-        src={SAILogo}
-        fallback="SAI"
-        size="2"
-        className="bg-white mb-4 cursor-pointer"
-      />
+      <Avatar src={SAILogo} fallback="SAI" size="2" className="bg-white mb-4" />
       {navs.map((n) => (
         <SideNav key={n.path} navigation={n} />
       ))}

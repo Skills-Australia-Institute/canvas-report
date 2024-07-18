@@ -15,7 +15,7 @@ function Copyright() {
     <div className="text-sm">
       <img src={CopyrightIcon} className="inline w-3 h-3" /> {year}{' '}
       <a
-        href="https://www.skillsaustralia.edu.au/"
+        href="https://skillsaustralia.instructure.com/"
         target="_blank"
         className="underline"
       >

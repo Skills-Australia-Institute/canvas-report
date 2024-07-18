@@ -9,8 +9,8 @@ interface IOutletHeader {
 export default function OutletHeader({ title, subTitle }: IOutletHeader) {
   const { pathname } = useLocation();
   return (
-    <div className="mb-4">
-      <Heading size="4" className="inline">
+    <div className="mb-2">
+      <Heading size="3" className="inline">
         <a
           className="hover:underline cursor-pointer"
           href={`/${title.toLowerCase()}`}
@@ -19,7 +19,7 @@ export default function OutletHeader({ title, subTitle }: IOutletHeader) {
         </a>
       </Heading>
       {subTitle && (
-        <Heading size="3" className="inline">
+        <Heading size="2" className="inline">
           <CaretRightIcon className="inline mx-2" />
           <a href={pathname} className="hover:underline cursor-pointer">
             {subTitle}
