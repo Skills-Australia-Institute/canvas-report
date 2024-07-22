@@ -1,4 +1,4 @@
-import { Button, ScrollArea, Table } from '@radix-ui/themes';
+import { Button, Progress, ScrollArea, Table } from '@radix-ui/themes';
 import { useQueries } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getUngradedAssignmentsByCourseID } from '../../api/assignments';
@@ -11,7 +11,7 @@ interface IUngradedAssignments {
 }
 
 export default function UngradedAssignments({ account }: IUngradedAssignments) {
-  const { pending, data, allSuccess } = useQueries({
+  const { pending, data, isAllSuccess, successCount } = useQueries({
     queries: account.courses
       ? account.courses.map((course) => {
           return {
@@ -24,7 +24,13 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
       return {
         data: results.map((result) => (result.data ? result.data : [])),
         pending: results.some((result) => result.isPending),
-        allSuccess: results.every((result) => result.isSuccess),
+        isAllSuccess: results.every((result) => result.isSuccess),
+        successCount: results.reduce((total, result) => {
+          if (result.isSuccess) {
+            total++;
+          }
+          return total;
+        }, 0),
       };
     },
   });
@@ -37,12 +43,7 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
 
   return (
     <div>
-      <ScrollArea
-        type="always"
-        scrollbars="vertical"
-        className="pr-4"
-        style={{ height: 600 }}
-      >
+      <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
         {allData.length > 0 && (
           <Table.Root size="1">
             <Table.Header>
@@ -96,28 +97,38 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
           </Table.Root>
         )}
       </ScrollArea>
-      {allSuccess && (
-        <div className="mt-4 border-t pt-4">
-          <CSVLink
-            data={allData}
-            headers={headers}
-            filename={`${name}-enrollments_results-${getDateTimeString()}`}
-          >
-            <Button className="cursor-pointer mr-4" color="teal">
-              Download Perth
-            </Button>
-          </CSVLink>
-          <CSVLink
-            data={allData}
-            headers={headers}
-            filename={`${name}-enrollments_results-${getDateTimeString()}`}
-          >
-            <Button className="cursor-pointer" color="cyan">
-              Download Adelaide
-            </Button>
-          </CSVLink>
-        </div>
-      )}
+      <div className="mt-4 border-t pt-4">
+        {!isAllSuccess && account.courses && (
+          <Progress
+            value={(successCount / account.courses.length) * 100}
+            size="3"
+            className="max-w-60"
+            color="green"
+          />
+        )}
+        {isAllSuccess && (
+          <>
+            <CSVLink
+              data={allData}
+              headers={headers}
+              filename={`${name}-enrollments_results-${getDateTimeString()}`}
+            >
+              <Button className="cursor-pointer mr-4" color="teal">
+                Download Perth
+              </Button>
+            </CSVLink>
+            <CSVLink
+              data={allData}
+              headers={headers}
+              filename={`${name}-enrollments_results-${getDateTimeString()}`}
+            >
+              <Button className="cursor-pointer" color="cyan">
+                Download Adelaide
+              </Button>
+            </CSVLink>
+          </>
+        )}
+      </div>
     </div>
   );
 }

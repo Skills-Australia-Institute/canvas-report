@@ -27,12 +27,7 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
   }
   return (
     <div>
-      <ScrollArea
-        type="always"
-        scrollbars="vertical"
-        className="pr-4"
-        style={{ height: 600 }}
-      >
+      <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
         {data && (
           <Table.Root size="1">
             <Table.Header>
