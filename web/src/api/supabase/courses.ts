@@ -43,3 +43,21 @@ export const getCoursesBySearchTerm = async (
     throw err as Error;
   }
 };
+
+export const getCourseByID = async (supabase: SupabaseClient, id: number) => {
+  try {
+    const { data, error } = await supabase
+      .schema('canvas')
+      .rpc('get_course_by_id', {
+        course_id: id,
+      });
+
+    if (error) {
+      throw Error(error.message);
+    }
+
+    return data as Course;
+  } catch (err) {
+    throw err as Error;
+  }
+};
