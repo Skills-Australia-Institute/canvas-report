@@ -6,12 +6,14 @@ interface ISearchBox<T> {
   data: Array<T>;
   updateFiltered: (filteredData: Array<T>) => void;
   filterKey: keyof T;
+  className?: string;
 }
 
 export default function SearchBox<T>({
   data,
   updateFiltered,
   filterKey,
+  className,
 }: ISearchBox<T>) {
   const debouncedUpdateSearch = useDebounce(updateFiltered);
 
@@ -26,7 +28,11 @@ export default function SearchBox<T>({
   };
 
   return (
-    <TextField.Root placeholder="Search…" onChange={handleChange}>
+    <TextField.Root
+      placeholder="Search…"
+      onChange={handleChange}
+      className={className}
+    >
       <TextField.Slot>
         <MagnifyingGlassIcon height="16" width="16" />
       </TextField.Slot>

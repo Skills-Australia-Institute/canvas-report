@@ -1,4 +1,8 @@
-import { AccessibilityIcon, PersonIcon } from '@radix-ui/react-icons';
+import {
+  AccessibilityIcon,
+  BackpackIcon,
+  PersonIcon,
+} from '@radix-ui/react-icons';
 import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
 import SAILogo from '../assets/sai-logo.png';
 
@@ -12,6 +16,11 @@ const navs = [
     title: 'Users',
     path: '/users',
     icon: PersonIcon,
+  },
+  {
+    title: 'Courses',
+    path: '/courses',
+    icon: BackpackIcon,
   },
 ];
 

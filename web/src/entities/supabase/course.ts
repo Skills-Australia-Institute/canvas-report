@@ -10,4 +10,5 @@ export interface Course {
   grading_standard_id: number | null;
   account?: Account;
   sections?: Section[];
+  account_name?: string;
 }

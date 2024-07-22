@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/auth';
 import Account from './pages/account';
 import Accounts from './pages/accounts';
+import Courses from './pages/courses';
 import Dashboard from './pages/dashboard';
 import ForgotPassword from './pages/forgotPassword';
 import Login from './pages/login';
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: 'users/:userID',
         element: <User />,
+      },
+      {
+        path: 'courses',
+        element: <Courses />,
       },
     ],
   },
