@@ -3,7 +3,7 @@ package supabase
 import "github.com/supabase-community/postgrest-go"
 
 type Supabase struct {
-	Client *postgrest.Client
+	client *postgrest.Client
 	Secret string
 }
 
@@ -18,7 +18,7 @@ func New(baseUrl, publicAnonKey string, secret string) (*Supabase, error) {
 	}
 
 	supabase := &Supabase{
-		Client: client,
+		client: client,
 		Secret: secret,
 	}
 
