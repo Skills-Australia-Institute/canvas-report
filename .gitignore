@@ -25,3 +25,9 @@ dist-ssr
 
 # Env
 .env
+
+server/tmp
+server/lambda
+
+*.exe
+*.zip
