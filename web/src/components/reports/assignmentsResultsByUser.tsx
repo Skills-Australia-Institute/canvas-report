@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getAssignmentsResultsByUserID } from '../../api/assignments';
 import { User } from '../../entities/supabase/user';
+import { useSupabase } from '../../hooks/supabase';
 import { getDateTimeString, getFormattedName } from '../../utils';
 import Callout from '../callout';
 import Loading from '../loading';
@@ -12,9 +13,10 @@ interface IAssignmentsResults {
 }
 
 export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
+  const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'assignments-results'],
-    queryFn: () => getAssignmentsResultsByUserID(user.id),
+    queryFn: () => getAssignmentsResultsByUserID(supabase, user.id),
   });
   const name = getFormattedName(user.name);
 
@@ -25,6 +27,7 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
   if (error) {
     return <Callout type="error" msg={error.message} />;
   }
+
   return (
     <div>
       <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>

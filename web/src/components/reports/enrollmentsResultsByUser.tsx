@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getEnrollmentsResultsByUserID } from '../../api/enrollments';
 import { User } from '../../entities/supabase/user';
+import { useSupabase } from '../../hooks/supabase';
 import { getDateTimeString, getFormattedName } from '../../utils';
 import Callout from '../callout';
 import Loading from '../loading';
@@ -14,9 +15,10 @@ interface IEnrollmentsResults {
 export default function EnrollmentsResultsByUser({
   user,
 }: IEnrollmentsResults) {
+  const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'enrollments-results'],
-    queryFn: () => getEnrollmentsResultsByUserID(user.id),
+    queryFn: () => getEnrollmentsResultsByUserID(supabase, user.id),
   });
   const name = getFormattedName(user.name);
 

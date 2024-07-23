@@ -3,6 +3,7 @@ import { useQueries } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getUngradedAssignmentsByCourseID } from '../../api/assignments';
 import { Account } from '../../entities/supabase/account';
+import { useSupabase } from '../../hooks/supabase';
 import { getDateTimeString } from '../../utils';
 import Loading from '../loading';
 
@@ -11,12 +12,14 @@ interface IUngradedAssignments {
 }
 
 export default function UngradedAssignments({ account }: IUngradedAssignments) {
+  const supabase = useSupabase();
   const { pending, data, isAllSuccess, successCount } = useQueries({
     queries: account.courses
       ? account.courses.map((course) => {
           return {
             queryKey: ['courses', course.id, 'ungraded-assignments'],
-            queryFn: () => getUngradedAssignmentsByCourseID(course.id),
+            queryFn: () =>
+              getUngradedAssignmentsByCourseID(supabase, course.id),
           };
         })
       : [],

@@ -44,7 +44,7 @@ func main() {
 	}
 
 	address := os.Getenv("API_ADDRESS")
-	if address != "" {
+	if address == "" {
 		log.Panic("missing env: API_ADDRESS")
 	}
 
