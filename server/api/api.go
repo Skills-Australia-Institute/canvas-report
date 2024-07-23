@@ -3,6 +3,8 @@ package api
 import (
 	"canvas-admin/canvas"
 	"canvas-admin/supabase"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -48,7 +50,12 @@ func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 		r.Get("/users/{user_id}/enrollments-results", withError(withAuth(c, withUser(c, c.GetEnrollmentsResultsByUser))))
 
 		r.Get("/accounts/{account_id}/courses", withError(withAuth(c, c.GetCoursesByAccountID)))
+		r.Get("/hello", hello)
 	})
 
 	return r
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(fmt.Sprintf(`{"message":"Hello World","time":"%s"}`, time.Now())))
 }
