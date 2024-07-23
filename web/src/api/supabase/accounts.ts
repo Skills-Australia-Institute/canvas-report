@@ -34,7 +34,7 @@ export const getAccountByID = async (supabase: SupabaseClient, id: number) => {
       throw Error(accountQueryError.message);
     }
 
-    const courses = await getCoursesByAccountID(account.id);
+    const courses = await getCoursesByAccountID(supabase, account.id);
 
     return {
       ...account,

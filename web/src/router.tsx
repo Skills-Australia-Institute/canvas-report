@@ -63,7 +63,6 @@ export const router = createBrowserRouter([
 
 function RequireAuth(props: PropsWithChildren) {
   const session = useContext(SessionContext);
-  console.log(session);
 
   if (!session) {
     return <Navigate to="/login" />;

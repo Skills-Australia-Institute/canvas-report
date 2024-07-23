@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
@@ -50,8 +51,19 @@ type claims struct {
 
 func withAuth(c *APIController, next func(w http.ResponseWriter, r *http.Request) (int, error)) func(w http.ResponseWriter, r *http.Request) (int, error) {
 	fn := func(w http.ResponseWriter, r *http.Request) (int, error) {
-		token := r.Header.Get("Authorization")
+		authHeader := r.Header.Get("Authorization")
 
+		if authHeader == "" {
+			return http.StatusUnauthorized, fmt.Errorf("%s", http.StatusText(http.StatusUnauthorized))
+		}
+
+		const prefix = "Bearer "
+
+		if !strings.HasPrefix(authHeader, prefix) {
+			return http.StatusUnauthorized, fmt.Errorf("%s", http.StatusText(http.StatusUnauthorized))
+		}
+
+		token := strings.TrimPrefix(authHeader, prefix)
 		if token == "" {
 			return http.StatusUnauthorized, fmt.Errorf("%s", http.StatusText(http.StatusUnauthorized))
 		}
