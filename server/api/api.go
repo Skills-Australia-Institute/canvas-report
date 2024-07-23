@@ -22,11 +22,11 @@ func NewAPIController(canvas *canvas.Canvas, supabase *supabase.Supabase) *APICo
 	}
 }
 
-func NewRouter(c *APIController, adminUrl string) *chi.Mux {
+func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{adminUrl},
+		AllowedOrigins:   []string{saiUrl},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
