@@ -26,8 +26,11 @@ dist-ssr
 # Env
 .env
 
+# Air
 server/tmp
-server/lambda
-
 *.exe
+
+
+# Lambda zip
 *.zip
+server/bootstrap
