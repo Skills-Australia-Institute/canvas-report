@@ -62,6 +62,8 @@ func NewRouter(c *APIController, adminUrl string) *chi.Mux {
 		r.Get("/hello", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Hello World"))
 		})
+
+		r.Get("/accounts/{account_id}/courses", withError(c.GetCoursesByAccountID))
 	})
 
 	return r

@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Account } from '../../entities/supabase/account';
+import { getCoursesByAccountID } from '../courses';
 
 export const getAccounts = async (supabase: SupabaseClient) => {
   try {
@@ -33,18 +34,7 @@ export const getAccountByID = async (supabase: SupabaseClient, id: number) => {
       throw Error(accountQueryError.message);
     }
 
-    const { data: courses, error: cousesQueryError } = await supabase
-      .schema('canvas')
-      .from('courses')
-      .select(
-        `id, name, course_code, workflow_state, account_id, grading_standard_id`
-      )
-      .eq('workflow_state', 'available')
-      .eq('account_id', id);
-
-    if (cousesQueryError) {
-      throw Error(cousesQueryError.message);
-    }
+    const courses = await getCoursesByAccountID(account.id);
 
     return {
       ...account,

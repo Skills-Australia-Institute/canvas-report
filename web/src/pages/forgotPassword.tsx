@@ -14,8 +14,6 @@ const formSchema = z.object({
     .min(1, { message: 'Valid email is required.' }),
 });
 
-const redirect = (await import.meta.env.BASE_URL) + 'reset-password';
-
 export default function ForgotPassword() {
   const supabase = useSupabase();
   const [errMsg, setErrMsg] = useState('');
@@ -31,6 +29,7 @@ export default function ForgotPassword() {
       email: 'john@skillsaustralia.edu.au',
     },
   });
+  const redirect = '/reset-password';
 
   async function onSubmit({ email }: z.infer<typeof formSchema>) {
     try {

@@ -1,4 +1,4 @@
-import { Box, Tabs } from '@radix-ui/themes';
+import { Badge, Box, ScrollArea, Table, Tabs } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { getAccountByID } from '../api/supabase/accounts';
@@ -7,6 +7,7 @@ import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import UngradedAssignments from '../components/reports/ungradedAssignments';
 import { ACTIONS } from '../constants';
+import { Course } from '../entities/courses';
 import { useSupabase } from '../hooks/supabase';
 
 export default function Account() {
@@ -36,20 +37,68 @@ export default function Account() {
   }
 
   return (
-    <div>
+    <div className="w-full">
       <OutletHeader title="Accounts" subTitle={data?.name} />
       <Tabs.Root>
         <Tabs.List>
+          <Tabs.Trigger value="Courses">Courses</Tabs.Trigger>
           <Tabs.Trigger value={ACTIONS.UngradedAssignments.key}>
             {ACTIONS.UngradedAssignments.value}
           </Tabs.Trigger>
         </Tabs.List>
         <Box pt="2">
+          <Tabs.Content value="Courses">
+            {data?.courses && <CoursesTable courses={data.courses} />}
+          </Tabs.Content>
           <Tabs.Content value={ACTIONS.UngradedAssignments.key}>
             {data && <UngradedAssignments account={data} />}
           </Tabs.Content>
         </Box>
       </Tabs.Root>
     </div>
+  );
+}
+
+function CoursesTable({ courses }: { courses: Course[] }) {
+  return (
+    <ScrollArea scrollbars="both" className="pr-4 mt-4" style={{ height: 600 }}>
+      <Table.Root size="1">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeaderCell className="text-xs">
+              Name
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="text-xs">
+              Status
+            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell className="text-xs">
+              Code
+            </Table.ColumnHeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {courses.map((c) => (
+            <Table.Row key={c.id}>
+              <Table.Cell className="text-xs">
+                <a
+                  href={`/courses/${c.id}`}
+                  className="hover:underline cursor-pointer"
+                >
+                  {c.name}
+                </a>
+              </Table.Cell>
+              <Table.Cell className="text-xs">
+                <Badge
+                  color={c.workflow_state === 'available' ? 'green' : 'orange'}
+                >
+                  {c.workflow_state}
+                </Badge>
+              </Table.Cell>
+              <Table.Cell className="text-xs">{c.course_code}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </ScrollArea>
   );
 }

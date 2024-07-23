@@ -83,3 +83,23 @@ func (c *APIController) GetGradingStandardCoursesByAccountID(w http.ResponseWrit
 
 	return http.StatusOK, nil
 }
+
+func (c *APIController) GetCoursesByAccountID(w http.ResponseWriter, r *http.Request) (int, error) {
+	accountID, err := strconv.Atoi(chi.URLParam(r, "account_id"))
+	if err != nil {
+		return http.StatusBadRequest, fmt.Errorf("invalid account id")
+	}
+
+	types := []canvas.CourseEnrollmentType{canvas.StudentCourseEnrollment}
+
+	results, code, err := c.canvas.GetCoursesByAccountID(accountID, "", types)
+	if err != nil {
+		return code, err
+	}
+
+	if err := json.NewEncoder(w).Encode(results); err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}

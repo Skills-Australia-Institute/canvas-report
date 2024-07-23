@@ -1,4 +1,4 @@
-import { Badge, Table, Text } from '@radix-ui/themes';
+import { Badge, ScrollArea, Table } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { getAccounts } from '../api/supabase/accounts';
@@ -36,85 +36,68 @@ export default function Accounts() {
     );
   }
 
-  if (data === undefined) {
-    return <div></div>;
-  }
-
   return (
-    <div>
-      <OutletHeader title="Accounts" subTitle="SMmsms amamms ma" />
-      {displayedData && (
-        <SearchBox<Account>
-          data={data}
-          filterKey="name"
-          updateFiltered={(filteredData: Account[]) =>
-            setDisplayedData(filteredData)
-          }
-        />
+    <div className="w-full">
+      <OutletHeader title="Accounts" />
+      {displayedData.length > 0 && (
+        <>
+          <SearchBox<Account>
+            data={data ?? []}
+            filterKey="name"
+            updateFiltered={(filteredData: Account[]) =>
+              setDisplayedData(filteredData)
+            }
+            className="max-w-lg"
+          />
+          <ScrollArea
+            scrollbars="both"
+            className="pr-4 mt-4"
+            style={{ height: 600 }}
+          >
+            <Table.Root size="1">
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeaderCell className="text-xs">
+                    Account
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="text-xs">
+                    State
+                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="text-xs">
+                    Total Courses
+                  </Table.ColumnHeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {displayedData.map((a) => (
+                  <Table.Row key={a.id}>
+                    <Table.Cell className="text-xs">
+                      <a
+                        className="hover:underline cursor-pointer"
+                        href={`/accounts/${a.id}`}
+                      >
+                        {a.name}
+                      </a>
+                    </Table.Cell>
+                    <Table.Cell className="text-xs">
+                      <Badge
+                        color={
+                          a.workflow_state === 'active' ? 'green' : 'orange'
+                        }
+                      >
+                        {a.workflow_state}
+                      </Badge>
+                    </Table.Cell>
+                    <Table.Cell className="text-xs">
+                      {a.courses_count}
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </ScrollArea>
+        </>
       )}
-      <Table.Root variant="surface" className="mb-4 mt-4">
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>State</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Total Courses</Table.ColumnHeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {displayedData &&
-            displayedData.map((a) => (
-              <Table.Row key={a.id}>
-                <Table.RowHeaderCell>
-                  <Text className="font-medium hover:underline cursor-pointer">
-                    <a href={`/accounts/${a.id}`}>{a.name}</a>
-                  </Text>
-                </Table.RowHeaderCell>
-                <Table.Cell>
-                  <Badge
-                    color={a.workflow_state === 'active' ? 'green' : 'orange'}
-                  >
-                    {a.workflow_state}
-                  </Badge>
-                </Table.Cell>
-                <Table.Cell>{a.courses_count}</Table.Cell>
-              </Table.Row>
-            ))}
-        </Table.Body>
-      </Table.Root>
     </div>
   );
 }
-
-// interface IPaginationProps {
-//   count: number;
-// }
-
-// function Pagination({ count }: IPaginationProps) {
-//   const numbers = Array.from({ length: count }, (_, index) => index + 1);
-//   const isMoreThanFive = numbers.length > 5;
-
-//   return (
-//     <div className="flex items-center justify-center gap-6">
-//       <div className="border-2 rounded p-2">
-//         <ArrowLeftIcon className="opacity-25" fontSize="16px" />
-//       </div>
-//       <div className="flex items-center gap-4">
-//         {isMoreThanFive ? (
-//           <></>
-//         ) : (
-//           <>
-//             {numbers.slice(0, 5).map((n) => (
-//               <Text key={n} className="border-2 rounded px-2.5 py-1.5">
-//                 {n}
-//               </Text>
-//             ))}
-//           </>
-//         )}
-//       </div>
-
-//       <div className="border-2 rounded p-2">
-//         <ArrowRightIcon fontSize="16px" />
-//       </div>
-//     </div>
-//   );
-// }

@@ -40,7 +40,7 @@ export default function User() {
   }
 
   return (
-    <div>
+    <div className="w-full">
       <OutletHeader title="Users" subTitle={data?.name} />
       <Tabs.Root>
         <Tabs.List>
@@ -56,7 +56,7 @@ export default function User() {
             {data && <EnrollmentsResultsByUser user={data} />}
           </Tabs.Content>
           <Tabs.Content value={ACTIONS.AssignmentsResultsByUser.key}>
-            {data && <AssignmentsResultsByUser />}
+            {data && <AssignmentsResultsByUser user={data} />}
           </Tabs.Content>
         </Box>
       </Tabs.Root>

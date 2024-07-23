@@ -1,4 +1,8 @@
-import { AccessibilityIcon, PersonIcon } from '@radix-ui/react-icons';
+import {
+  AccessibilityIcon,
+  BackpackIcon,
+  PersonIcon,
+} from '@radix-ui/react-icons';
 import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
 import SAILogo from '../assets/sai-logo.png';
 
@@ -13,17 +17,17 @@ const navs = [
     path: '/users',
     icon: PersonIcon,
   },
+  {
+    title: 'Courses',
+    path: '/courses',
+    icon: BackpackIcon,
+  },
 ];
 
 export default function SideBar() {
   return (
     <Flex direction="column" gap="5">
-      <Avatar
-        src={SAILogo}
-        fallback="SAI"
-        size="2"
-        className="bg-white mb-4 cursor-pointer"
-      />
+      <Avatar src={SAILogo} fallback="SAI" size="2" className="bg-white mb-4" />
       {navs.map((n) => (
         <SideNav key={n.path} navigation={n} />
       ))}
