@@ -2,14 +2,14 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { Badge, ScrollArea, Table, TextField } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { getCoursesBySearchTerm } from '../api/supabase/courses';
-import ErrorQuery from '../components/errorQuery';
+import { getUsersBySearchTerm } from '../api/supabase/users';
+import ErrorCallout from '../components/errorCallout';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import { useDebounce } from '../hooks/debounce';
 import { useSupabase } from '../hooks/supabase';
 
-export default function Courses() {
+export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   const [inputValue, setInputValue] = useState('');
   const debouncedSetSearchTerm = useDebounce(setSearchTerm);
@@ -21,7 +21,7 @@ export default function Courses() {
 
   return (
     <div className="w-full">
-      <OutletHeader title="Courses" />
+      <OutletHeader title="Users" />
       <TextField.Root
         placeholder="Search…"
         onChange={handleChange}
@@ -32,16 +32,16 @@ export default function Courses() {
           <MagnifyingGlassIcon height="16" width="16" />
         </TextField.Slot>
       </TextField.Root>
-      <CoursesTable searchTerm={searchTerm} />
+      <UsersTable searchTerm={searchTerm} />
     </div>
   );
 }
 
-function CoursesTable({ searchTerm }: { searchTerm: string }) {
+function UsersTable({ searchTerm }: { searchTerm: string }) {
   const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
-    queryKey: ['courses', searchTerm, 'search-term'],
-    queryFn: () => getCoursesBySearchTerm(supabase, searchTerm),
+    queryKey: ['users', searchTerm, 'search-term'],
+    queryFn: () => getUsersBySearchTerm(supabase, searchTerm),
     enabled: searchTerm.length > 4,
   });
 
@@ -51,9 +51,10 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
 
   if (error) {
     return (
-      <ErrorQuery
-        outletHeaderProps={{ title: 'Courses' }}
-        calloutProps={{ type: 'error', msg: error.message }}
+      <ErrorCallout
+        msg={error.message}
+        className="mt-4 max-w-lg
+    "
       />
     );
   }
@@ -72,34 +73,43 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
                   Name
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell className="text-xs">
-                  Account
+                  Status
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell className="text-xs">
-                  Status
+                  SIS ID
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell className="text-xs">
+                  Email
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell className="text-xs">
+                  Integration
                 </Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.map((c) => (
-                <Table.Row key={c.id}>
+              {data.map((u) => (
+                <Table.Row key={u.id}>
                   <Table.Cell className="text-xs">
                     <a
                       className="hover:underline cursor-pointer"
-                      href={`/courses/${c.id}`}
+                      href={`/users/${u.id}`}
                     >
-                      {c.name}
+                      {u.name}
                     </a>
                   </Table.Cell>
                   <Table.Cell className="text-xs">
-                    <a
-                      className="hover:underline cursor-pointer"
-                      href={`/accounts/${c.account_id}`}
+                    <Badge
+                      color={
+                        u.workflow_state == 'registered' ? 'green' : 'amber'
+                      }
                     >
-                      {c.account_name}
-                    </a>
+                      {u.workflow_state}
+                    </Badge>
                   </Table.Cell>
+                  <Table.Cell className="text-xs">{u.sis_user_id}</Table.Cell>
+                  <Table.Cell className="text-xs">{u.unique_id}</Table.Cell>
                   <Table.Cell className="text-xs">
-                    <Badge color="green">{c.workflow_state}</Badge>
+                    {u.integration_id}
                   </Table.Cell>
                 </Table.Row>
               ))}

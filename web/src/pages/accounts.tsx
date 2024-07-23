@@ -73,7 +73,7 @@ export default function Accounts() {
                   <Table.Row key={a.id}>
                     <Table.Cell className="text-xs">
                       <a
-                        className="font-medium underline cursor-pointer"
+                        className="hover:underline cursor-pointer"
                         href={`/accounts/${a.id}`}
                       >
                         {a.name}

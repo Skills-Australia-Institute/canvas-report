@@ -1,4 +1,4 @@
-import { Badge, Button, ScrollArea, Table, Text } from '@radix-ui/themes';
+import { Badge, Button, ScrollArea, Table } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getEnrollmentsResultsByUserID } from '../../api/enrollments';
@@ -61,9 +61,7 @@ export default function EnrollmentsResultsByUser({
             <Table.Body>
               {data.map((d) => (
                 <Table.Row key={d.name + d.course_name + d.section}>
-                  <Table.Cell className="text-xs">
-                    <Text>{d.account}</Text>
-                  </Table.Cell>
+                  <Table.Cell className="text-xs">{d.account}</Table.Cell>
                   <Table.Cell className="text-xs">{d.course_name}</Table.Cell>
                   <Table.Cell className="text-xs">{d.section}</Table.Cell>
                   <Table.Cell className="text-xs">{d.current_grade}</Table.Cell>

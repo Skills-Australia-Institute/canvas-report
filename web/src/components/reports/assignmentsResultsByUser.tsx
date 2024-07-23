@@ -59,9 +59,13 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.map((d) => (
+              {data.map((d, i) => (
                 <Table.Row
-                  key={d.account + d.course_name + d.section + d.title}
+                  key={
+                    d.course_name === 'Total'
+                      ? i
+                      : d.account + d.course_name + d.section + d.title
+                  }
                 >
                   <Table.Cell className="text-xs">{d.account}</Table.Cell>
                   <Table.Cell className="text-xs">

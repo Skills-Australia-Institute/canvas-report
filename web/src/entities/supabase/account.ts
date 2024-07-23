@@ -1,5 +1,4 @@
-import { Course as CanvasCourse } from '../courses';
-import { Course } from './course';
+import { Course } from '../courses';
 
 export interface Account {
   id: number;
@@ -7,5 +6,5 @@ export interface Account {
   parent_account_id: number | null;
   workflow_state: string;
   courses_count?: number;
-  courses?: Course[] | CanvasCourse[];
+  courses?: Course[];
 }

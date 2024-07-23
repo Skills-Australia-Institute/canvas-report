@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 
-export default function ErrorCallout({ msg }: { msg: string }) {
+export default function ErrorCallout({
+  msg,
+  className,
+}: {
+  msg: string;
+  className?: string;
+}) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -15,7 +21,9 @@ export default function ErrorCallout({ msg }: { msg: string }) {
 
   return (
     visible && (
-      <div className="flex items-center px-4 py-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:text-red-400">
+      <div
+        className={`flex items-center px-4 py-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:text-red-400 ${className}`}
+      >
         <svg
           className="flex-shrink-0 w-4 h-4"
           aria-hidden="true"

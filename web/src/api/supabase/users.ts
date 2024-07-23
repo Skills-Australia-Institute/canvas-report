@@ -21,3 +21,24 @@ export const getUserByID = async (supabase: SupabaseClient, id: number) => {
     throw err as Error;
   }
 };
+
+export const getUsersBySearchTerm = async (
+  supabase: SupabaseClient,
+  searchTerm: string
+) => {
+  try {
+    const { data, error } = await supabase
+      .schema('canvas')
+      .rpc('get_users_by_search_term', {
+        search_term: searchTerm,
+      });
+
+    if (error) {
+      throw Error(error.message);
+    }
+
+    return data as User[];
+  } catch (err) {
+    throw err as Error;
+  }
+};

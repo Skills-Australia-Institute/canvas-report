@@ -25,7 +25,6 @@ export default function Course() {
     return <Loading />;
   }
 
-  console.log(data);
   if (error) {
     return (
       <ErrorQuery
