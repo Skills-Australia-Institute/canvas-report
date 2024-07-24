@@ -42,7 +42,7 @@ func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Route("/", func(r chi.Router) {
+	r.Route("/api", func(r chi.Router) {
 		r.Get("/courses/{course_id}/ungraded-assignments", withError(withAuth(c, withCourse(c, c.GetUngradedAssignmentsByCourse))))
 		r.Get("/courses/{course_id}/enrollments-results", withError(withAuth(c, withCourse(c, c.GetEnrollmentResultsByCourse))))
 
@@ -57,5 +57,7 @@ func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf(`{"message":"Hello World","time":"%s"}`, time.Now())))
 }
