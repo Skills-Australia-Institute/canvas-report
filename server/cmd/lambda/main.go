@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	chiadapter "github.com/awslabs/aws-lambda-go-api-proxy/chi"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var chiLambda *chiadapter.ChiLambda
