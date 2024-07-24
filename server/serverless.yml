@@ -1,0 +1,49 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: sanam
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: sai
+# serverless.yml
+
+service: sai
+
+provider:
+  name: aws
+  stage: prod
+  runtime: provided.al2023
+  region: ap-southeast-2
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bootstrap
+
+# https://richdevelops.dev/keeping-secrets-out-of-git
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  secrets: ${file(secrets.yml):${self:custom.stage}}
+
+# GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -o bootstrap cmd/lambda/main.go
+# build binary before running serverless deploy
+# binary name must be bootstrap
+
+functions:
+  sai:
+    handler: bootstrap
+    environment:
+      CANVAS_BASE_URL: '${self:custom.secrets.CANVAS_BASE_URL}'
+      CANVAS_PAGE_SIZE: '${self:custom.secrets.CANVAS_PAGE_SIZE}'
+      CANVAS_ACCESS_TOKEN: '${self:custom.secrets.CANVAS_ACCESS_TOKEN}'
+      SAI_URL: '${self:custom.secrets.SAI_URL}'
+      SUPABASE_BASE_URL: '${self:custom.secrets.SUPABASE_BASE_URL}'
+      SUPABASE_PUBLIC_ANON_KEY: '${self:custom.secrets.SUPABASE_PUBLIC_ANON_KEY}'
+      SUPABASE_JWT_SECRET: '${self:custom.secrets.SUPABASE_JWT_SECRET}'
+    events:
+      - http:
+          path: /api/{proxy+}
+          method: ANY
+          cors:
+            origin: '${self:custom.secrets.SAI_URL}'
+            headers:
+              - '*'
+            allowCredentials: true
