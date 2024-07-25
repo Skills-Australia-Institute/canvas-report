@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import SAILogo from '../assets/sai-logo.png';
-import ErrorCallout from '../components/errorCallout';
+import Callout from '../components/callout';
 import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z.object({
@@ -32,6 +32,7 @@ export default function ForgotPassword() {
   const redirect = '/reset-password';
 
   async function onSubmit({ email }: z.infer<typeof formSchema>) {
+    setErrMsg('');
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirect,
@@ -49,7 +50,7 @@ export default function ForgotPassword() {
 
   if (success) {
     return (
-      <div className="flex flex-col items-center mt-24">
+      <main className="flex flex-col items-center pt-24">
         <img src={SAILogo} className="h-20 mb-4" />
         <div className="w-96 p-2">
           <p className="mb-4">
@@ -73,9 +74,9 @@ export default function ForgotPassword() {
               Forgot password
             </Button>
           </div>
-          {errMsg && <ErrorCallout msg={errMsg} />}
+          {errMsg && <Callout type="error" msg={errMsg} />}
         </div>
-      </div>
+      </main>
     );
   }
 
@@ -112,7 +113,7 @@ export default function ForgotPassword() {
             Request password
           </Button>
         </div>
-        {errMsg && <ErrorCallout msg={errMsg} />}
+        {errMsg && <Callout type="error" msg={errMsg} />}
       </form>
     </div>
   );

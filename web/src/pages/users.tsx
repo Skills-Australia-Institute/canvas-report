@@ -3,7 +3,7 @@ import { Badge, ScrollArea, Table, TextField } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { getUsersBySearchTerm } from '../api/supabase/users';
-import ErrorCallout from '../components/errorCallout';
+import Callout from '../components/callout';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import { useDebounce } from '../hooks/debounce';
@@ -51,11 +51,7 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
 
   if (error) {
     return (
-      <ErrorCallout
-        msg={error.message}
-        className="mt-4 max-w-lg
-    "
-      />
+      <Callout type="error" msg={error.message} className="mt-4 max-w-lg" />
     );
   }
   return (

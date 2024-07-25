@@ -6,7 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import SAILogo from '../assets/sai-logo.png';
-import ErrorCallout from '../components/errorCallout';
+import Callout from '../components/callout';
 import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z
@@ -43,6 +43,7 @@ export default function ResetPassword() {
   });
 
   async function onSubmit({ password }: z.infer<typeof formSchema>) {
+    setErrMsg('');
     try {
       const { error } = await supabase.auth.updateUser({
         password: password,
@@ -59,7 +60,7 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="flex flex-col items-center mt-24">
+    <main className="flex flex-col items-center pt-24">
       <img src={SAILogo} className="h-20 mb-4" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <Controller
@@ -130,8 +131,8 @@ export default function ResetPassword() {
             Reset password
           </Button>
         </div>
-        {errMsg && <ErrorCallout msg={errMsg} />}
+        {errMsg && <Callout type="error" msg={errMsg} />}
       </form>
-    </div>
+    </main>
   );
 }

@@ -6,7 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import SAILogo from '../assets/sai-logo.png';
-import ErrorCallout from '../components/errorCallout';
+import Callout from '../components/callout';
 import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z.object({
@@ -35,6 +35,7 @@ export default function Login() {
   });
 
   async function onSubmit({ email, password }: z.infer<typeof formSchema>) {
+    setErrMsg('');
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: email,
@@ -52,7 +53,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col items-center mt-24">
+    <main className="flex flex-col items-center pt-24">
       <img src={SAILogo} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <Controller
@@ -109,8 +110,8 @@ export default function Login() {
             Login
           </Button>
         </div>
-        {errMsg && <ErrorCallout msg={errMsg} />}
+        {errMsg && <Callout type={'error'} msg={errMsg} />}
       </form>
-    </div>
+    </main>
   );
 }
