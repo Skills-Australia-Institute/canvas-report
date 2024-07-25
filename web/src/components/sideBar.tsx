@@ -4,6 +4,7 @@ import {
   PersonIcon,
 } from '@radix-ui/react-icons';
 import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
+import { useLocation } from 'react-router-dom';
 import SAILogo from '../assets/sai-logo.png';
 
 const navs = [
@@ -51,10 +52,13 @@ interface ISideNavProps {
 }
 
 function SideNav({ navigation: { title, path, icon: Icon } }: ISideNavProps) {
+  const location = useLocation();
+  const isActive = location.pathname.includes(path);
+
   return (
     <Tooltip content={title}>
       <a href={path} className="cursor-pointer">
-        <Icon className="w-5 h-5" />
+        <Icon className={isActive ? 'w-6 h-6 text-blue-600' : 'w-6 h-6'} />
       </a>
     </Tooltip>
   );
