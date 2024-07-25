@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-import Footer from '../components/footer';
 import SideBar from '../components/sideBar';
 import TopBar from '../components/topBar';
 
@@ -19,9 +18,6 @@ export default function Dashboard() {
           </div>
           <div className="flex flex-1 p-4">
             <Outlet />
-          </div>
-          <div className="flex p-3 justify-center">
-            <Footer />
           </div>
         </div>
       </div>
