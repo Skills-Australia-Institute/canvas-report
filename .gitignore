@@ -26,8 +26,16 @@ dist-ssr
 # Env
 .env
 
+# Air
 server/tmp
-server/lambda
-
 *.exe
-*.zip
+
+
+
+
+# Serverless
+server/.serverless
+server/*.zip
+server/bootstrap
+server/bin
+server/secrets.yml

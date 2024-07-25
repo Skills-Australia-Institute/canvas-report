@@ -7,6 +7,7 @@ import Courses from './pages/courses';
 import Dashboard from './pages/dashboard';
 import ForgotPassword from './pages/forgotPassword';
 import Login from './pages/login';
+import NotFound from './pages/notFound';
 import ResetPassword from './pages/resetPassword';
 import User from './pages/user';
 import Users from './pages/users';
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
         <Dashboard />
       </RequireAuth>
     ),
+    errorElement: <NotFound />,
     children: [
       {
         path: 'accounts/:accountID',

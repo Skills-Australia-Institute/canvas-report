@@ -3,6 +3,8 @@ package api
 import (
 	"canvas-admin/canvas"
 	"canvas-admin/supabase"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -22,11 +24,11 @@ func NewAPIController(canvas *canvas.Canvas, supabase *supabase.Supabase) *APICo
 	}
 }
 
-func NewRouter(c *APIController, adminUrl string) *chi.Mux {
+func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{adminUrl},
+		AllowedOrigins:   []string{saiUrl},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
@@ -40,7 +42,7 @@ func NewRouter(c *APIController, adminUrl string) *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Route("/", func(r chi.Router) {
+	r.Route("/api", func(r chi.Router) {
 		r.Get("/courses/{course_id}/ungraded-assignments", withError(withAuth(c, withCourse(c, c.GetUngradedAssignmentsByCourse))))
 		r.Get("/courses/{course_id}/enrollments-results", withError(withAuth(c, withCourse(c, c.GetEnrollmentResultsByCourse))))
 
@@ -48,7 +50,14 @@ func NewRouter(c *APIController, adminUrl string) *chi.Mux {
 		r.Get("/users/{user_id}/enrollments-results", withError(withAuth(c, withUser(c, c.GetEnrollmentsResultsByUser))))
 
 		r.Get("/accounts/{account_id}/courses", withError(withAuth(c, c.GetCoursesByAccountID)))
+		r.Get("/hello", hello)
 	})
 
 	return r
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(fmt.Sprintf(`{"message":"Hello World","time":"%s"}`, time.Now())))
 }

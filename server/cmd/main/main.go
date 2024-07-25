@@ -38,9 +38,9 @@ func main() {
 		log.Panic("missing env: CANVAS_ACCESS_TOKEN")
 	}
 
-	canvasAdminUrl := os.Getenv("CANVAS_ADMIN_URL")
-	if canvasAdminUrl == "" {
-		log.Panic("missing env: CANVAS_ADMIN_URL")
+	saiUrl := os.Getenv("SAI_URL")
+	if saiUrl == "" {
+		log.Panic("missing env: SAI_URL")
 	}
 
 	address := os.Getenv("API_ADDRESS")
@@ -74,7 +74,7 @@ func main() {
 
 	controller := api.NewAPIController(canvas, supabase)
 
-	router := api.NewRouter(controller, canvasAdminUrl)
+	router := api.NewRouter(controller, saiUrl)
 
 	server := &http.Server{
 		Addr:    address,

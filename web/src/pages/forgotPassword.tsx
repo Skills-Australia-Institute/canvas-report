@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import SAILogo from '../assets/sai-logo.png';
-import ErrorCallout from '../components/errorCallout';
+import Callout from '../components/callout';
 import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z.object({
@@ -13,6 +13,8 @@ const formSchema = z.object({
     .email({ message: 'Valid email is required.' })
     .min(1, { message: 'Valid email is required.' }),
 });
+
+const redirect = 'https://skillsaustralia.netlify.app/reset-password';
 
 export default function ForgotPassword() {
   const supabase = useSupabase();
@@ -29,9 +31,9 @@ export default function ForgotPassword() {
       email: 'john@skillsaustralia.edu.au',
     },
   });
-  const redirect = '/reset-password';
 
   async function onSubmit({ email }: z.infer<typeof formSchema>) {
+    setErrMsg('');
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirect,
@@ -49,8 +51,8 @@ export default function ForgotPassword() {
 
   if (success) {
     return (
-      <div className="flex flex-col items-center mt-24">
-        <img src={SAILogo} className="h-20 mb-4" />
+      <main className="flex flex-col items-center pt-24">
+        <img src={SAILogo} className="h-20 mb-6" />
         <div className="w-96 p-2">
           <p className="mb-4">
             A password reset link has been emailed. This link will redirect you
@@ -73,15 +75,15 @@ export default function ForgotPassword() {
               Forgot password
             </Button>
           </div>
-          {errMsg && <ErrorCallout msg={errMsg} />}
+          {errMsg && <Callout type="error" msg={errMsg} />}
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="flex flex-col items-center mt-24">
-      <img src={SAILogo} className="h-20 mb-4" />
+    <main className="flex flex-col items-center pt-24">
+      <img src={SAILogo} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <div className="mb-4">
           <Text size="2">
@@ -112,8 +114,8 @@ export default function ForgotPassword() {
             Request password
           </Button>
         </div>
-        {errMsg && <ErrorCallout msg={errMsg} />}
+        {errMsg && <Callout type="error" msg={errMsg} />}
       </form>
-    </div>
+    </main>
   );
 }

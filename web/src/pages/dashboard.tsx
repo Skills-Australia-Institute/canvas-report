@@ -17,7 +17,7 @@ export default function Dashboard() {
           <div className="flex h-12 p-4 justify-end border-b items-center">
             <TopBar />
           </div>
-          <div className="flex flex-1  p-4">
+          <div className="flex flex-1 p-4">
             <Outlet />
           </div>
           <div className="flex p-3 justify-center">
