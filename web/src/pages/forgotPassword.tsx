@@ -14,6 +14,8 @@ const formSchema = z.object({
     .min(1, { message: 'Valid email is required.' }),
 });
 
+const redirect = 'https://skillsaustralia.netlify.app/reset-password';
+
 export default function ForgotPassword() {
   const supabase = useSupabase();
   const [errMsg, setErrMsg] = useState('');
@@ -33,7 +35,9 @@ export default function ForgotPassword() {
   async function onSubmit({ email }: z.infer<typeof formSchema>) {
     setErrMsg('');
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirect,
+      });
 
       if (!error) {
         return setSuccess(true);
