@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import SAILogo from '../assets/sai-logo.png';
+import SAILogoFull from '../assets/sai-logo-full.png';
 import Callout from '../components/callout';
 import { useSupabase } from '../hooks/supabase';
 
@@ -61,7 +61,7 @@ export default function ResetPassword() {
 
   return (
     <main className="flex flex-col items-center pt-24">
-      <img src={SAILogo} className="h-20 mb-6" />
+      <img src={SAILogoFull} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <Controller
           name="password"
