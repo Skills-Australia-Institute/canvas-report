@@ -61,7 +61,7 @@ export default function ResetPassword() {
 
   return (
     <main className="flex flex-col items-center pt-24">
-      <img src={SAILogo} className="h-20 mb-4" />
+      <img src={SAILogo} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <Controller
           name="password"
