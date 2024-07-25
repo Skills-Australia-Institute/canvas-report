@@ -61,25 +61,19 @@ export default function Account() {
 
 function CoursesTable({ courses }: { courses: Course[] }) {
   return (
-    <ScrollArea scrollbars="both" className="pr-4 mt-4" style={{ height: 600 }}>
+    <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
       <Table.Root size="1">
         <Table.Header>
           <Table.Row>
-            <Table.ColumnHeaderCell className="text-xs">
-              Name
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-xs">
-              Status
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-xs">
-              Code
-            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Code</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {courses.map((c) => (
             <Table.Row key={c.id}>
-              <Table.Cell className="text-xs">
+              <Table.Cell>
                 <a
                   href={`/courses/${c.id}`}
                   className="hover:underline cursor-pointer"
@@ -87,14 +81,14 @@ function CoursesTable({ courses }: { courses: Course[] }) {
                   {c.name}
                 </a>
               </Table.Cell>
-              <Table.Cell className="text-xs">
+              <Table.Cell>
                 <Badge
                   color={c.workflow_state === 'available' ? 'green' : 'orange'}
                 >
                   {c.workflow_state}
                 </Badge>
               </Table.Cell>
-              <Table.Cell className="text-xs">{c.course_code}</Table.Cell>
+              <Table.Cell>{c.course_code}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>

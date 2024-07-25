@@ -68,21 +68,15 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Name
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Account
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Status
-                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {data.map((c) => (
                 <Table.Row key={c.id}>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
                     <a
                       className="hover:underline cursor-pointer"
                       href={`/courses/${c.id}`}
@@ -90,7 +84,7 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
                       {c.name}
                     </a>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
                     <a
                       className="hover:underline cursor-pointer"
                       href={`/accounts/${c.account_id}`}
@@ -98,7 +92,7 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
                       {c.account_name}
                     </a>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
                     <Badge color="green">{c.workflow_state}</Badge>
                   </Table.Cell>
                 </Table.Row>

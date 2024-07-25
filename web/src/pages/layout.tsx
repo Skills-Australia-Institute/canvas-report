@@ -1,5 +1,4 @@
 import { PropsWithChildren } from 'react';
-import Footer from '../components/footer';
 import SideBar from '../components/sideBar';
 import TopBar from '../components/topBar';
 
@@ -18,9 +17,6 @@ export default function Layout({ children }: PropsWithChildren) {
             <TopBar />
           </div>
           <div className="flex flex-1 p-4">{children}</div>
-          <div className="flex p-3 justify-center">
-            <Footer />
-          </div>
         </div>
       </div>
     </main>

@@ -35,30 +35,14 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Account
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Course
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Assignment
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Section
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Total
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Score
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Status
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Enrollment
-                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Assignment</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Section</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Total</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Score</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Enrollment</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -70,32 +54,46 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
                       : d.account + d.course_name + d.section + d.title
                   }
                 >
-                  <Table.Cell className="text-xs">{d.account}</Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell className="max-w-sm">{d.account}</Table.Cell>
+                  <Table.Cell className="max-w-sm">
                     <Text
                       className={d.course_name === 'Total' ? 'font-bold' : ''}
                     >
                       {d.course_name}
                     </Text>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">{d.title}</Table.Cell>
-                  <Table.Cell className="text-xs">{d.section}</Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell className="max-w-sm">{d.title}</Table.Cell>
+                  <Table.Cell>{d.section}</Table.Cell>
+                  <Table.Cell>
                     <Text
                       className={d.course_name === 'Total' ? 'font-bold' : ''}
                     >
                       {d.points_possible}
                     </Text>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
                     <Text
                       className={d.course_name === 'Total' ? 'font-bold' : ''}
                     >
                       {d.score && Math.round(d.score * 100) / 100}
                     </Text>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">{d.status}</Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
+                    {d.course_name !== 'Total' && (
+                      <Badge
+                        color={
+                          d.status === 'on_time'
+                            ? 'blue'
+                            : d.status === 'late'
+                            ? 'red'
+                            : 'gray'
+                        }
+                      >
+                        {d.status}
+                      </Badge>
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>
                     {d.course_name !== 'Total' && (
                       <Badge
                         color={

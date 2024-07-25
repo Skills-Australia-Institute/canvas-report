@@ -37,45 +37,31 @@ export default function EnrollmentsResultsByUser({
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Account
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Course
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Section
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Grade
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Score
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Enrollment
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Grade URL
-                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Section</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Grade</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Score</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Enrollment</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Grade URL</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {data.map((d) => (
                 <Table.Row key={d.name + d.course_name + d.section}>
-                  <Table.Cell className="text-xs">{d.account}</Table.Cell>
-                  <Table.Cell className="text-xs">{d.course_name}</Table.Cell>
-                  <Table.Cell className="text-xs">{d.section}</Table.Cell>
-                  <Table.Cell className="text-xs">{d.current_grade}</Table.Cell>
-                  <Table.Cell className="text-xs">{d.current_score}</Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>{d.account}</Table.Cell>
+                  <Table.Cell>{d.course_name}</Table.Cell>
+                  <Table.Cell>{d.section}</Table.Cell>
+                  <Table.Cell>{d.current_grade}</Table.Cell>
+                  <Table.Cell>{d.current_score}</Table.Cell>
+                  <Table.Cell>
                     <Badge
                       color={d.enrollment_state === 'active' ? 'green' : 'teal'}
                     >
                       {d.enrollment_state}
                     </Badge>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
                     <a
                       href={d.grades_url}
                       target="_blank"
