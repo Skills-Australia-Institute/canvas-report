@@ -46,4 +46,3 @@ functions:
             origin: '${self:custom.secrets.SAI_URL}'
             headers:
               - '*'
-            allowCredentials: true
