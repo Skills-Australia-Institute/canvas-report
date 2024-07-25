@@ -65,27 +65,17 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Name
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Status
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  SIS ID
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Email
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Integration
-                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>SIS ID</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Email</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Integration</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {data.map((u) => (
                 <Table.Row key={u.id}>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
                     <a
                       className="hover:underline cursor-pointer"
                       href={`/users/${u.id}`}
@@ -93,7 +83,7 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
                       {u.name}
                     </a>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>
                     <Badge
                       color={
                         u.workflow_state == 'registered' ? 'green' : 'amber'
@@ -102,11 +92,9 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
                       {u.workflow_state}
                     </Badge>
                   </Table.Cell>
-                  <Table.Cell className="text-xs">{u.sis_user_id}</Table.Cell>
-                  <Table.Cell className="text-xs">{u.unique_id}</Table.Cell>
-                  <Table.Cell className="text-xs">
-                    {u.integration_id}
-                  </Table.Cell>
+                  <Table.Cell>{u.sis_user_id}</Table.Cell>
+                  <Table.Cell>{u.unique_id}</Table.Cell>
+                  <Table.Cell>{u.integration_id}</Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>

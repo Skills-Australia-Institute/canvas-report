@@ -51,41 +51,25 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Account
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Course
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Name
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Section
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Needs Grading
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Teachers
-                </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell className="text-xs">
-                  Gradebook URL
-                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Section</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Needs Grading</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Teachers</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Gradebook URL</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {allData.map((a) => (
                 <Table.Row key={a.account + a.course_name + a.section + a.name}>
-                  <Table.Cell className="text-xs">{a.account}</Table.Cell>
-                  <Table.Cell className="text-xs">{a.course_name}</Table.Cell>
-                  <Table.Cell className="text-xs">{a.name}</Table.Cell>
-                  <Table.Cell className="text-xs">{a.section}</Table.Cell>
-                  <Table.Cell className="text-xs">
-                    {a.needs_grading_section}
-                  </Table.Cell>
-                  <Table.Cell className="text-xs">{a.teachers}</Table.Cell>
-                  <Table.Cell className="text-xs">
+                  <Table.Cell>{a.account}</Table.Cell>
+                  <Table.Cell>{a.course_name}</Table.Cell>
+                  <Table.Cell>{a.name}</Table.Cell>
+                  <Table.Cell>{a.section}</Table.Cell>
+                  <Table.Cell>{a.needs_grading_section}</Table.Cell>
+                  <Table.Cell>{a.teachers}</Table.Cell>
+                  <Table.Cell>
                     <a
                       href={a.gradebook_url}
                       target="_blank"
@@ -105,7 +89,7 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
           <Progress
             value={(successCount / account.courses.length) * 100}
             size="3"
-            className="max-w-60"
+            className="max-w-lg"
             color="green"
           />
         )}

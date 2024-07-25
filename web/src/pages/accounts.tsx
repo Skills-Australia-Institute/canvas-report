@@ -39,16 +39,16 @@ export default function Accounts() {
   return (
     <div className="w-full">
       <OutletHeader title="Accounts" />
+      <SearchBox<Account>
+        data={data ?? []}
+        filterKey="name"
+        updateFiltered={(filteredData: Account[]) =>
+          setDisplayedData(filteredData)
+        }
+        className="max-w-lg"
+      />
       {displayedData.length > 0 && (
         <>
-          <SearchBox<Account>
-            data={data ?? []}
-            filterKey="name"
-            updateFiltered={(filteredData: Account[]) =>
-              setDisplayedData(filteredData)
-            }
-            className="max-w-lg"
-          />
           <ScrollArea
             scrollbars="both"
             className="pr-4 mt-4"
@@ -57,21 +57,15 @@ export default function Accounts() {
             <Table.Root size="1">
               <Table.Header>
                 <Table.Row>
-                  <Table.ColumnHeaderCell className="text-xs">
-                    Account
-                  </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="text-xs">
-                    State
-                  </Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell className="text-xs">
-                    Total Courses
-                  </Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell>State</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell>Courses</Table.ColumnHeaderCell>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
                 {displayedData.map((a) => (
                   <Table.Row key={a.id}>
-                    <Table.Cell className="text-xs">
+                    <Table.Cell>
                       <a
                         className="hover:underline cursor-pointer"
                         href={`/accounts/${a.id}`}
@@ -79,7 +73,7 @@ export default function Accounts() {
                         {a.name}
                       </a>
                     </Table.Cell>
-                    <Table.Cell className="text-xs">
+                    <Table.Cell>
                       <Badge
                         color={
                           a.workflow_state === 'active' ? 'green' : 'orange'
@@ -88,9 +82,7 @@ export default function Accounts() {
                         {a.workflow_state}
                       </Badge>
                     </Table.Cell>
-                    <Table.Cell className="text-xs">
-                      {a.courses_count}
-                    </Table.Cell>
+                    <Table.Cell>{a.courses_count}</Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
