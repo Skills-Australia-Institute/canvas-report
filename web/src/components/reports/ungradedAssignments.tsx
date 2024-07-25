@@ -4,7 +4,7 @@ import { CSVLink } from 'react-csv';
 import { getUngradedAssignmentsByCourseID } from '../../api/assignments';
 import { Account } from '../../entities/supabase/account';
 import { useSupabase } from '../../hooks/supabase';
-import { getDateTimeString } from '../../utils';
+import { getDateTimeString, getFormattedName } from '../../utils';
 import Loading from '../loading';
 
 interface IUngradedAssignments {
@@ -40,6 +40,8 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
 
   const allData = data.flat();
 
+  const accountName = getFormattedName(account.name);
+
   if (pending) {
     <Loading />;
   }
@@ -63,12 +65,12 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
             <Table.Body>
               {allData.map((a) => (
                 <Table.Row key={a.account + a.course_name + a.section + a.name}>
-                  <Table.Cell>{a.account}</Table.Cell>
-                  <Table.Cell>{a.course_name}</Table.Cell>
-                  <Table.Cell>{a.name}</Table.Cell>
-                  <Table.Cell>{a.section}</Table.Cell>
+                  <Table.Cell className="max-w-sm">{a.account}</Table.Cell>
+                  <Table.Cell className="max-w-sm">{a.course_name}</Table.Cell>
+                  <Table.Cell className="max-w-sm">{a.name}</Table.Cell>
+                  <Table.Cell className="max-w-sm">{a.section}</Table.Cell>
                   <Table.Cell>{a.needs_grading_section}</Table.Cell>
-                  <Table.Cell>{a.teachers}</Table.Cell>
+                  <Table.Cell className="max-w-sm">{a.teachers}</Table.Cell>
                   <Table.Cell>
                     <a
                       href={a.gradebook_url}
@@ -89,25 +91,39 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
           <Progress
             value={(successCount / account.courses.length) * 100}
             size="3"
-            className="max-w-lg"
+            className="w-full mt-4"
             color="green"
           />
         )}
         {isAllSuccess && (
           <>
             <CSVLink
-              data={allData}
+              data={allData.filter(
+                (d) =>
+                  !(
+                    d.section.includes('ADL') ||
+                    d.section.includes('Adl') ||
+                    d.section.includes('ADELAIDE') ||
+                    d.section.includes('Adelaide')
+                  )
+              )}
               headers={headers}
-              filename={`${name}-enrollments_results-${getDateTimeString()}`}
+              filename={`${accountName}_Perth_enrollments_results-${getDateTimeString()}`}
             >
               <Button className="cursor-pointer mr-4" color="teal">
                 Download Perth
               </Button>
             </CSVLink>
             <CSVLink
-              data={allData}
+              data={allData.filter(
+                (d) =>
+                  d.section.includes('ADL') ||
+                  d.section.includes('Adl') ||
+                  d.section.includes('ADELAIDE') ||
+                  d.section.includes('Adelaide')
+              )}
               headers={headers}
-              filename={`${name}-enrollments_results-${getDateTimeString()}`}
+              filename={`${accountName}_Adelaide_enrollments_results-${getDateTimeString()}`}
             >
               <Button className="cursor-pointer" color="cyan">
                 Download Adelaide
@@ -122,47 +138,47 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
 
 const headers = [
   {
-    label: 'SIS ID',
-    key: 'sis_id',
-  },
-  {
-    label: 'Name',
-    key: 'name',
-  },
-  {
     label: 'Account',
     key: 'account',
   },
   {
-    label: 'Course Name',
+    label: 'Course',
     key: 'course_name',
+  },
+  {
+    label: 'Assignment',
+    key: 'name',
   },
   {
     label: 'Section',
     key: 'section',
   },
   {
-    label: 'Enrollment State',
-    key: 'enrollment_state',
+    label: 'Needs Grading',
+    key: 'needs_grading_section',
   },
   {
-    label: 'Course State',
-    key: 'course_state',
+    label: 'Teachers',
+    key: 'teachers',
   },
   {
-    label: 'Current Grade',
-    key: 'current_grade',
+    label: 'Due',
+    key: 'due_at',
   },
   {
-    label: 'Current Score',
-    key: 'current_score',
+    label: 'Available From',
+    key: 'unlock_at',
   },
   {
-    label: 'Enrollment Role',
-    key: 'enrollment_role',
+    label: 'Until',
+    key: 'lock_at',
   },
   {
-    label: 'Grades URL',
-    key: 'grades_url',
+    label: 'Published',
+    key: 'published',
+  },
+  {
+    label: 'Gradebook URL',
+    key: 'gradebook_url',
   },
 ];
