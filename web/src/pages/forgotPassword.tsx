@@ -29,14 +29,11 @@ export default function ForgotPassword() {
       email: 'john@skillsaustralia.edu.au',
     },
   });
-  const redirect = '/reset-password';
 
   async function onSubmit({ email }: z.infer<typeof formSchema>) {
     setErrMsg('');
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirect,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
 
       if (!error) {
         return setSuccess(true);
@@ -51,7 +48,7 @@ export default function ForgotPassword() {
   if (success) {
     return (
       <main className="flex flex-col items-center pt-24">
-        <img src={SAILogo} className="h-20 mb-4" />
+        <img src={SAILogo} className="h-20 mb-6" />
         <div className="w-96 p-2">
           <p className="mb-4">
             A password reset link has been emailed. This link will redirect you
@@ -81,8 +78,8 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="flex flex-col items-center mt-24">
-      <img src={SAILogo} className="h-20 mb-4" />
+    <main className="flex flex-col items-center pt-24">
+      <img src={SAILogo} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <div className="mb-4">
           <Text size="2">
@@ -115,6 +112,6 @@ export default function ForgotPassword() {
         </div>
         {errMsg && <Callout type="error" msg={errMsg} />}
       </form>
-    </div>
+    </main>
   );
 }
