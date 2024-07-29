@@ -17,3 +17,10 @@ export const ACTIONS = {
     value: 'Enrollments results',
   },
 };
+
+export const APP_ROLES = [
+  'Superadmin',
+  'Admin',
+  'Compliance',
+  'Student Services',
+];

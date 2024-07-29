@@ -41,8 +41,13 @@ export default function Account() {
       <OutletHeader title="Accounts" subTitle={data?.name} />
       <Tabs.Root>
         <Tabs.List>
-          <Tabs.Trigger value="Courses">Courses</Tabs.Trigger>
-          <Tabs.Trigger value={ACTIONS.UngradedAssignments.key}>
+          <Tabs.Trigger value="Courses" className="cursor-pointer">
+            Courses
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value={ACTIONS.UngradedAssignments.key}
+            className="cursor-pointer"
+          >
             {ACTIONS.UngradedAssignments.value}
           </Tabs.Trigger>
         </Tabs.List>

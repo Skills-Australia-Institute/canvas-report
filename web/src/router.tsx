@@ -8,6 +8,7 @@ import Dashboard from './pages/dashboard';
 import ForgotPassword from './pages/forgotPassword';
 import Login from './pages/login';
 import NotFound from './pages/notFound';
+import Profile from './pages/profile';
 import ResetPassword from './pages/resetPassword';
 import User from './pages/user';
 import Users from './pages/users';
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
     ),
     errorElement: <NotFound />,
     children: [
+      {
+        path: '/profile',
+        element: <Profile />,
+      },
       {
         path: 'accounts/:accountID',
         element: <Account />,

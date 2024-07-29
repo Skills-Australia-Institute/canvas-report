@@ -25,10 +25,14 @@ export default function SessionProvider(props: PropsWithChildren) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase.auth]);
 
   if (loading) {
-    return <Loading />;
+    return (
+      <main className="flex flex-col h-screen">
+        <Loading />
+      </main>
+    );
   }
 
   return (

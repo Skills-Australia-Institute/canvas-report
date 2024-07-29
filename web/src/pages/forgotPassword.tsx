@@ -3,7 +3,7 @@ import { Button, Text, TextField } from '@radix-ui/themes';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import SAILogo from '../assets/sai-logo.png';
+import SAILogoFull from '../assets/sai-logo-full.png';
 import Callout from '../components/callout';
 import { useSupabase } from '../hooks/supabase';
 
@@ -52,7 +52,7 @@ export default function ForgotPassword() {
   if (success) {
     return (
       <main className="flex flex-col items-center pt-24">
-        <img src={SAILogo} className="h-20 mb-6" />
+        <img src={SAILogoFull} className="h-20 mb-6" />
         <div className="w-96 p-2">
           <p className="mb-4">
             A password reset link has been emailed. This link will redirect you
@@ -83,7 +83,7 @@ export default function ForgotPassword() {
 
   return (
     <main className="flex flex-col items-center pt-24">
-      <img src={SAILogo} className="h-20 mb-6" />
+      <img src={SAILogoFull} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <div className="mb-4">
           <Text size="2">

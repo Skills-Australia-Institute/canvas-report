@@ -30,7 +30,7 @@ func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{saiUrl},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
+		AllowedHeaders:   []string{"Origin", "X-Requested-With", "Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))

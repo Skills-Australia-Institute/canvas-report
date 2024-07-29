@@ -42,7 +42,10 @@ export default function Course() {
       <OutletHeader title="Accounts" subTitle={data?.name || undefined} />
       <Tabs.Root>
         <Tabs.List>
-          <Tabs.Trigger value={ACTIONS.UngradedAssignments.key}>
+          <Tabs.Trigger
+            value={ACTIONS.UngradedAssignments.key}
+            className="cursor-pointer"
+          >
             {ACTIONS.UngradedAssignments.value}
           </Tabs.Trigger>
         </Tabs.List>

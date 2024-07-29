@@ -5,14 +5,18 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import SAILogo from '../assets/sai-logo.png';
+import SAILogoFull from '../assets/sai-logo-full.png';
 import Callout from '../components/callout';
 import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z
   .object({
-    password: z.string().min(1, { message: 'Password is required.' }),
-    confirmPassword: z.string().min(1, { message: 'Password is required.' }),
+    password: z
+      .string()
+      .min(6, { message: 'Minimum of 6 characters is required.' }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: 'Minimum of 6 characters is required.' }),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
@@ -61,7 +65,7 @@ export default function ResetPassword() {
 
   return (
     <main className="flex flex-col items-center pt-24">
-      <img src={SAILogo} className="h-20 mb-6" />
+      <img src={SAILogoFull} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <Controller
           name="password"

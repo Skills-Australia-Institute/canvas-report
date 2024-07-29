@@ -44,10 +44,16 @@ export default function User() {
       <OutletHeader title="Users" subTitle={data?.name} />
       <Tabs.Root>
         <Tabs.List>
-          <Tabs.Trigger value={ACTIONS.EnrollmentsResultsByUser.key}>
+          <Tabs.Trigger
+            value={ACTIONS.EnrollmentsResultsByUser.key}
+            className="cursor-pointer"
+          >
             {ACTIONS.EnrollmentsResultsByUser.value}
           </Tabs.Trigger>
-          <Tabs.Trigger value={ACTIONS.AssignmentsResultsByUser.key}>
+          <Tabs.Trigger
+            value={ACTIONS.AssignmentsResultsByUser.key}
+            className="cursor-pointer"
+          >
             {ACTIONS.AssignmentsResultsByUser.value}
           </Tabs.Trigger>
         </Tabs.List>

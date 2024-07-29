@@ -5,13 +5,13 @@ import SessionProvider from './providers/session';
 
 function App() {
   return (
-    <SessionProvider>
-      <Theme>
+    <Theme>
+      <SessionProvider>
         <ReactQueryClientProvider>
           <RouterProvider />
         </ReactQueryClientProvider>
-      </Theme>
-    </SessionProvider>
+      </SessionProvider>
+    </Theme>
   );
 }
 
