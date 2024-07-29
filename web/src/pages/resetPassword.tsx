@@ -11,8 +11,12 @@ import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z
   .object({
-    password: z.string().min(1, { message: 'Password is required.' }),
-    confirmPassword: z.string().min(1, { message: 'Password is required.' }),
+    password: z
+      .string()
+      .min(6, { message: 'Minimum of 6 characters is required.' }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: 'Minimum of 6 characters is required.' }),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
