@@ -1,7 +1,8 @@
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
-import { Badge, ScrollArea, Table, TextField } from '@radix-ui/themes';
+import { Badge, ScrollArea, Table, Text, TextField } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getCoursesBySearchTerm } from '../api/supabase/courses';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
@@ -44,6 +45,7 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
     queryFn: () => getCoursesBySearchTerm(supabase, searchTerm),
     enabled: searchTerm.length > 4,
   });
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <Loading />;
@@ -77,20 +79,20 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
               {data.map((c) => (
                 <Table.Row key={c.id}>
                   <Table.Cell>
-                    <a
+                    <Text
                       className="hover:underline cursor-pointer"
-                      href={`/courses/${c.id}`}
+                      onClick={() => navigate(`/courses/${c.id}`)}
                     >
                       {c.name}
-                    </a>
+                    </Text>
                   </Table.Cell>
                   <Table.Cell>
-                    <a
+                    <Text
                       className="hover:underline cursor-pointer"
-                      href={`/accounts/${c.account_id}`}
+                      onClick={() => navigate(`/accounts/${c.account_id}`)}
                     >
                       {c.account_name}
-                    </a>
+                    </Text>
                   </Table.Cell>
                   <Table.Cell>
                     <Badge color="green">{c.workflow_state}</Badge>

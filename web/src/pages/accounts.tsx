@@ -1,6 +1,7 @@
-import { Badge, ScrollArea, Table } from '@radix-ui/themes';
+import { Badge, ScrollArea, Table, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAccounts } from '../api/supabase/accounts';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
@@ -16,6 +17,7 @@ export default function Accounts() {
     queryFn: () => getAccounts(supabase),
   });
   const [displayedData, setDisplayedData] = useState<Account[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (data) {
@@ -66,12 +68,12 @@ export default function Accounts() {
                 {displayedData.map((a) => (
                   <Table.Row key={a.id}>
                     <Table.Cell>
-                      <a
+                      <Text
                         className="hover:underline cursor-pointer"
-                        href={`/accounts/${a.id}`}
+                        onClick={() => navigate(`/accounts/${a.id}`)}
                       >
                         {a.name}
-                      </a>
+                      </Text>
                     </Table.Cell>
                     <Table.Cell>
                       <Badge
