@@ -18,8 +18,8 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
       ? account.courses.map((course) => {
           return {
             queryKey: ['courses', course.id, 'ungraded-assignments'],
-            queryFn: () =>
-              getUngradedAssignmentsByCourseID(supabase, course.id),
+            queryFn: ({ signal }: { signal: AbortSignal }) =>
+              getUngradedAssignmentsByCourseID(signal, supabase, course.id),
           };
         })
       : [],
