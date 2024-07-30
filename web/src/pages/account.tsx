@@ -39,7 +39,7 @@ export default function Account() {
   return (
     <div className="w-full">
       <OutletHeader title="Accounts" subTitle={data?.name} />
-      <Tabs.Root>
+      <Tabs.Root defaultValue="Courses">
         <Tabs.List>
           <Tabs.Trigger value="Courses" className="cursor-pointer">
             Courses
