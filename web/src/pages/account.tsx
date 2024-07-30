@@ -1,6 +1,6 @@
-import { Badge, Box, ScrollArea, Table, Tabs } from '@radix-ui/themes';
+import { Badge, Box, ScrollArea, Table, Tabs, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getAccountByID } from '../api/supabase/accounts';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
@@ -65,6 +65,7 @@ export default function Account() {
 }
 
 function CoursesTable({ courses }: { courses: Course[] }) {
+  const navigate = useNavigate();
   return (
     <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
       <Table.Root size="1">
@@ -79,12 +80,12 @@ function CoursesTable({ courses }: { courses: Course[] }) {
           {courses.map((c) => (
             <Table.Row key={c.id}>
               <Table.Cell>
-                <a
-                  href={`/courses/${c.id}`}
+                <Text
                   className="hover:underline cursor-pointer"
+                  onClick={() => navigate(`/courses/${c.id}`)}
                 >
                   {c.name}
-                </a>
+                </Text>
               </Table.Cell>
               <Table.Cell>
                 <Badge

@@ -14,7 +14,7 @@ export const getCoursesByAccountID = async (
       .eq('workflow_state', 'available');
 
     if (error) {
-      throw Error(error.message);
+      throw new Error(error.message);
     }
 
     return data as Course[];
@@ -35,7 +35,7 @@ export const getCoursesBySearchTerm = async (
       });
 
     if (error) {
-      throw Error(error.message);
+      throw new Error(error.message);
     }
 
     return data as Course[];
@@ -53,7 +53,7 @@ export const getCourseByID = async (supabase: SupabaseClient, id: number) => {
       });
 
     if (error) {
-      throw Error(error.message);
+      throw new Error(error.message);
     }
 
     return data as Course;

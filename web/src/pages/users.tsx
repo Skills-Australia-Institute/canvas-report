@@ -1,7 +1,8 @@
 import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
-import { Badge, ScrollArea, Table, TextField } from '@radix-ui/themes';
+import { Badge, ScrollArea, Table, Text, TextField } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getUsersBySearchTerm } from '../api/supabase/users';
 import Callout from '../components/callout';
 import Loading from '../components/loading';
@@ -44,6 +45,7 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
     queryFn: () => getUsersBySearchTerm(supabase, searchTerm),
     enabled: searchTerm.length > 4,
   });
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <Loading />;
@@ -76,12 +78,12 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
               {data.map((u) => (
                 <Table.Row key={u.id}>
                   <Table.Cell>
-                    <a
+                    <Text
                       className="hover:underline cursor-pointer"
-                      href={`/users/${u.id}`}
+                      onClick={() => navigate(`/users/${u.id}`)}
                     >
                       {u.name}
-                    </a>
+                    </Text>
                   </Table.Cell>
                   <Table.Cell>
                     <Badge

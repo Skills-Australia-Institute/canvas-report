@@ -1,29 +1,34 @@
 import { CaretRightIcon } from '@radix-ui/react-icons';
-import { Heading } from '@radix-ui/themes';
-import { useLocation } from 'react-router-dom';
+import { Heading, Text } from '@radix-ui/themes';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface IOutletHeader {
   title: string;
   subTitle?: string;
 }
+
 export default function OutletHeader({ title, subTitle }: IOutletHeader) {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   return (
     <div className="mb-2">
       <Heading size="3" className="inline">
-        <a
+        <Text
           className="hover:underline cursor-pointer"
-          href={`/${title.toLowerCase()}`}
+          onClick={() => navigate(`/${title.toLowerCase()}`)}
         >
           {title}
-        </a>
+        </Text>
       </Heading>
       {subTitle && (
         <Heading size="2" className="inline">
           <CaretRightIcon className="inline mx-2" />
-          <a href={pathname} className="hover:underline cursor-pointer">
+          <Text
+            className="hover:underline cursor-pointer"
+            onClick={() => navigate(pathname)}
+          >
             {subTitle}
-          </a>
+          </Text>
         </Heading>
       )}
     </div>
