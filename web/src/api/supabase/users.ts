@@ -13,7 +13,7 @@ export const getUserByID = async (supabase: SupabaseClient, id: number) => {
       .single();
 
     if (error) {
-      throw Error(error.message);
+      throw new Error(error.message);
     }
 
     return data as User;
@@ -34,7 +34,7 @@ export const getUsersBySearchTerm = async (
       });
 
     if (error) {
-      throw Error(error.message);
+      throw new Error(error.message);
     }
 
     return data as User[];

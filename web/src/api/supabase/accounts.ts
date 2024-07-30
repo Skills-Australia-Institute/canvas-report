@@ -7,7 +7,7 @@ export const getAccounts = async (supabase: SupabaseClient) => {
     const { data, error } = await supabase.schema('canvas').rpc('get_accounts');
 
     if (error) {
-      throw Error(error.message);
+      throw new Error(error.message);
     }
 
     return data as Account[];
@@ -31,7 +31,7 @@ export const getAccountByID = async (supabase: SupabaseClient, id: number) => {
       .single();
 
     if (accountQueryError) {
-      throw Error(accountQueryError.message);
+      throw new Error(accountQueryError.message);
     }
 
     const courses = await getCoursesByAccountID(supabase, account.id);
