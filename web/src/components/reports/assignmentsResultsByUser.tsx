@@ -105,7 +105,10 @@ export function AssignmentsResultsByUser({
                       </Badge>
                     )}
                   </Table.Cell>
-                  <Table.Cell className="max-w-sm">{d.submitted_at}</Table.Cell>
+                  <Table.Cell className="max-w-sm">
+                    {d.submitted_at !== '' &&
+                      new Date(d.submitted_at).toLocaleString()}
+                  </Table.Cell>
                   <Table.Cell>
                     {d.course_name !== 'Total' && (
                       <Badge
