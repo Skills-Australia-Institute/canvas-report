@@ -31,3 +31,10 @@ export const APP_ROLES = [
   'Admin',
   'Student Services',
 ];
+
+export enum AppRole {
+  Superadmin = 'Superadmin',
+  Admin = 'Admin',
+  Compliance = 'Compliance',
+  StudentServices = 'Student Services',
+}

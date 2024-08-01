@@ -7,6 +7,7 @@ import {
 import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SAILogo from '../assets/sai-logo.png';
+import { AppRole } from '../constants';
 import { useAuth } from '../hooks/auth';
 
 const navs = [
@@ -43,7 +44,7 @@ export default function SideBar() {
       {navs.map((n) => (
         <SideNav key={n.path} navigation={n} />
       ))}
-      {user?.app_role === 'Superadmin' && (
+      {user?.app_role === AppRole.Superadmin && (
         <SideNav
           key={'/app'}
           navigation={{

@@ -6,12 +6,14 @@ import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import UngradedAssignments from '../components/reports/ungradedAssignments';
-import { ACTIONS } from '../constants';
+import { ACTIONS, AppRole } from '../constants';
 import { Course } from '../entities/courses';
+import { useAuth } from '../hooks/auth';
 import { useSupabase } from '../hooks/supabase';
 
 export default function Account() {
   const { accountID } = useParams();
+  const { user } = useAuth();
   const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
     queryKey: ['accounts', accountID],
@@ -44,20 +46,24 @@ export default function Account() {
           <Tabs.Trigger value="Courses" className="cursor-pointer">
             Courses
           </Tabs.Trigger>
-          <Tabs.Trigger
-            value={ACTIONS.UngradedAssignments.key}
-            className="cursor-pointer"
-          >
-            {ACTIONS.UngradedAssignments.value}
-          </Tabs.Trigger>
+          {user?.app_role !== AppRole.StudentServices && (
+            <Tabs.Trigger
+              value={ACTIONS.UngradedAssignments.key}
+              className="cursor-pointer"
+            >
+              {ACTIONS.UngradedAssignments.value}
+            </Tabs.Trigger>
+          )}
         </Tabs.List>
         <Box pt="2">
           <Tabs.Content value="Courses">
             {data?.courses && <CoursesTable courses={data.courses} />}
           </Tabs.Content>
-          <Tabs.Content value={ACTIONS.UngradedAssignments.key}>
-            {data && <UngradedAssignments account={data} />}
-          </Tabs.Content>
+          {user?.app_role !== AppRole.StudentServices && (
+            <Tabs.Content value={ACTIONS.UngradedAssignments.key}>
+              {data && <UngradedAssignments account={data} />}
+            </Tabs.Content>
+          )}
         </Box>
       </Tabs.Root>
     </div>
