@@ -5,7 +5,6 @@ import { getUngradedAssignmentsByCourseID } from '../../api/assignments';
 import { Account } from '../../entities/supabase/account';
 import { useSupabase } from '../../hooks/supabase';
 import { getDateTimeString, getFormattedName } from '../../utils';
-import Loading from '../loading';
 
 interface IUngradedAssignments {
   account: Account;
@@ -13,7 +12,7 @@ interface IUngradedAssignments {
 
 export default function UngradedAssignments({ account }: IUngradedAssignments) {
   const supabase = useSupabase();
-  const { pending, data, isAllSuccess, successCount } = useQueries({
+  const { data, isAllSuccess, successCount } = useQueries({
     queries: account.courses
       ? account.courses.map((course) => {
           return {
@@ -26,7 +25,6 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
     combine: (results) => {
       return {
         data: results.map((result) => (result.data ? result.data : [])),
-        pending: results.some((result) => result.isPending),
         isAllSuccess: results.every((result) => result.isSuccess),
         successCount: results.reduce((total, result) => {
           if (result.isSuccess) {
@@ -41,10 +39,6 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
   const allData = data.flat();
 
   const accountName = getFormattedName(account.name);
-
-  if (pending) {
-    <Loading />;
-  }
 
   return (
     <div>
@@ -91,7 +85,7 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
           <Progress
             value={(successCount / account.courses.length) * 100}
             size="3"
-            className="w-full mt-4"
+            className="max-w-lg mt-4"
             color="green"
           />
         )}
