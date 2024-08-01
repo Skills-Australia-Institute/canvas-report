@@ -62,3 +62,34 @@ export const getAssignmentsResultsByUserID = async (
     throw err as Error;
   }
 };
+
+export const getUngradedAssignmentsByAccountID = async (
+  signal: AbortSignal,
+  supabase: SupabaseClient,
+  accountID: number
+) => {
+  try {
+    const accessToken = (await supabase.auth.getSession()).data.session
+      ?.access_token;
+
+    const { data, status } = await axios(
+      `/accounts/${accountID}/ungraded-assignments`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        signal: signal,
+      }
+    );
+
+    if (status !== 200) {
+      throw new Error(
+        `Error fetching ungraded assignments of account: ${accountID}`
+      );
+    }
+
+    return data as UngradedAssignment[];
+  } catch (err) {
+    throw err as Error;
+  }
+};

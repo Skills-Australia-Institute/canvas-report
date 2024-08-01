@@ -1,49 +1,45 @@
-import { Button, Progress, ScrollArea, Table } from '@radix-ui/themes';
-import { useQueries } from '@tanstack/react-query';
+import { Button, ScrollArea, Table } from '@radix-ui/themes';
+import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
-import { getUngradedAssignmentsByCourseID } from '../../api/assignments';
+import { getUngradedAssignmentsByAccountID } from '../../api/assignments';
 import { Account } from '../../entities/supabase/account';
 import { useSupabase } from '../../hooks/supabase';
 import { getDateTimeString, getFormattedName } from '../../utils';
+import Callout from '../callout';
+import Loading from '../loading';
 
 interface IUngradedAssignments {
   account: Account;
 }
 
-export default function UngradedAssignments({ account }: IUngradedAssignments) {
+export default function UngradedAssignmentsByAccount({
+  account,
+}: IUngradedAssignments) {
   const supabase = useSupabase();
-  const { data, isAllSuccess, successCount } = useQueries({
-    queries: account.courses
-      ? account.courses.map((course) => {
-          return {
-            queryKey: ['courses', course.id, 'ungraded-assignments'],
-            queryFn: ({ signal }: { signal: AbortSignal }) =>
-              getUngradedAssignmentsByCourseID(signal, supabase, course.id),
-          };
-        })
-      : [],
-    combine: (results) => {
-      return {
-        data: results.map((result) => (result.data ? result.data : [])),
-        isAllSuccess: results.every((result) => result.isSuccess),
-        successCount: results.reduce((total, result) => {
-          if (result.isSuccess) {
-            total++;
-          }
-          return total;
-        }, 0),
-      };
-    },
+  const { isLoading, error, data } = useQuery({
+    queryKey: ['accounts', account.id, 'ungraded-assignments'],
+    queryFn: ({ signal }: { signal: AbortSignal }) =>
+      getUngradedAssignmentsByAccountID(signal, supabase, account.id),
   });
 
-  const allData = data.flat();
-
   const accountName = getFormattedName(account.name);
+
+  if (isLoading) {
+    return (
+      <div className="pt-10">
+        <Loading />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <Callout type="error" msg={error.message} />;
+  }
 
   return (
     <div>
       <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
-        {allData.length > 0 && (
+        {data && (
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
@@ -57,7 +53,7 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {allData.map((a) => (
+              {data.map((a) => (
                 <Table.Row key={a.account + a.course_name + a.section + a.name}>
                   <Table.Cell className="max-w-sm">{a.account}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.course_name}</Table.Cell>
@@ -81,18 +77,10 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
         )}
       </ScrollArea>
       <div className="mt-4 border-t pt-4">
-        {!isAllSuccess && account.courses && (
-          <Progress
-            value={(successCount / account.courses.length) * 100}
-            size="3"
-            className="max-w-lg mt-4"
-            color="green"
-          />
-        )}
-        {isAllSuccess && (
+        {data && (
           <>
             <CSVLink
-              data={allData.filter(
+              data={data.filter(
                 (d) =>
                   !(
                     d.section.includes('ADL') ||
@@ -109,7 +97,7 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
               </Button>
             </CSVLink>
             <CSVLink
-              data={allData.filter(
+              data={data.filter(
                 (d) =>
                   d.section.includes('ADL') ||
                   d.section.includes('Adl') ||

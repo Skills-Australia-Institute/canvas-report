@@ -21,7 +21,11 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
   const name = getFormattedName(user.name);
 
   if (isLoading) {
-    return <Loading />;
+    return (
+      <div className="pt-10">
+        <Loading />
+      </div>
+    );
   }
 
   if (error) {
