@@ -15,6 +15,10 @@ export const ACTIONS = {
     key: 'AssignmentsResultsByUser',
     value: 'Assignments results',
   },
+  UngradedAssignmentsResultsByUser: {
+    key: 'UngradedAssignmentsResultsByUser',
+    value: 'Ungraded assignments',
+  },
   EnrollmentsResultsByUser: {
     key: 'EnrollmentsResultsByUser',
     value: 'Enrollments results',
