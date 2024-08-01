@@ -107,8 +107,13 @@ function AuthUsersTable({ users }: { users: AuthUser[] }) {
                   {u.app_role}
                 </Badge>
               </Table.Cell>
-              <Table.Cell>{u.last_sign_in_at}</Table.Cell>
-              <Table.Cell>{u.created_at}</Table.Cell>
+              <Table.Cell>
+                {u.last_sign_in_at &&
+                  new Date(u.last_sign_in_at).toLocaleString()}
+              </Table.Cell>
+              <Table.Cell>
+                {u.created_at && new Date(u.created_at).toLocaleString()}
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
