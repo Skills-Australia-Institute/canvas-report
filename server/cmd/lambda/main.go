@@ -13,10 +13,13 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	chiadapter "github.com/awslabs/aws-lambda-go-api-proxy/chi"
+	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 var chiLambda *chiadapter.ChiLambda
+
+var validate *validator.Validate
 
 func init() {
 	canvasBaseUrl := os.Getenv("CANVAS_BASE_URL")
@@ -44,9 +47,24 @@ func init() {
 		log.Panic("missing env: SAI_URL")
 	}
 
+	clientID := os.Getenv("CANVAS_CLIENT_ID")
+	if clientID == "" {
+		log.Panic("missing env: CANVAS_CLIENT_ID")
+	}
+
+	clientSecret := os.Getenv("CANVAS_CLIENT_SECRET")
+	if clientSecret == "" {
+		log.Panic("missing env: CANVAS_CLIENT_SECRET")
+	}
+
+	redirectUri := os.Getenv("CANVAS_REDIRECT_URI")
+	if redirectUri == "" {
+		log.Panic("missing env: CANVAS_REDIRECT_URI")
+	}
+
 	canvasHtmlUrl := strings.TrimSuffix(canvasBaseUrl, "/api/v1")
 
-	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl)
+	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl, clientID, clientSecret, redirectUri)
 
 	supabaseBaseUrl := os.Getenv("SUPABASE_BASE_URL")
 	if supabaseBaseUrl == "" {
@@ -68,7 +86,7 @@ func init() {
 		log.Panic(err)
 	}
 
-	controller := api.NewAPIController(canvas, supabase)
+	controller := api.NewAPIController(canvas, supabase, validate)
 
 	router := api.NewRouter(controller, saiUrl)
 

@@ -48,6 +48,7 @@ export default function Accounts() {
           setDisplayedData(filteredData)
         }
         className="max-w-lg"
+        placeholder="Enter account name"
       />
       {displayedData.length > 0 && (
         <>

@@ -1,11 +1,13 @@
 import {
   AccessibilityIcon,
   BackpackIcon,
+  GearIcon,
   PersonIcon,
 } from '@radix-ui/react-icons';
 import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SAILogo from '../assets/sai-logo.png';
+import { useAuth } from '../hooks/auth';
 
 const navs = [
   {
@@ -27,6 +29,8 @@ const navs = [
 
 export default function SideBar() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   return (
     <Flex direction="column" gap="5">
       <Avatar
@@ -39,6 +43,16 @@ export default function SideBar() {
       {navs.map((n) => (
         <SideNav key={n.path} navigation={n} />
       ))}
+      {user?.app_role === 'Superadmin' && (
+        <SideNav
+          key={'/app'}
+          navigation={{
+            title: 'App',
+            path: '/app',
+            icon: GearIcon,
+          }}
+        />
+      )}
     </Flex>
   );
 }

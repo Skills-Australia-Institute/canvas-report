@@ -8,22 +8,28 @@ import (
 )
 
 type Canvas struct {
-	baseUrl     string
-	accessToken string
-	pageSize    int
-	client      *http.Client
-	HtmlUrl     string
+	baseUrl      string
+	accessToken  string
+	pageSize     int
+	client       *http.Client
+	HtmlUrl      string
+	ClientID     string
+	ClientSecret string
+	RedirectUri  string
 }
 
-func New(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canvas {
+func New(baseUrl string, accessToken string, pageSize int, htmlUrl, clientID, clientSecret, redirectUri string) *Canvas {
 	return &Canvas{
 		baseUrl:     baseUrl,
 		accessToken: accessToken,
 		pageSize:    pageSize,
 		client: &http.Client{
-			Timeout: time.Second * 5,
+			Timeout: time.Second * 15,
 		},
-		HtmlUrl: htmlUrl,
+		HtmlUrl:      htmlUrl,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectUri:  redirectUri,
 	}
 }
 
