@@ -118,6 +118,10 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 	}
 
 	for _, enrollment := range enrollments {
+		if enrollment.Role != string(canvas.StudentEnrollment) {
+			continue
+		}
+
 		data, code, err := c.canvas.GetAssignmentsDataOfUserByCourseID(user.ID, enrollment.CourseID)
 		if err != nil {
 			return code, err
