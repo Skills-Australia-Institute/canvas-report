@@ -31,6 +31,7 @@ custom:
 functions:
   sai:
     handler: bootstrap
+    timeout: 30
     environment:
       CANVAS_BASE_URL: '${self:custom.secrets.CANVAS_BASE_URL}'
       CANVAS_PAGE_SIZE: '${self:custom.secrets.CANVAS_PAGE_SIZE}'
@@ -44,7 +45,7 @@ functions:
       SUPABASE_JWT_SECRET: '${self:custom.secrets.SUPABASE_JWT_SECRET}'
     events:
       - http:
-          path: /api
+          path: /api/{proxy+}
           method: ANY
           cors:
             origin: '${self:custom.secrets.SAI_URL}'
