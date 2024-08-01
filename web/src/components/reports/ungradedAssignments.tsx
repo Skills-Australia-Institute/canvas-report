@@ -108,7 +108,7 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
                   )
               )}
               headers={headers}
-              filename={`${accountName}_Perth_enrollments_results-${getDateTimeString()}`}
+              filename={`PERTH_${accountName}_ungraded_assignments-${getDateTimeString()}`}
             >
               <Button className="cursor-pointer mr-4" color="teal">
                 Download Perth
@@ -123,7 +123,7 @@ export default function UngradedAssignments({ account }: IUngradedAssignments) {
                   d.section.includes('Adelaide')
               )}
               headers={headers}
-              filename={`${accountName}_Adelaide_enrollments_results-${getDateTimeString()}`}
+              filename={`ADL_${accountName}_ungraded_assignments-${getDateTimeString()}`}
             >
               <Button className="cursor-pointer" color="cyan">
                 Download Adelaide

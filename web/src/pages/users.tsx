@@ -24,7 +24,7 @@ export default function Users() {
     <div className="w-full">
       <OutletHeader title="Users" />
       <TextField.Root
-        placeholder="Search…"
+        placeholder="Enter name, email or SIS ID"
         onChange={handleChange}
         className="max-w-lg"
         value={inputValue}
@@ -43,7 +43,6 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', searchTerm, 'search-term'],
     queryFn: () => getUsersBySearchTerm(supabase, searchTerm),
-    enabled: searchTerm.length > 4,
   });
   const navigate = useNavigate();
 

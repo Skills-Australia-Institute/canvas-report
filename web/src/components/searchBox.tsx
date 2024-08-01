@@ -7,6 +7,7 @@ interface ISearchBox<T> {
   updateFiltered: (filteredData: Array<T>) => void;
   filterKey: keyof T;
   className?: string;
+  placeholder?: string;
 }
 
 export default function SearchBox<T>({
@@ -14,6 +15,7 @@ export default function SearchBox<T>({
   updateFiltered,
   filterKey,
   className,
+  placeholder,
 }: ISearchBox<T>) {
   const debouncedUpdateSearch = useDebounce(updateFiltered);
 
@@ -29,7 +31,7 @@ export default function SearchBox<T>({
 
   return (
     <TextField.Root
-      placeholder="Search…"
+      placeholder={placeholder}
       onChange={handleChange}
       className={className}
     >

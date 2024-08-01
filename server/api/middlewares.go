@@ -45,7 +45,10 @@ func withError(next func(w http.ResponseWriter, r *http.Request) (int, error)) h
 }
 
 type claims struct {
-	Email string `json:"email"`
+	Email       string `json:"email"`
+	AppMetaData struct {
+		AppRole string `json:"app_role"`
+	} `json:"app_metadata"`
 	jwt.RegisteredClaims
 }
 

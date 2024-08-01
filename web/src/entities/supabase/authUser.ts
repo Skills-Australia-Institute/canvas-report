@@ -7,6 +7,8 @@ export interface AuthUser {
   email: string;
   app_role: string;
   avatar_url: string;
+  created_at: string;
+  last_sign_in_at: string;
 }
 
 export const getUserFromSession = (session: Session): AuthUser => {
@@ -15,7 +17,9 @@ export const getUserFromSession = (session: Session): AuthUser => {
     email: session.user.email || '',
     first_name: session.user.user_metadata['first_name'] || '',
     last_name: session.user.user_metadata['last_name'] || '',
-    app_role: session.user.user_metadata['app_role'] || '',
+    app_role: session.user.app_metadata['app_role'] || '',
     avatar_url: session.user.user_metadata['avatar_url'] || '',
+    created_at: session.user.created_at,
+    last_sign_in_at: session.user.last_sign_in_at || '',
   };
 };

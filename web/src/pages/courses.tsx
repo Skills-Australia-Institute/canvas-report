@@ -24,7 +24,7 @@ export default function Courses() {
     <div className="w-full">
       <OutletHeader title="Courses" />
       <TextField.Root
-        placeholder="Search…"
+        placeholder="Enter course name or course code"
         onChange={handleChange}
         className="max-w-lg"
         value={inputValue}
@@ -43,7 +43,6 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
   const { isLoading, error, data } = useQuery({
     queryKey: ['courses', searchTerm, 'search-term'],
     queryFn: () => getCoursesBySearchTerm(supabase, searchTerm),
-    enabled: searchTerm.length > 4,
   });
   const navigate = useNavigate();
 

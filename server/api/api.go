@@ -10,17 +10,20 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-playground/validator/v10"
 )
 
 type APIController struct {
 	canvas   *canvas.Canvas
 	supabase *supabase.Supabase
+	validate *validator.Validate
 }
 
-func NewAPIController(canvas *canvas.Canvas, supabase *supabase.Supabase) *APIController {
+func NewAPIController(canvas *canvas.Canvas, supabase *supabase.Supabase, validate *validator.Validate) *APIController {
 	return &APIController{
 		canvas:   canvas,
 		supabase: supabase,
+		validate: validate,
 	}
 }
 
@@ -49,7 +52,9 @@ func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 		r.Get("/users/{user_id}/enrollments-results", withError(withAuth(c, withUser(c, c.GetEnrollmentsResultsByUser))))
 
 		r.Get("/accounts/{account_id}/courses", withError(withAuth(c, c.GetCoursesByAccountID)))
+
 		r.Get("/hello", hello)
+		r.Get("/oauth2/url", withError(withAuth(c, c.GetCanvasOAuth2Url)))
 	})
 
 	return r

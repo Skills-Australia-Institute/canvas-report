@@ -14,8 +14,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
 )
+
+var validate *validator.Validate
 
 func main() {
 	canvasBaseUrl := os.Getenv("CANVAS_BASE_URL")
@@ -48,9 +51,23 @@ func main() {
 		log.Panic("missing env: API_ADDRESS")
 	}
 
+	clientID := os.Getenv("CANVAS_CLIENT_ID")
+	if clientID == "" {
+		log.Panic("missing env: CANVAS_CLIENT_ID")
+	}
+
+	clientSecret := os.Getenv("CANVAS_CLIENT_SECRET")
+	if clientSecret == "" {
+		log.Panic("missing env: CANVAS_CLIENT_SECRET")
+	}
+
+	redirectUri := os.Getenv("CANVAS_REDIRECT_URI")
+	if redirectUri == "" {
+		log.Panic("missing env: CANVAS_REDIRECT_URI")
+	}
 	canvasHtmlUrl := strings.TrimSuffix(canvasBaseUrl, "/api/v1")
 
-	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl)
+	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl, clientID, clientSecret, redirectUri)
 
 	supabaseBaseUrl := os.Getenv("SUPABASE_BASE_URL")
 	if supabaseBaseUrl == "" {
@@ -72,7 +89,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	controller := api.NewAPIController(canvas, supabase)
+	controller := api.NewAPIController(canvas, supabase, validate)
 
 	router := api.NewRouter(controller, saiUrl)
 
