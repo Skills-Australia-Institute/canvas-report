@@ -10,15 +10,22 @@ import Loading from '../loading';
 
 interface IAssignmentsResults {
   user: User;
+  ungraded?: boolean;
 }
 
-export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
+export function AssignmentsResultsByUser({
+  user,
+  ungraded,
+}: IAssignmentsResults) {
   const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'assignments-results'],
     queryFn: () => getAssignmentsResultsByUserID(supabase, user.id),
   });
   const name = getFormattedName(user.name);
+  const filterData = ungraded
+    ? data?.filter((d) => d.submitted_at != '' && d.score === null)
+    : data;
 
   if (isLoading) {
     return (
@@ -35,7 +42,7 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
   return (
     <div>
       <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
-        {data && (
+        {filterData && (
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
@@ -46,11 +53,12 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
                 <Table.ColumnHeaderCell>Total</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Score</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Submitted</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Enrollment</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.map((d, i) => (
+              {filterData.map((d, i) => (
                 <Table.Row
                   key={
                     d.course_name === 'Total'
@@ -97,6 +105,7 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
                       </Badge>
                     )}
                   </Table.Cell>
+                  <Table.Cell className="max-w-sm">{d.submitted_at}</Table.Cell>
                   <Table.Cell>
                     {d.course_name !== 'Total' && (
                       <Badge
@@ -115,9 +124,9 @@ export function AssignmentsResultsByUser({ user }: IAssignmentsResults) {
         )}
       </ScrollArea>
       <div className="mt-4 border-t pt-4">
-        {data && (
+        {filterData && (
           <CSVLink
-            data={data}
+            data={filterData}
             headers={headers}
             filename={`${name}-assignments_results-${getDateTimeString()}`}
           >

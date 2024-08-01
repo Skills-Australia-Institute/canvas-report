@@ -56,6 +56,12 @@ export default function User() {
           >
             {ACTIONS.AssignmentsResultsByUser.value}
           </Tabs.Trigger>
+          <Tabs.Trigger
+            value={ACTIONS.UngradedAssignmentsResultsByUser.key}
+            className="cursor-pointer"
+          >
+            {ACTIONS.UngradedAssignmentsResultsByUser.value}
+          </Tabs.Trigger>
         </Tabs.List>
         <Box pt="2">
           <Tabs.Content value={ACTIONS.EnrollmentsResultsByUser.key}>
@@ -63,6 +69,9 @@ export default function User() {
           </Tabs.Content>
           <Tabs.Content value={ACTIONS.AssignmentsResultsByUser.key}>
             {data && <AssignmentsResultsByUser user={data} />}
+          </Tabs.Content>
+          <Tabs.Content value={ACTIONS.UngradedAssignmentsResultsByUser.key}>
+            {data && <AssignmentsResultsByUser user={data} ungraded={true} />}
           </Tabs.Content>
         </Box>
       </Tabs.Root>
