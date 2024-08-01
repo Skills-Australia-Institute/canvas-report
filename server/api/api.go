@@ -52,6 +52,7 @@ func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 		r.Get("/users/{user_id}/enrollments-results", withError(withAuth(c, withUser(c, c.GetEnrollmentsResultsByUser))))
 
 		r.Get("/accounts/{account_id}/courses", withError(withAuth(c, c.GetCoursesByAccountID)))
+		r.Get("/accounts/{account_id}/ungraded-assignments", withError(withAuth(c, c.GetUngradedAssignmentsByAccountID)))
 
 		r.Get("/hello", hello)
 		r.Get("/oauth2/url", withError(withAuth(c, c.GetCanvasOAuth2Url)))
