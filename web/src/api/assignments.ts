@@ -44,6 +44,7 @@ export const getUngradedAssignmentsByCourseID = async (
 };
 
 export const getAssignmentsResultsByUserID = async (
+  signal: AbortSignal,
   supabase: SupabaseClient,
   userID: number
 ) => {
@@ -55,6 +56,7 @@ export const getAssignmentsResultsByUserID = async (
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+      signal: signal,
     });
 
     return data as AssignmentResult[];

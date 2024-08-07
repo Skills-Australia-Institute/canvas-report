@@ -8,17 +8,14 @@ import (
 )
 
 type Canvas struct {
-	baseUrl      string
-	accessToken  string
-	pageSize     int
-	client       *http.Client
-	HtmlUrl      string
-	ClientID     string
-	ClientSecret string
-	RedirectUri  string
+	baseUrl     string
+	accessToken string
+	pageSize    int
+	client      *http.Client
+	HtmlUrl     string
 }
 
-func New(baseUrl string, accessToken string, pageSize int, htmlUrl, clientID, clientSecret, redirectUri string) *Canvas {
+func New(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canvas {
 	return &Canvas{
 		baseUrl:     baseUrl,
 		accessToken: accessToken,
@@ -26,10 +23,7 @@ func New(baseUrl string, accessToken string, pageSize int, htmlUrl, clientID, cl
 		client: &http.Client{
 			Timeout: time.Second * 5,
 		},
-		HtmlUrl:      htmlUrl,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		RedirectUri:  redirectUri,
+		HtmlUrl: htmlUrl,
 	}
 }
 

@@ -47,24 +47,9 @@ func init() {
 		log.Panic("missing env: SAI_URL")
 	}
 
-	clientID := os.Getenv("CANVAS_CLIENT_ID")
-	if clientID == "" {
-		log.Panic("missing env: CANVAS_CLIENT_ID")
-	}
-
-	clientSecret := os.Getenv("CANVAS_CLIENT_SECRET")
-	if clientSecret == "" {
-		log.Panic("missing env: CANVAS_CLIENT_SECRET")
-	}
-
-	redirectUri := os.Getenv("CANVAS_REDIRECT_URI")
-	if redirectUri == "" {
-		log.Panic("missing env: CANVAS_REDIRECT_URI")
-	}
-
 	canvasHtmlUrl := strings.TrimSuffix(canvasBaseUrl, "/api/v1")
 
-	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl, clientID, clientSecret, redirectUri)
+	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl)
 
 	supabaseBaseUrl := os.Getenv("SUPABASE_BASE_URL")
 	if supabaseBaseUrl == "" {
