@@ -5,8 +5,8 @@ import { useAuth } from '../hooks/auth';
 export default function TopBar() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const firstInitial = user?.first_name.charAt(0).toLocaleUpperCase() || '';
-  const lastInitial = user?.last_name.charAt(0).toLocaleUpperCase() || '';
+  const firstInitial = user?.first_name?.charAt(0).toLocaleUpperCase() || '';
+  const lastInitial = user?.last_name?.charAt(0).toLocaleUpperCase() || '';
 
   return (
     <div>

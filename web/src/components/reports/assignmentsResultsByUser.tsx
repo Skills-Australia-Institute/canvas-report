@@ -20,7 +20,8 @@ export function AssignmentsResultsByUser({
   const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'assignments-results'],
-    queryFn: () => getAssignmentsResultsByUserID(supabase, user.id),
+    queryFn: ({ signal }: { signal: AbortSignal }) =>
+      getAssignmentsResultsByUserID(signal, supabase, user.id),
   });
   const name = getFormattedName(user.name);
   const filterData = ungraded

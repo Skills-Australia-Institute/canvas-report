@@ -5,7 +5,7 @@ import { getAccountByID } from '../api/supabase/accounts';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
-import UngradedAssignments from '../components/reports/ungradedAssignments';
+import UngradedAssignmentsByAccount from '../components/reports/ungradedAssignmentsByAccount';
 import { ACTIONS, AppRole } from '../constants';
 import { Course } from '../entities/courses';
 import { useAuth } from '../hooks/auth';
@@ -61,7 +61,7 @@ export default function Account() {
           </Tabs.Content>
           {user?.app_role !== AppRole.StudentServices && (
             <Tabs.Content value={ACTIONS.UngradedAssignments.key}>
-              {data && <UngradedAssignments account={data} />}
+              {data && <UngradedAssignmentsByAccount account={data} />}
             </Tabs.Content>
           )}
         </Box>

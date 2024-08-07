@@ -69,8 +69,8 @@ function ProfileSection({ user }: { user: AuthUser }) {
   } = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      firstName: user ? user.first_name : '',
-      lastName: user ? user.last_name : '',
+      firstName: user.first_name || '',
+      lastName: user.last_name || '',
     },
   });
 
@@ -106,11 +106,11 @@ function ProfileSection({ user }: { user: AuthUser }) {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-4">
           <Text>Email</Text>
-          <TextField.Root value={user.email} disabled></TextField.Root>
+          <TextField.Root value={user.email || ''} disabled></TextField.Root>
         </div>
         <div className="mb-4">
           <Text>Role</Text>
-          <TextField.Root value={user.app_role} disabled></TextField.Root>
+          <TextField.Root value={user.app_role || ''} disabled></TextField.Root>
         </div>
         <div className="flex justify-between mb-6">
           <Controller
