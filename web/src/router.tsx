@@ -9,7 +9,6 @@ import Dashboard from './pages/dashboard';
 import ForgotPassword from './pages/forgotPassword';
 import Login from './pages/login';
 import NotFound from './pages/notFound';
-import OAuth2Response from './pages/oauth2Response';
 import Profile from './pages/profile';
 import ResetPassword from './pages/resetPassword';
 import Superadmin from './pages/superadmin';
@@ -85,10 +84,6 @@ export const router = createBrowserRouter([
       {
         path: '',
         element: <Superadmin />,
-      },
-      {
-        path: 'oauth2response',
-        element: <OAuth2Response />,
       },
     ],
   },
