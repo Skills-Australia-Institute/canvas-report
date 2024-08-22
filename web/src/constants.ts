@@ -12,7 +12,7 @@ export const APP = import.meta.env.VITE_APP;
 
 export const LOGO = APP === 'stanley' ? StanleyLogo : SAILogo;
 
-export const LOGO_FULL = APP === 'stanley' ? SAILogoFull : StanleyLogoFull;
+export const LOGO_FULL = APP === 'stanley' ? StanleyLogoFull : SAILogoFull;
 
 export const ACTIONS = {
   UngradedAssignments: {
