@@ -1,21 +1,25 @@
 import { Badge, Box, ScrollArea, Table, Tabs, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getAccountByID } from '../api/supabase/accounts';
+import { Course, getCoursesByAccountID } from '../canvas/courses';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import UngradedAssignmentsByAccount from '../components/reports/ungradedAssignmentsByAccount';
 import { ACTIONS, AppRole } from '../constants';
-import { Course } from '../entities/courses';
 import { useAuth } from '../hooks/auth';
 import { useSupabase } from '../hooks/supabase';
+import { getAccountByID } from '../supabase/accounts';
 
 export default function Account() {
   const { accountID } = useParams();
   const { user } = useAuth();
   const supabase = useSupabase();
-  const { isLoading, error, data } = useQuery({
+  const {
+    isLoading: isLoadingAccount,
+    error: errorAccount,
+    data: account,
+  } = useQuery({
     queryKey: ['accounts', accountID],
     queryFn: () => {
       if (accountID) {
@@ -25,6 +29,23 @@ export default function Account() {
     enabled: !!accountID,
   });
 
+  const {
+    isLoading: isLoadingCourses,
+    error: errorCourses,
+    data: courses,
+  } = useQuery({
+    queryKey: ['accounts', accountID, 'courses'],
+    queryFn: () => {
+      if (accountID) {
+        return getCoursesByAccountID(supabase, Number(accountID));
+      }
+    },
+    enabled: !!accountID,
+  });
+
+  const isLoading = isLoadingAccount || isLoadingCourses;
+  const error = errorAccount || errorCourses;
+
   if (isLoading) {
     return <Loading />;
   }
@@ -32,7 +53,7 @@ export default function Account() {
   if (error) {
     return (
       <ErrorQuery
-        outletHeaderProps={{ title: 'Accounts', subtitle: data?.name }}
+        outletHeaderProps={{ title: 'Accounts', subtitle: account?.name }}
         calloutProps={{ type: 'error', msg: error.message }}
       />
     );
@@ -40,7 +61,7 @@ export default function Account() {
 
   return (
     <div className="w-full">
-      <OutletHeader title="Accounts" subTitle={data?.name} />
+      <OutletHeader title="Accounts" subTitle={account?.name} />
       <Tabs.Root defaultValue="Courses">
         <Tabs.List>
           <Tabs.Trigger value="Courses" className="cursor-pointer">
@@ -57,11 +78,16 @@ export default function Account() {
         </Tabs.List>
         <Box pt="2">
           <Tabs.Content value="Courses">
-            {data?.courses && <CoursesTable courses={data.courses} />}
+            {courses && <CoursesTable courses={courses} />}
           </Tabs.Content>
           {user?.app_role !== AppRole.StudentServices && (
             <Tabs.Content value={ACTIONS.UngradedAssignments.key}>
-              {data && <UngradedAssignmentsByAccount account={data} />}
+              {account && courses && (
+                <UngradedAssignmentsByAccount
+                  account={account}
+                  courses={courses}
+                />
+              )}
             </Tabs.Content>
           )}
         </Box>

@@ -6,8 +6,7 @@ import {
 } from '@radix-ui/react-icons';
 import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
 import { useLocation, useNavigate } from 'react-router-dom';
-import SAILogo from '../assets/sai-logo.png';
-import { AppRole } from '../constants';
+import { AppRole, LOGO } from '../constants';
 import { useAuth } from '../hooks/auth';
 
 const navs = [
@@ -35,7 +34,7 @@ export default function SideBar() {
   return (
     <Flex direction="column" gap="5">
       <Avatar
-        src={SAILogo}
+        src={LOGO}
         fallback="SAI"
         size="2"
         className="bg-gray-100 mb-4 cursor-pointer"

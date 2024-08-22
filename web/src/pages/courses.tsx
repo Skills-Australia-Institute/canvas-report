@@ -3,12 +3,12 @@ import { Badge, ScrollArea, Table, Text, TextField } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCoursesBySearchTerm } from '../api/supabase/courses';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import { useDebounce } from '../hooks/debounce';
 import { useSupabase } from '../hooks/supabase';
+import { getCoursesBySearchTerm } from '../supabase/courses';
 
 export default function Courses() {
   const [searchTerm, setSearchTerm] = useState('');

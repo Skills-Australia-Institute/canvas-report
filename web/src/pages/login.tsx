@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import SAILogoFull from '../assets/sai-logo-full.png';
 import Callout from '../components/callout';
+import { APP, LOGO_FULL } from '../constants';
 import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z.object({
@@ -29,7 +29,10 @@ export default function Login() {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: 'john@skillsaustralia.edu.au',
+      email:
+        APP === 'stanley'
+          ? 'john@stanleycollege.edu.au'
+          : 'john@skillsaustralia.edu.au',
       password: '',
     },
   });
@@ -54,7 +57,7 @@ export default function Login() {
 
   return (
     <main className="flex flex-col items-center pt-24">
-      <img src={SAILogoFull} className="h-20 mb-6" />
+      <img src={LOGO_FULL} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <Controller
           name="email"

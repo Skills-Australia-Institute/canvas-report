@@ -23,19 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 
-# Env
 .env
-
-# Air
-server/tmp
-*.exe
-
-
-
-
-# Serverless
-server/.serverless
-server/*.zip
-server/bootstrap
-server/bin
-server/secrets.yml

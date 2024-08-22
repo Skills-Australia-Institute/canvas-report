@@ -2,13 +2,12 @@ import { Badge, ScrollArea, Table, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAccounts } from '../api/supabase/accounts';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import SearchBox from '../components/searchBox';
-import { Account } from '../entities/supabase/account';
 import { useSupabase } from '../hooks/supabase';
+import { Account, getAccounts } from '../supabase/accounts';
 
 export default function Accounts() {
   const supabase = useSupabase();

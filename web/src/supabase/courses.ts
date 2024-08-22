@@ -1,5 +1,19 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Course } from '../../entities/supabase/course';
+import { Account } from './accounts';
+import { Section } from './section';
+
+export interface Course {
+  id: number;
+  name: string | null;
+  course_code: string | null;
+  workflow_state: string;
+  grading_standard_id: number | null;
+  grading_standard: string | null;
+  account?: Account;
+  sections?: Section[];
+  account_id: number;
+  account_name?: string;
+}
 
 export const getCoursesByAccountID = async (
   supabase: SupabaseClient,

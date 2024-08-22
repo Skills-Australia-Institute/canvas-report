@@ -1,15 +1,17 @@
 import { Button, ScrollArea, Table } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
-import { getUngradedAssignmentsByAccountID } from '../../api/assignments';
-import { Account } from '../../entities/supabase/account';
+import { getUngradedAssignmentsByAccountID } from '../../canvas/assignments';
+import { Course } from '../../canvas/courses';
 import { useSupabase } from '../../hooks/supabase';
+import { Account } from '../../supabase/accounts';
 import { getDateTimeString, getFormattedName } from '../../utils';
 import Callout from '../callout';
 import Loading from '../loading';
 
 interface IUngradedAssignments {
   account: Account;
+  courses: Course[];
 }
 
 export default function UngradedAssignmentsByAccount({

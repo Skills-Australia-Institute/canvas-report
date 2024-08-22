@@ -1,7 +1,6 @@
 import { Box, Tabs } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { getUserByID } from '../api/supabase/users';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
@@ -9,6 +8,7 @@ import { AssignmentsResultsByUser } from '../components/reports/assignmentsResul
 import EnrollmentsResultsByUser from '../components/reports/enrollmentsResultsByUser';
 import { ACTIONS } from '../constants';
 import { useSupabase } from '../hooks/supabase';
+import { getUserByID } from '../supabase/users';
 
 export default function User() {
   const { userID } = useParams();
