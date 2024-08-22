@@ -3,12 +3,12 @@ import { Badge, ScrollArea, Table, Text, TextField } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUsersBySearchTerm } from '../api/supabase/users';
 import Callout from '../components/callout';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import { useDebounce } from '../hooks/debounce';
 import { useSupabase } from '../hooks/supabase';
+import { getUsersBySearchTerm } from '../supabase/users';
 
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');

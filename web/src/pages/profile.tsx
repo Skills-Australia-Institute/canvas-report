@@ -14,10 +14,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { Navigate } from 'react-router-dom';
 import { z } from 'zod';
 import Callout from '../components/callout';
-import { AuthUser } from '../entities/supabase/authUser';
 import { useAuth } from '../hooks/auth';
 import { useSupabase } from '../hooks/supabase';
-import { supabase } from '../supabase';
+import { AuthUser } from '../supabase/authUsers';
+import { supabase } from '../supabase/supabase';
 
 export default function Profile() {
   const { user } = useAuth();

@@ -1,12 +1,12 @@
 import { Box, Tabs } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { getCourseByID } from '../api/supabase/courses';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
 import { ACTIONS } from '../constants';
 import { useSupabase } from '../hooks/supabase';
+import { getCourseByID } from '../supabase/courses';
 
 export default function Course() {
   const { courseID } = useParams();

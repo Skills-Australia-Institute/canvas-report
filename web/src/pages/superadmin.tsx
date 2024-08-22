@@ -8,11 +8,10 @@ import {
   Text,
 } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
-import { getAuthUsers } from '../api/supabase/authUsers';
 import Callout from '../components/callout';
 import Loading from '../components/loading';
-import { AuthUser } from '../entities/supabase/authUser';
 import { useSupabase } from '../hooks/supabase';
+import { AuthUser, getAuthUsers } from '../supabase/authUsers';
 
 export default function Superadmin() {
   const supabase = useSupabase();

@@ -27,12 +27,12 @@ func NewAPIController(canvas *canvas.Canvas, supabase *supabase.Supabase, valida
 	}
 }
 
-func NewRouter(c *APIController, saiUrl string) *chi.Mux {
+func NewRouter(c *APIController, webUrl string) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{saiUrl},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedOrigins:   []string{webUrl},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "OPTIONS"},
 		AllowedHeaders:   []string{"Origin", "X-Requested-With", "Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
 		MaxAge:           300,
@@ -44,7 +44,7 @@ func NewRouter(c *APIController, saiUrl string) *chi.Mux {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	r.Route("/api", func(r chi.Router) {
+	r.Route("/", func(r chi.Router) {
 		r.Get("/courses/{course_id}/ungraded-assignments", withError(withAuth(c, withCourse(c, c.GetUngradedAssignmentsByCourse))))
 		r.Get("/courses/{course_id}/enrollments-results", withError(withAuth(c, withCourse(c, c.GetEnrollmentResultsByCourse))))
 

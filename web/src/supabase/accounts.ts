@@ -1,6 +1,12 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Account } from '../../entities/supabase/account';
-import { getCoursesByAccountID } from '../courses';
+
+export interface Account {
+  id: number;
+  name: string;
+  parent_account_id: number | null;
+  workflow_state: string;
+  courses_count?: number;
+}
 
 export const getAccounts = async (supabase: SupabaseClient) => {
   try {
@@ -18,7 +24,7 @@ export const getAccounts = async (supabase: SupabaseClient) => {
 
 export const getAccountByID = async (supabase: SupabaseClient, id: number) => {
   try {
-    const { data: account, error: accountQueryError } = await supabase
+    const { data, error } = await supabase
       .schema('canvas')
       .from('accounts')
       .select(
@@ -30,16 +36,11 @@ export const getAccountByID = async (supabase: SupabaseClient, id: number) => {
       .limit(1)
       .single();
 
-    if (accountQueryError) {
-      throw new Error(accountQueryError.message);
+    if (error) {
+      throw new Error(error.message);
     }
 
-    const courses = await getCoursesByAccountID(supabase, account.id);
-
-    return {
-      ...account,
-      courses: courses,
-    } as Account;
+    return data as Account;
   } catch (err) {
     throw err as Error;
   }

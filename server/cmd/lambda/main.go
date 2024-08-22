@@ -42,9 +42,9 @@ func init() {
 		log.Panic("missing env: CANVAS_ACCESS_TOKEN")
 	}
 
-	saiUrl := os.Getenv("SAI_URL")
-	if saiUrl == "" {
-		log.Panic("missing env: SAI_URL")
+	webUrl := os.Getenv("WEB_URL")
+	if webUrl == "" {
+		log.Panic("missing env: WEB_URL")
 	}
 
 	canvasHtmlUrl := strings.TrimSuffix(canvasBaseUrl, "/api/v1")
@@ -73,7 +73,7 @@ func init() {
 
 	controller := api.NewAPIController(canvas, supabase, validate)
 
-	router := api.NewRouter(controller, saiUrl)
+	router := api.NewRouter(controller, webUrl)
 
 	chiLambda = chiadapter.New(router)
 }

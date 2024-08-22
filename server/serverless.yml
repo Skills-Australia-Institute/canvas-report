@@ -36,7 +36,7 @@ functions:
       CANVAS_BASE_URL: '${self:custom.secrets.CANVAS_BASE_URL}'
       CANVAS_PAGE_SIZE: '${self:custom.secrets.CANVAS_PAGE_SIZE}'
       CANVAS_ACCESS_TOKEN: '${self:custom.secrets.CANVAS_ACCESS_TOKEN}'
-      SAI_URL: '${self:custom.secrets.SAI_URL}'
+      WEB_URL: '${self:custom.secrets.WEB_URL}'
       SUPABASE_BASE_URL: '${self:custom.secrets.SUPABASE_BASE_URL}'
       SUPABASE_PUBLIC_ANON_KEY: '${self:custom.secrets.SUPABASE_PUBLIC_ANON_KEY}'
       SUPABASE_JWT_SECRET: '${self:custom.secrets.SUPABASE_JWT_SECRET}'
@@ -45,6 +45,6 @@ functions:
           path: /api/{proxy+}
           method: ANY
           cors:
-            origin: '${self:custom.secrets.SAI_URL}'
+            origin: '${self:custom.secrets.WEB_URL}'
             headers:
               - '*'

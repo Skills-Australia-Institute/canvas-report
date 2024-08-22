@@ -1,9 +1,9 @@
 import { Badge, Button, ScrollArea, Table } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
-import { getEnrollmentsResultsByUserID } from '../../api/enrollments';
-import { User } from '../../entities/supabase/user';
+import { getEnrollmentsResultsByUserID } from '../../canvas/enrollments';
 import { useSupabase } from '../../hooks/supabase';
+import { User } from '../../supabase/users';
 import { getDateTimeString, getFormattedName } from '../../utils';
 import Callout from '../callout';
 import Loading from '../loading';

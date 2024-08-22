@@ -1,6 +1,19 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { axios } from '../axios';
-import { EnrollmentResult } from '../entities/enrollment';
+
+export interface EnrollmentResult {
+  sis_id: string;
+  name: string;
+  account: string;
+  course_name: string;
+  section: string;
+  enrollment_state: string;
+  course_state: string;
+  current_grade: string | null;
+  current_score: number | null;
+  enrollment_role: string;
+  grades_url: string;
+}
 
 export const getEnrollmentsResultsByUserID = async (
   supabase: SupabaseClient,

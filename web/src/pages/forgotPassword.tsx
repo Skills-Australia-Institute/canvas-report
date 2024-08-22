@@ -3,8 +3,8 @@ import { Button, Text, TextField } from '@radix-ui/themes';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import SAILogoFull from '../assets/sai-logo-full.png';
 import Callout from '../components/callout';
+import { APP, LOGO_FULL } from '../constants';
 import { useSupabase } from '../hooks/supabase';
 
 const formSchema = z.object({
@@ -28,7 +28,10 @@ export default function ForgotPassword() {
   } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: 'john@skillsaustralia.edu.au',
+      email:
+        APP === 'stanley'
+          ? 'john@stanleycollege.edu.au'
+          : 'john@skillsaustralia.edu.au',
     },
   });
 
@@ -52,7 +55,7 @@ export default function ForgotPassword() {
   if (success) {
     return (
       <main className="flex flex-col items-center pt-24">
-        <img src={SAILogoFull} className="h-20 mb-6" />
+        <img src={LOGO_FULL} className="h-20 mb-6" />
         <div className="w-96 p-2">
           <p className="mb-4">
             A password reset link has been emailed. This link will redirect you
@@ -83,7 +86,7 @@ export default function ForgotPassword() {
 
   return (
     <main className="flex flex-col items-center pt-24">
-      <img src={SAILogoFull} className="h-20 mb-6" />
+      <img src={LOGO_FULL} className="h-20 mb-6" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-96 p-2">
         <div className="mb-4">
           <Text size="2">

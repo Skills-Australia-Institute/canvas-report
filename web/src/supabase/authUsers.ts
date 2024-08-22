@@ -1,4 +1,4 @@
-import { Session } from '@supabase/supabase-js';
+import { Session, SupabaseClient } from '@supabase/supabase-js';
 
 export interface AuthUser {
   id: string;
@@ -20,4 +20,23 @@ export const getUserFromSession = (session: Session): AuthUser => {
     created_at: session.user.created_at,
     last_sign_in_at: session.user.last_sign_in_at || '',
   } as AuthUser;
+};
+
+export const getAuthUsers = async (supabase: SupabaseClient) => {
+  try {
+    const { data, error } = await supabase
+      .schema('public')
+      .from('users')
+      .select(
+        'id, email, last_sign_in_at, created_at, phone, first_name, last_name, app_role'
+      );
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data as AuthUser[];
+  } catch (err) {
+    throw err as Error;
+  }
 };
