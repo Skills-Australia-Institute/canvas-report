@@ -4,7 +4,7 @@ export interface Account {
   id: number;
   name: string;
   parent_account_id: number | null;
-  workflow_state: string;
+  workflow_state: 'active' | 'deleted';
   courses_count?: number;
 }
 

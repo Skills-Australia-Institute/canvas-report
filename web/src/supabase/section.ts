@@ -4,6 +4,6 @@ export interface Section {
   course_code: number;
   start_at: Date | null;
   end_at: Date | null;
-  workflow_state: string;
+  workflow_state: 'active' | 'deleted';
   sis_source_id: string | null;
 }

@@ -1,10 +1,25 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Semaphore } from 'async-mutex';
 import { axios } from '../axios';
+import { Course } from './courses';
 
 export interface UngradedAssignment {
+  course_id: number;
+  name: string;
+  section: string;
+  needs_grading_section: number;
+  teachers: string;
+  due_at: string;
+  unlock_at: string;
+  lock_at: string;
+  published: boolean;
+  gradebook_url: string;
+}
+
+export interface UngradedAssignmentWithAccountCourseInfo {
   account: string;
   course_name: string;
+  course_id: number;
   name: string;
   section: string;
   needs_grading_section: number;
@@ -37,36 +52,44 @@ export interface AssignmentResult {
 // https://github.com/TanStack/query/discussions/4943
 // Making only 10 API call is parallel
 
-const ungradedAssignmentsSemaphore = new Semaphore(10);
+const ungradedAssignmentsByCourseIDSemaphore = new Semaphore(10);
 
 export const getUngradedAssignmentsByCourseID = async (
   signal: AbortSignal,
   supabase: SupabaseClient,
-  courseID: number
+  courseID: number,
+  courseName: string,
+  accountName: string
 ) => {
   try {
-    const data = await ungradedAssignmentsSemaphore.runExclusive(async () => {
-      const accessToken = (await supabase.auth.getSession()).data.session
-        ?.access_token;
+    const data = await ungradedAssignmentsByCourseIDSemaphore.runExclusive(
+      async () => {
+        const accessToken = (await supabase.auth.getSession()).data.session
+          ?.access_token;
 
-      const { data, status } = await axios(
-        `/courses/${courseID}/ungraded-assignments`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          signal: signal,
-        }
-      );
-
-      if (status !== 200) {
-        throw new Error(
-          `Error fetching ungraded assignments of course: ${courseID}`
+        const { data, status } = await axios(
+          `/courses/${courseID}/ungraded-assignments`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            signal: signal,
+            params: {
+              course_name: courseName,
+              account_name: accountName,
+            },
+          }
         );
-      }
 
-      return data as UngradedAssignment[];
-    });
+        if (status !== 200) {
+          throw new Error(
+            `Error fetching ungraded assignments of course: ${courseID}`
+          );
+        }
+
+        return data as UngradedAssignmentWithAccountCourseInfo[];
+      }
+    );
 
     return data;
   } catch (err) {
@@ -122,6 +145,56 @@ export const getUngradedAssignmentsByAccountID = async (
     }
 
     return data as UngradedAssignment[];
+  } catch (err) {
+    throw err as Error;
+  }
+};
+
+const ungradedAssignmentsByCoursesSemaphore = new Semaphore(10);
+
+export const getUngradedAssignmentsByCourses = async (
+  signal: AbortSignal,
+  supabase: SupabaseClient,
+  courses: Course[],
+  ids: string
+) => {
+  try {
+    const data = await ungradedAssignmentsByCoursesSemaphore.runExclusive(
+      async () => {
+        const accessToken = (await supabase.auth.getSession()).data.session
+          ?.access_token;
+
+        const { data, status } = await axios<UngradedAssignment[]>(
+          `/courses/ungraded-assignments`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              ids: ids,
+            },
+            signal: signal,
+          }
+        );
+
+        if (status !== 200) {
+          throw new Error(
+            `Error fetching ungraded assignments of courses with ids: ${ids}}`
+          );
+        }
+
+        return data.map((d) => {
+          const course = courses.find((course) => course.id === d.course_id);
+          return {
+            ...d,
+            account: course?.account.name,
+            course_name: course?.name,
+          } as UngradedAssignmentWithAccountCourseInfo;
+        });
+      }
+    );
+
+    return data;
   } catch (err) {
     throw err as Error;
   }

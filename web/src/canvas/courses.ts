@@ -12,7 +12,7 @@ export interface Course {
   account_id: number;
   root_account_id: number;
   friendly_name: string;
-  workflow_state: string;
+  workflow_state: 'deleted' | 'claimed' | 'available';
   start_at: string;
   end_at: string;
   is_public: boolean;

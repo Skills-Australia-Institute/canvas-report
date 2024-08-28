@@ -5,7 +5,7 @@ import { Course, getCoursesByAccountID } from '../canvas/courses';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
-import UngradedAssignmentsByAccount from '../components/reports/ungradedAssignmentsByAccount';
+import UngradedAssignments from '../components/reports/ungradedAssignments';
 import { ACTIONS, AppRole } from '../constants';
 import { useAuth } from '../hooks/auth';
 import { useSupabase } from '../hooks/supabase';
@@ -83,10 +83,7 @@ export default function Account() {
           {user?.app_role !== AppRole.StudentServices && (
             <Tabs.Content value={ACTIONS.UngradedAssignments.key}>
               {account && courses && (
-                <UngradedAssignmentsByAccount
-                  account={account}
-                  courses={courses}
-                />
+                <UngradedAssignments account={account} courses={courses} />
               )}
             </Tabs.Content>
           )}

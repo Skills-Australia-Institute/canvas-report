@@ -5,7 +5,7 @@ import StanleyLogo from './assets/stanley-logo.png';
 
 export const API_BASE_URL =
   import.meta.env.MODE === 'development'
-    ? 'http://localhost:8080/api'
+    ? 'http://localhost:8080'
     : import.meta.env.VITE_API_BASE_URL;
 
 export const APP = import.meta.env.VITE_APP;

@@ -14,10 +14,24 @@ import (
 )
 
 type UngradedAssignment struct {
+	Name                  string `json:"name"`
+	Section               string `json:"section"`
+	CourseID              int    `json:"course_id"`
+	NeedingGradingSection int    `json:"needs_grading_section"`
+	Teachers              string `json:"teachers"`
+	DueAt                 string `json:"due_at"`
+	UnlockAt              string `json:"unlock_at"`
+	LockAt                string `json:"lock_at"`
+	Published             bool   `json:"published"`
+	GradebookURL          string `json:"gradebook_url"`
+}
+
+type UngradedAssignmentWithAccountCourseInfo struct {
 	Account               string `json:"account"`
 	CourseName            string `json:"course_name"`
 	Name                  string `json:"name"`
 	Section               string `json:"section"`
+	CourseID              int    `json:"course_id"`
 	NeedingGradingSection int    `json:"needs_grading_section"`
 	Teachers              string `json:"teachers"`
 	DueAt                 string `json:"due_at"`
@@ -314,90 +328,245 @@ type sectionWithTeachers struct {
 	teachers     []string
 }
 
-func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r *http.Request, course canvas.Course) (int, error) {
-	results := []UngradedAssignment{}
+func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r *http.Request) (int, error) {
+	ctx, cancel := context.WithCancel(r.Context())
+	defer cancel()
 
-	assignments, code, err := c.canvas.GetAssignmentsByCourseID(course.ID, "", canvas.UngradedBucket, true)
+	courseName := r.URL.Query().Get("course_name")
+	if courseName == "" {
+		return http.StatusBadRequest, fmt.Errorf("missing course_name query paramater")
+	}
+
+	accountName := r.URL.Query().Get("account_name")
+	if accountName == "" {
+		return http.StatusBadRequest, fmt.Errorf("missing account_name query parameter")
+	}
+
+	courseID, err := strconv.Atoi(chi.URLParam(r, "course_id"))
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	results, code, err := func(ctx context.Context) (results []UngradedAssignmentWithAccountCourseInfo, code int, err error) {
+
+		assignments, code, err := c.canvas.GetAssignmentsByCourseID(courseID, "", canvas.UngradedBucket, true)
+		if err != nil {
+			return nil, code, err
+		}
+
+		// holds sections with teachers names
+		sectionsWithTeachersMap := make(map[int]sectionWithTeachers)
+
+		for _, assignment := range assignments {
+			select {
+			case <-ctx.Done():
+				return nil, http.StatusRequestTimeout, ctx.Err()
+			default:
+				{
+					for _, section := range assignment.NeedsGradingCountBySection {
+
+						datesMap := make(map[int]canvas.AssignmentDate)
+
+						for _, date := range assignment.AllDates {
+							if date.SetID.Valid && date.SetType == "CourseSection" {
+								datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+							}
+						}
+
+						// no section information at the moment
+						if _, ok := sectionsWithTeachersMap[section.SectionID]; !ok {
+
+							enrollments, code, err := c.canvas.GetEnrollmentsBySectionID(section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
+							if err != nil {
+								return nil, code, err
+							}
+
+							teachers := []string{}
+
+							for _, enrollment := range enrollments {
+								teachers = append(teachers, enrollment.User.Name)
+							}
+
+							st := sectionWithTeachers{
+								id:       section.SectionID,
+								teachers: teachers,
+							}
+
+							// there are teachers in the section
+							if len(enrollments) != 0 {
+								st.sisSectionID = enrollments[0].SISSectionID
+							}
+
+							// get section when there is no sis section id
+							if st.sisSectionID == "" {
+								_section, code, err := c.canvas.GetSectionByID(section.SectionID)
+								if err != nil {
+									return nil, code, err
+								}
+
+								st.sisSectionID = _section.Name
+							}
+
+							sectionsWithTeachersMap[section.SectionID] = st
+						}
+
+						result := UngradedAssignmentWithAccountCourseInfo{
+							Name:                  assignment.Name,
+							CourseID:              assignment.CourseID,
+							NeedingGradingSection: section.NeedsGradingCount,
+							Published:             assignment.Published,
+							Account:               accountName,
+							CourseName:            courseName,
+							GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvas.HtmlUrl, courseID),
+						}
+
+						// now we have section information
+						if st, ok := sectionsWithTeachersMap[section.SectionID]; ok {
+							result.Section = st.sisSectionID
+							result.Teachers = strings.Join(st.teachers, ";")
+						}
+
+						// section has date
+						if date, ok := datesMap[section.SectionID]; ok {
+							result.DueAt = date.DueAt
+							result.LockAt = date.LockAt
+							result.UnlockAt = date.UnlockAt
+						}
+
+						results = append(results, result)
+					}
+				}
+			}
+		}
+
+		return results, http.StatusOK, nil
+	}(ctx)
+
 	if err != nil {
 		return code, err
 	}
 
-	// holds sections with teachers names
-	sectionsWithTeachersMap := make(map[int]sectionWithTeachers)
+	if err := json.NewEncoder(w).Encode(results); err != nil {
+		return http.StatusInternalServerError, err
+	}
 
-	for _, assignment := range assignments {
+	return http.StatusOK, nil
+}
 
-		for _, section := range assignment.NeedsGradingCountBySection {
+func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r *http.Request) (int, error) {
+	ctx, cancel := context.WithCancel(r.Context())
+	defer cancel()
 
-			datesMap := make(map[int]canvas.AssignmentDate)
+	results, code, err := func(ctx context.Context) (results []UngradedAssignment, code int, err error) {
+		ids := r.URL.Query().Get("ids")
+		if ids == "" {
+			return nil, http.StatusBadRequest, fmt.Errorf("missing courses ids")
+		}
 
-			for _, date := range assignment.AllDates {
-				if date.SetID.Valid && date.SetType == "CourseSection" {
-					datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
-				}
-			}
+		courseIDs := strings.Split(ids, ",")
 
-			// no section information at the moment
-			if _, ok := sectionsWithTeachersMap[section.SectionID]; !ok {
-
-				enrollments, code, err := c.canvas.GetEnrollmentsBySectionID(section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
-				if err != nil {
-					return code, err
-				}
-
-				teachers := []string{}
-
-				for _, enrollment := range enrollments {
-					teachers = append(teachers, enrollment.User.Name)
-				}
-
-				st := sectionWithTeachers{
-					id:       section.SectionID,
-					teachers: teachers,
-				}
-
-				// there are teachers in the section
-				if len(enrollments) != 0 {
-					st.sisSectionID = enrollments[0].SISSectionID
-				}
-
-				// get section when there is no sis section id
-				if st.sisSectionID == "" {
-					_section, code, err := c.canvas.GetSectionByID(section.SectionID)
+		for _, id := range courseIDs {
+			select {
+			case <-ctx.Done():
+				return nil, http.StatusRequestTimeout, ctx.Err()
+			default:
+				{
+					courseID, err := strconv.Atoi(id)
 					if err != nil {
-						return code, err
+						return nil, http.StatusBadRequest, fmt.Errorf("invalid course id: %s", id)
 					}
 
-					st.sisSectionID = _section.Name
+					assignments, code, err := c.canvas.GetAssignmentsByCourseID(courseID, "", canvas.UngradedBucket, true)
+					if err != nil {
+						return nil, code, err
+					}
+
+					// holds sections with teachers names
+					sectionsWithTeachersMap := make(map[int]sectionWithTeachers)
+
+					for _, assignment := range assignments {
+
+						for _, section := range assignment.NeedsGradingCountBySection {
+
+							datesMap := make(map[int]canvas.AssignmentDate)
+
+							for _, date := range assignment.AllDates {
+								if date.SetID.Valid && date.SetType == "CourseSection" {
+									datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+								}
+							}
+
+							// no section information at the moment
+							if _, ok := sectionsWithTeachersMap[section.SectionID]; !ok {
+
+								enrollments, code, err := c.canvas.GetEnrollmentsBySectionID(section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
+								if err != nil {
+									return nil, code, err
+								}
+
+								teachers := []string{}
+
+								for _, enrollment := range enrollments {
+									teachers = append(teachers, enrollment.User.Name)
+								}
+
+								st := sectionWithTeachers{
+									id:       section.SectionID,
+									teachers: teachers,
+								}
+
+								// there are teachers in the section
+								if len(enrollments) != 0 {
+									st.sisSectionID = enrollments[0].SISSectionID
+								}
+
+								// get section when there is no sis section id
+								if st.sisSectionID == "" {
+									_section, code, err := c.canvas.GetSectionByID(section.SectionID)
+									if err != nil {
+										return nil, code, err
+									}
+
+									st.sisSectionID = _section.Name
+								}
+
+								sectionsWithTeachersMap[section.SectionID] = st
+							}
+
+							result := UngradedAssignment{
+								Name:                  assignment.Name,
+								CourseID:              assignment.CourseID,
+								NeedingGradingSection: section.NeedsGradingCount,
+								Published:             assignment.Published,
+								GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvas.HtmlUrl, courseID),
+							}
+
+							// now we have section information
+							if st, ok := sectionsWithTeachersMap[section.SectionID]; ok {
+								result.Section = st.sisSectionID
+								result.Teachers = strings.Join(st.teachers, ";")
+							}
+
+							// section has date
+							if date, ok := datesMap[section.SectionID]; ok {
+								result.DueAt = date.DueAt
+								result.LockAt = date.LockAt
+								result.UnlockAt = date.UnlockAt
+							}
+
+							results = append(results, result)
+						}
+					}
 				}
-
-				sectionsWithTeachersMap[section.SectionID] = st
 			}
-
-			result := UngradedAssignment{
-				Name:                  assignment.Name,
-				NeedingGradingSection: section.NeedsGradingCount,
-				Published:             assignment.Published,
-				Account:               course.Account.Name,
-				CourseName:            course.Name,
-				GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvas.HtmlUrl, course.ID),
-			}
-
-			// now we have section information
-			if st, ok := sectionsWithTeachersMap[section.SectionID]; ok {
-				result.Section = st.sisSectionID
-				result.Teachers = strings.Join(st.teachers, ";")
-			}
-
-			// section has date
-			if date, ok := datesMap[section.SectionID]; ok {
-				result.DueAt = date.DueAt
-				result.LockAt = date.LockAt
-				result.UnlockAt = date.UnlockAt
-			}
-
-			results = append(results, result)
 		}
+
+		fmt.Println(len(results))
+		return results, http.StatusOK, nil
+	}(ctx)
+
+	if err != nil {
+		return code, err
 	}
 
 	if err := json.NewEncoder(w).Encode(results); err != nil {
@@ -411,7 +580,7 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
 
-	results, code, err := func(ctx context.Context) (results []UngradedAssignment, code int, err error) {
+	results, code, err := func(ctx context.Context) (results []UngradedAssignmentWithAccountCourseInfo, code int, err error) {
 		accountID, err := strconv.Atoi(chi.URLParam(r, "account_id"))
 		if err != nil {
 			return nil, http.StatusBadRequest, fmt.Errorf("invalid account id")
@@ -487,8 +656,9 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 								sectionsWithTeachersMap[section.SectionID] = st
 							}
 
-							result := UngradedAssignment{
+							result := UngradedAssignmentWithAccountCourseInfo{
 								Name:                  assignment.Name,
+								CourseID:              assignment.CourseID,
 								NeedingGradingSection: section.NeedsGradingCount,
 								Published:             assignment.Published,
 								Account:               course.Account.Name,
