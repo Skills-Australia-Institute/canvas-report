@@ -144,7 +144,7 @@ export const getUngradedAssignmentsByAccountID = async (
       );
     }
 
-    return data as UngradedAssignment[];
+    return data as UngradedAssignmentWithAccountCourseInfo[];
   } catch (err) {
     throw err as Error;
   }

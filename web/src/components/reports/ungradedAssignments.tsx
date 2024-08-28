@@ -3,6 +3,7 @@ import { useQueries } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getUngradedAssignmentsByCourseID } from '../../canvas/assignments';
 import { Course } from '../../canvas/courses';
+import { APP } from '../../constants';
 import { useSupabase } from '../../hooks/supabase';
 import { Account } from '../../supabase/accounts';
 import { getDateTimeString, getFormattedName } from '../../utils';
@@ -90,11 +91,11 @@ export default function UngradedAssignments({
           <Progress
             value={(successCount / courses.length) * 100}
             size="3"
-            className="w-full mt-4"
+            className="max-w-3xl mt-4"
             color="green"
           />
         )}
-        {isAllSuccess && (
+        {isAllSuccess && APP === 'sai' && (
           <>
             <CSVLink
               data={data.filter(
@@ -107,7 +108,7 @@ export default function UngradedAssignments({
                   )
               )}
               headers={headers}
-              filename={`${accountName}_Perth_enrollments_results-${getDateTimeString()}`}
+              filename={`PERTH_${accountName}_ungraded_assignments-${getDateTimeString()}`}
             >
               <Button className="cursor-pointer mr-4" color="teal">
                 Download Perth
@@ -122,13 +123,24 @@ export default function UngradedAssignments({
                   d.section.includes('Adelaide')
               )}
               headers={headers}
-              filename={`${accountName}_Adelaide_enrollments_results-${getDateTimeString()}`}
+              filename={`ADL_${accountName}_ungraded_assignments-${getDateTimeString()}`}
             >
               <Button className="cursor-pointer" color="cyan">
                 Download Adelaide
               </Button>
             </CSVLink>
           </>
+        )}
+        {isAllSuccess && APP === 'stanley' && (
+          <CSVLink
+            data={data}
+            headers={headers}
+            filename={`${accountName}_ungraded_assignments-${getDateTimeString()}`}
+          >
+            <Button className="cursor-pointer" color="cyan">
+              Download
+            </Button>
+          </CSVLink>
         )}
       </div>
     </div>
