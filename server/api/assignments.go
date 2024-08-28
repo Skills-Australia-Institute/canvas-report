@@ -242,86 +242,6 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 	return http.StatusOK, nil
 }
 
-func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *http.Request, user canvas.User) (int, error) {
-	results := []UngradedAssignmentOfUser{}
-
-	coursesMap := make(map[int]canvas.Course)
-
-	courses, code, err := c.canvas.GetCoursesByUserID(user.ID)
-	if err != nil {
-		return code, err
-	}
-
-	for _, course := range courses {
-		coursesMap[course.ID] = course
-	}
-
-	// for "invited", "rejected", and "deleted", GetAssignmentsDataOfUserByCourseID return 404 error
-	// so skip those enrollments
-	states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
-
-	enrollments, code, err := c.canvas.GetEnrollmentsByUserID(user.ID, states)
-	if err != nil {
-		return code, err
-	}
-
-	for _, enrollment := range enrollments {
-		data, code, err := c.canvas.GetAssignmentsDataOfUserByCourseID(user.ID, enrollment.CourseID)
-		if err != nil {
-			return code, err
-		}
-
-		for _, ad := range data {
-			if strings.Contains(ad.Title, "Assessment Coversheet") {
-				continue
-			}
-
-			// submitted and no score
-			if ad.Submission.SubmittedAt != "" && !ad.Submission.Score.Valid {
-				result := UngradedAssignmentOfUser{
-					Title:           ad.Title,
-					PointsPossible:  ad.PointsPossible,
-					DueAt:           ad.DueAt,
-					Score:           ad.Submission.Score,
-					SubmittedAt:     ad.Submission.SubmittedAt,
-					UserSisID:       user.SISUserID,
-					Name:            user.Name,
-					Section:         enrollment.SISSectionID,
-					EnrollmentRole:  enrollment.Role,
-					EnrollmentState: enrollment.EnrollmentState,
-					Status:          ad.Status,
-				}
-
-				if course, ok := coursesMap[enrollment.CourseID]; ok {
-					result.Acccount = course.Account.Name
-					result.CourseName = course.Name
-					result.CourseState = course.WorkflowState
-
-				} else {
-					course, code, err := c.canvas.GetCourseByID(enrollment.CourseID)
-					if err != nil {
-						return code, err
-					}
-
-					coursesMap[enrollment.CourseID] = course
-
-					result.Acccount = course.Account.Name
-					result.CourseName = course.Name
-					result.CourseState = course.WorkflowState
-				}
-
-				results = append(results, result)
-			}
-		}
-	}
-
-	if err := json.NewEncoder(w).Encode(results); err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	return http.StatusOK, nil
-}
-
 type sectionWithTeachers struct {
 	id           int
 	sisSectionID string
@@ -561,7 +481,6 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 			}
 		}
 
-		fmt.Println(len(results))
 		return results, http.StatusOK, nil
 	}(ctx)
 
@@ -691,93 +610,6 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 
 	if err != nil {
 		return code, err
-	}
-
-	if err := json.NewEncoder(w).Encode(results); err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	return http.StatusOK, nil
-}
-
-func (c *APIController) GetAdditionalAttemptAssignmentsByCourse(w http.ResponseWriter, r *http.Request, course canvas.Course) (int, error) {
-	results := []AdditionalAttemptAssignment{}
-
-	assignments, code, err := c.canvas.GetAssignmentsByCourseID(course.ID, "Attempt", canvas.AllBucket, false)
-	if err != nil {
-		return code, err
-	}
-
-	for _, assignment := range assignments {
-		result := AdditionalAttemptAssignment{
-			Qualification:     course.Account.Name,
-			CourseName:        course.Name,
-			Name:              assignment.Name,
-			LockAt:            assignment.LockAt,
-			NeedsGradingCount: assignment.NeedsGradingCount,
-			HtmlUrl:           assignment.HtmlUrl,
-		}
-
-		results = append(results, result)
-	}
-
-	if err := json.NewEncoder(w).Encode(results); err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	return http.StatusOK, nil
-}
-
-func (c *APIController) GetGradingStandardAssignmentsByCourse(w http.ResponseWriter, r *http.Request, course canvas.Course) (int, error) {
-	results := []GradingStandardAssignment{}
-
-	gradingStandardsMap := make(map[int]canvas.GradingStandard)
-
-	gradingStandards, code, err := c.canvas.GetGradingStandardsByContext(canvas.GradingStandardAccountContext, 1) // 1 is root account ID
-	if err != nil {
-		return code, err
-	}
-
-	for _, gradingStandard := range gradingStandards {
-		gradingStandardsMap[gradingStandard.ID] = gradingStandard
-	}
-
-	assignments, code, err := c.canvas.GetAssignmentsByCourseID(course.ID, "", canvas.AllBucket, false)
-	if err != nil {
-		return code, err
-	}
-
-	for _, assignment := range assignments {
-		result := GradingStandardAssignment{
-			Name:               assignment.Name,
-			GradingStandardID:  assignment.GradingStandardID,
-			GradingType:        assignment.GradingType,
-			OmitFromFinalGrade: assignment.OmitFromFinalGrade,
-			DueAt:              assignment.DueAt,
-			WorkflowState:      assignment.WorkflowState,
-			UnlockAt:           assignment.UnlockAt,
-			LockAt:             assignment.LockAt,
-			Account:            course.Account.Name,
-			CourseName:         course.Name,
-			CourseState:        course.WorkflowState,
-		}
-
-		if _, ok := gradingStandardsMap[int(assignment.GradingStandardID.Int64)]; !ok {
-			gradingStandards, code, err := c.canvas.GetGradingStandardsByContext(canvas.GradingStandardCourseContext, course.ID)
-			if err != nil {
-				return code, err
-			}
-
-			for _, gradingStandard := range gradingStandards {
-				gradingStandardsMap[gradingStandard.ID] = gradingStandard
-			}
-		}
-
-		if gradingStandard, ok := gradingStandardsMap[int(assignment.GradingStandardID.Int64)]; ok {
-			result.GradingStandard = gradingStandard.Title
-		}
-
-		results = append(results, result)
 	}
 
 	if err := json.NewEncoder(w).Encode(results); err != nil {
