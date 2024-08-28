@@ -2,10 +2,11 @@ import { Badge, Box, ScrollArea, Table, Tabs, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Course, getCoursesByAccountID } from '../canvas/courses';
+import Callout from '../components/callout';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
-import UngradedAssignmentsByAccount from '../components/reports/ungradedAssignmentsByAccount';
+import UngradedAssignments from '../components/reports/ungradedAssignments';
 import { ACTIONS, AppRole } from '../constants';
 import { useAuth } from '../hooks/auth';
 import { useSupabase } from '../hooks/supabase';
@@ -78,15 +79,20 @@ export default function Account() {
         </Tabs.List>
         <Box pt="2">
           <Tabs.Content value="Courses">
-            {courses && <CoursesTable courses={courses} />}
+            {courses && courses.length > 0 ? (
+              <CoursesTable courses={courses} />
+            ) : (
+              <Callout
+                type={'success'}
+                msg={'No items to display'}
+                className="max-w-lg"
+              ></Callout>
+            )}
           </Tabs.Content>
           {user?.app_role !== AppRole.StudentServices && (
             <Tabs.Content value={ACTIONS.UngradedAssignments.key}>
               {account && courses && (
-                <UngradedAssignmentsByAccount
-                  account={account}
-                  courses={courses}
-                />
+                <UngradedAssignments account={account} courses={courses} />
               )}
             </Tabs.Content>
           )}

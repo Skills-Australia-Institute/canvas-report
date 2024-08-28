@@ -1,10 +1,10 @@
 # "org" ensures this Service is used with the correct Serverless Framework Access Key.
-org: sanam
+org: skillsaustralia
 # "app" enables Serverless Framework Dashboard features and sharing them with other Services.
-app: sai
+app: canavs-report-prod
 # serverless.yml
 
-service: sai
+service: api
 
 provider:
   name: aws

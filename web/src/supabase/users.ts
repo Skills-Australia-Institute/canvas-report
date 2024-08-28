@@ -3,7 +3,11 @@ import { SupabaseClient } from '@supabase/supabase-js';
 export interface User {
   id: number;
   name: string;
-  workflow_state: string;
+  workflow_state:
+    | 'registered'
+    | 'pre_registered'
+    | 'creation_pending'
+    | 'deleted';
   unique_id: string;
   sis_user_id: string;
   account_id: number;

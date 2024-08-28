@@ -120,24 +120,6 @@ func withCourse(c *APIController, next func(w http.ResponseWriter, r *http.Reque
 	return fn
 }
 
-func withAccount(c *APIController, next func(w http.ResponseWriter, r *http.Request, account canvas.Account) (int, error)) func(w http.ResponseWriter, r *http.Request) (int, error) {
-	fn := func(w http.ResponseWriter, r *http.Request) (int, error) {
-		accountID, err := strconv.Atoi(chi.URLParam(r, "account_id"))
-		if err != nil {
-			return http.StatusBadRequest, fmt.Errorf("invalid account id")
-		}
-
-		account, code, err := c.canvas.GetAccountByID(accountID)
-		if err != nil {
-			return code, err
-		}
-
-		return next(w, r, account)
-	}
-
-	return fn
-}
-
 func withUser(c *APIController, next func(w http.ResponseWriter, r *http.Request, user canvas.User) (int, error)) func(w http.ResponseWriter, r *http.Request) (int, error) {
 	fn := func(w http.ResponseWriter, r *http.Request) (int, error) {
 		userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))

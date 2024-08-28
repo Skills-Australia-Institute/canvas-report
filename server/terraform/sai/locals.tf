@@ -1,6 +1,5 @@
 locals {
   service_name = "canvas-report"
-  src_path     = "../${path.module}/cmd/lambda"
 
   # for runtime "provided.al2023" binary name must be "bootstrap"
   binary_name  = "bootstrap"

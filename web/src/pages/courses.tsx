@@ -70,8 +70,9 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
             <Table.Header>
               <Table.Row>
                 <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Account status</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -86,6 +87,15 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
                     </Text>
                   </Table.Cell>
                   <Table.Cell>
+                    <Badge
+                      color={
+                        c.workflow_state === 'available' ? 'green' : 'gray'
+                      }
+                    >
+                      {c.workflow_state}
+                    </Badge>
+                  </Table.Cell>
+                  <Table.Cell>
                     <Text
                       className="hover:underline cursor-pointer"
                       onClick={() => navigate(`/accounts/${c.account_id}`)}
@@ -94,7 +104,13 @@ function CoursesTable({ searchTerm }: { searchTerm: string }) {
                     </Text>
                   </Table.Cell>
                   <Table.Cell>
-                    <Badge color="green">{c.workflow_state}</Badge>
+                    <Badge
+                      color={
+                        c.account_workflow_state === 'active' ? 'green' : 'gray'
+                      }
+                    >
+                      {c.account_workflow_state}
+                    </Badge>
                   </Table.Cell>
                 </Table.Row>
               ))}

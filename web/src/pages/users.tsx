@@ -87,7 +87,11 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
                   <Table.Cell>
                     <Badge
                       color={
-                        u.workflow_state == 'registered' ? 'green' : 'amber'
+                        u.workflow_state === 'registered'
+                          ? 'green'
+                          : u.workflow_state === 'pre_registered'
+                          ? 'gray'
+                          : 'amber'
                       }
                     >
                       {u.workflow_state}
