@@ -114,6 +114,8 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 	defer cancel()
 
 	results, code, err := func(ctx context.Context) (results []AssignmentResult, code int, err error) {
+		results = []AssignmentResult{}
+
 		coursesMap := make(map[int]canvas.Course)
 
 		courses, code, err := c.canvas.GetCoursesByUserID(user.ID)
@@ -268,6 +270,7 @@ func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r 
 	}
 
 	results, code, err := func(ctx context.Context) (results []UngradedAssignmentWithAccountCourseInfo, code int, err error) {
+		results = []UngradedAssignmentWithAccountCourseInfo{}
 
 		assignments, code, err := c.canvas.GetAssignmentsByCourseID(courseID, "", canvas.UngradedBucket, true)
 		if err != nil {
@@ -378,6 +381,8 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 	defer cancel()
 
 	results, code, err := func(ctx context.Context) (results []UngradedAssignment, code int, err error) {
+		results = []UngradedAssignment{}
+
 		ids := r.URL.Query().Get("ids")
 		if ids == "" {
 			return nil, http.StatusBadRequest, fmt.Errorf("missing courses ids")
@@ -500,6 +505,8 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 	defer cancel()
 
 	results, code, err := func(ctx context.Context) (results []UngradedAssignmentWithAccountCourseInfo, code int, err error) {
+		results = []UngradedAssignmentWithAccountCourseInfo{}
+
 		accountID, err := strconv.Atoi(chi.URLParam(r, "account_id"))
 		if err != nil {
 			return nil, http.StatusBadRequest, fmt.Errorf("invalid account id")

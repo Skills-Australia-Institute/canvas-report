@@ -7,6 +7,7 @@ import { APP } from '../../constants';
 import { useSupabase } from '../../hooks/supabase';
 import { Account } from '../../supabase/accounts';
 import { getDateTimeString, getFormattedName } from '../../utils';
+import Callout from '../callout';
 
 interface IUngradedAssignments {
   account: Account;
@@ -17,7 +18,7 @@ export default function UngradedAssignments({
   courses,
 }: IUngradedAssignments) {
   const supabase = useSupabase();
-  const { result, isAllSuccess, successCount } = useQueries({
+  const { result, isAllSuccess, successCount, errors } = useQueries({
     queries: courses.map((course) => {
       return {
         queryKey: ['courses', course.id, 'ungraded-assignments'],
@@ -34,6 +35,7 @@ export default function UngradedAssignments({
     combine: (results) => {
       return {
         result: results.map((result) => (result.data ? result.data : [])),
+        errors: results.map((result) => (result.error ? result.error : null)),
         isAllSuccess: results.every((result) => result.isSuccess),
         successCount: results.reduce((total, result) => {
           if (result.isSuccess) {
@@ -47,6 +49,32 @@ export default function UngradedAssignments({
 
   const data = result.flat();
   const accountName = getFormattedName(account.name);
+
+  const errorsOnly = errors.filter((err) => err !== null);
+
+  if (errorsOnly.length > 0) {
+    return (
+      <>
+        {errorsOnly.map((error) => (
+          <Callout
+            type="error"
+            msg={error.message}
+            className="max-w-lg"
+          ></Callout>
+        ))}
+      </>
+    );
+  }
+
+  if (isAllSuccess && data.length === 0) {
+    return (
+      <Callout
+        type={'success'}
+        msg={'No items to display'}
+        className="max-w-lg"
+      ></Callout>
+    );
+  }
 
   return (
     <div>

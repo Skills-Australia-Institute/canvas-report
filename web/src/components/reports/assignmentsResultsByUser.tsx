@@ -40,6 +40,16 @@ export function AssignmentsResultsByUser({
     return <Callout type="error" msg={error.message} />;
   }
 
+  if (data?.length === 0) {
+    return (
+      <Callout
+        type={'success'}
+        msg={'No items to display'}
+        className="max-w-lg"
+      ></Callout>
+    );
+  }
+
   return (
     <div>
       <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
