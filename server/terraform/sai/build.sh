@@ -1,8 +1,16 @@
 #!/bin/bash
 
+set -e
+
 export GOOS=linux
 export GOARCH=amd64
 export CGO_ENABLED=0
 export GOFLAGS=-trimpath
 
-go build -tags lambda.norpc -mod=readonly -ldflags="-s -w" -o ../sai/tf_generated/bootstrap ../../cmd/lambda/main.go
+echo "Deleting 'bootstrap' binary..."
+rm ./tf_generated/bootstrap
+echo "Deleted 'bootstrap' binary."
+
+echo "Building 'bootstrap' binary..."
+go build -tags lambda.norpc -mod=readonly -ldflags="-s -w" -o ./tf_generated/bootstrap ../../cmd/lambda/main.go
+echo "Built 'bootstrap' binary."
