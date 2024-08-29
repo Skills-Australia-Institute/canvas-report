@@ -31,7 +31,7 @@ export default function EnrollmentsResultsByUser({
   }
 
   if (error) {
-    return <Callout type="error" msg={error.message} />;
+    return <Callout type="error" msg={error.message} className="max-w-lg" />;
   }
 
   if (data?.length === 0) {

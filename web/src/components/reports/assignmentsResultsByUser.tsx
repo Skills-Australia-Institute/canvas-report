@@ -37,10 +37,10 @@ export function AssignmentsResultsByUser({
   }
 
   if (error) {
-    return <Callout type="error" msg={error.message} />;
+    return <Callout type="error" msg={error.message} className="max-w-lg" />;
   }
 
-  if (data?.length === 0) {
+  if (filterData?.length === 0) {
     return (
       <Callout
         type={'success'}
