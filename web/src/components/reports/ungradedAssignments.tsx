@@ -76,6 +76,10 @@ export default function UngradedAssignments({
     );
   }
 
+  if (data.length < 0) {
+    return <></>;
+  }
+
   return (
     <div>
       <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
