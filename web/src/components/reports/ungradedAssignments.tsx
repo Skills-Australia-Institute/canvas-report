@@ -148,30 +148,32 @@ const UngradedAssignmentsTable = ({
                         : 'ascending'
                     }`}
                   >
-                    <Flex
-                      align="center"
-                      gap="1"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        if (sortBy === 'course-asc') {
-                          setSortBy('course-desc');
-                        } else if (sortBy === 'course-desc') {
-                          setSortBy('course-asc');
-                        } else {
-                          setSortBy('course-asc');
-                        }
-                      }}
-                    >
-                      <span>Course</span>
+                    <div className="inline-block">
+                      <Flex
+                        className="cursor-pointer"
+                        align="center"
+                        gap="1"
+                        onClick={() => {
+                          if (sortBy === 'course-asc') {
+                            setSortBy('course-desc');
+                          } else if (sortBy === 'course-desc') {
+                            setSortBy('course-asc');
+                          } else {
+                            setSortBy('course-asc');
+                          }
+                        }}
+                      >
+                        <span>Course</span>
 
-                      {sortBy === 'course-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
-                      )}
+                        {sortBy === 'course-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        )}
 
-                      {sortBy === 'course-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
-                      )}
-                    </Flex>
+                        {sortBy === 'course-desc' && (
+                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        )}
+                      </Flex>
+                    </div>
                   </Tooltip>
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
@@ -184,30 +186,32 @@ const UngradedAssignmentsTable = ({
                         : 'ascending'
                     }`}
                   >
-                    <Flex
-                      align="center"
-                      gap="1"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        if (sortBy === 'name-asc') {
-                          setSortBy('name-desc');
-                        } else if (sortBy === 'name-desc') {
-                          setSortBy('name-asc');
-                        } else {
-                          setSortBy('name-asc');
-                        }
-                      }}
-                    >
-                      <span>Name</span>
+                    <div className="inline-block">
+                      <Flex
+                        gap="1"
+                        align="center"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          if (sortBy === 'name-asc') {
+                            setSortBy('name-desc');
+                          } else if (sortBy === 'name-desc') {
+                            setSortBy('name-asc');
+                          } else {
+                            setSortBy('name-asc');
+                          }
+                        }}
+                      >
+                        <span>Name</span>
 
-                      {sortBy === 'name-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
-                      )}
+                        {sortBy === 'name-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        )}
 
-                      {sortBy === 'name-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
-                      )}
-                    </Flex>
+                        {sortBy === 'name-desc' && (
+                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        )}
+                      </Flex>
+                    </div>
                   </Tooltip>
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
@@ -220,30 +224,32 @@ const UngradedAssignmentsTable = ({
                         : 'ascending'
                     }`}
                   >
-                    <Flex
-                      align="center"
-                      gap="1"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        if (sortBy === 'section-asc') {
-                          setSortBy('section-desc');
-                        } else if (sortBy === 'section-desc') {
-                          setSortBy('section-asc');
-                        } else {
-                          setSortBy('section-asc');
-                        }
-                      }}
-                    >
-                      <span>Section</span>
+                    <div className="inline-block">
+                      <Flex
+                        align="center"
+                        gap="1"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          if (sortBy === 'section-asc') {
+                            setSortBy('section-desc');
+                          } else if (sortBy === 'section-desc') {
+                            setSortBy('section-asc');
+                          } else {
+                            setSortBy('section-asc');
+                          }
+                        }}
+                      >
+                        <span>Section</span>
 
-                      {sortBy === 'section-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
-                      )}
+                        {sortBy === 'section-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        )}
 
-                      {sortBy === 'section-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
-                      )}
-                    </Flex>
+                        {sortBy === 'section-desc' && (
+                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        )}
+                      </Flex>
+                    </div>
                   </Tooltip>
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Needs Grading</Table.ColumnHeaderCell>
