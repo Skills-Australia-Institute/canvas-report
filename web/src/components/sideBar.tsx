@@ -1,13 +1,16 @@
 import {
   AccessibilityIcon,
   BackpackIcon,
+  ExitIcon,
   GearIcon,
   PersonIcon,
 } from '@radix-ui/react-icons';
 import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
+import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppRole, LOGO } from '../constants';
 import { useAuth } from '../hooks/auth';
+import { useSupabase } from '../hooks/supabase';
 
 const navs = [
   {
@@ -32,7 +35,7 @@ export default function SideBar() {
   const { user } = useAuth();
 
   return (
-    <Flex direction="column" gap="5">
+    <Flex direction="column" gap="5" className="relative">
       <Avatar
         src={LOGO}
         fallback="SAI"
@@ -53,6 +56,7 @@ export default function SideBar() {
           }}
         />
       )}
+      <LogoutButton />
     </Flex>
   );
 }
@@ -77,6 +81,32 @@ function SideNav({ navigation: { title, path, icon: Icon } }: ISideNavProps) {
       <div className="cursor-pointer" onClick={() => navigate(path)}>
         <Icon className={isActive ? 'w-6 h-6 text-blue-600' : 'w-6 h-6'} />
       </div>
+    </Tooltip>
+  );
+}
+
+function LogoutButton() {
+  const supabase = useSupabase();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Logged out successfully.');
+      }
+    } catch (err: unknown) {
+      toast.error('Unable to logout. Try again.');
+    }
+  };
+
+  return (
+    <Tooltip content="Click to logout">
+      <ExitIcon
+        className="w-6 h-6 absolute bottom-2 cursor-pointer"
+        onClick={handleLogout}
+      />
     </Tooltip>
   );
 }
