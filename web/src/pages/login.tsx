@@ -3,6 +3,7 @@ import { EyeNoneIcon, EyeOpenIcon } from '@radix-ui/react-icons';
 import { Button, Text, TextField } from '@radix-ui/themes';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import Callout from '../components/callout';
@@ -46,6 +47,7 @@ export default function Login() {
       });
 
       if (!error) {
+        toast.success('Logged in successfully.');
         return navigate('/');
       }
 
