@@ -6,6 +6,7 @@ terraform {
     }
   }
 
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -15,19 +16,14 @@ terraform {
       source  = "hashicorp/archive"
       version = "~> 2.5.0"
     }
-    null = {
-      source  = "hashicorp/null"
-      version = "~> 3.2.2"
-    }
   }
 
   required_version = "~> 1.9.4"
 }
 
 provider "aws" {
-  region     = var.aws_region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  region = var.aws_region
+
 
   default_tags {
     tags = {
@@ -37,19 +33,55 @@ provider "aws" {
   }
 }
 
-resource "null_resource" "function_binary" {
-  provisioner "local-exec" {
-    command     = "build.bat"
-    working_dir = path.module
-  }
-}
-
 data "archive_file" "function_archive" {
-  depends_on = [null_resource.function_binary]
-
   type        = "zip"
   source_file = local.binary_path
   output_path = local.archive_path
+}
+
+resource "aws_s3_bucket" "lambda_bucket" {
+  bucket = "stanley-${local.service_name}-lambda-bucket"
+}
+
+resource "aws_s3_bucket_versioning" "versioning" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "versioning-bucket-config" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+
+  rule {
+    status = "Enabled"
+    id     = "delete_previous_versions"
+
+    noncurrent_version_expiration {
+      noncurrent_days = 5
+    }
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "lambda_bucket_ownership_controls" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "lambda_bucket_acl" {
+  depends_on = [aws_s3_bucket_ownership_controls.lambda_bucket_ownership_controls]
+
+  bucket = aws_s3_bucket.lambda_bucket.id
+  acl    = "private"
+}
+
+resource "aws_s3_object" "lambda_zip" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+  key    = "${local.service_name}.zip"
+  source = data.archive_file.function_archive.output_path
+  etag   = filemd5(data.archive_file.function_archive.output_path)
 }
 
 resource "aws_lambda_function" "function" {
@@ -57,9 +89,11 @@ resource "aws_lambda_function" "function" {
   description   = "Canvas Report Server"
   role          = aws_iam_role.lambda_exec.arn
   handler       = local.binary_name
-  memory_size   = 128
 
-  filename         = local.archive_path
+  memory_size = 128
+  s3_bucket   = aws_s3_bucket.lambda_bucket.id
+  s3_key      = aws_s3_object.lambda_zip.key
+
   source_code_hash = data.archive_file.function_archive.output_base64sha256
 
   timeout = 30

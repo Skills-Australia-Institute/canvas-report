@@ -8,7 +8,8 @@ export CGO_ENABLED=0
 export GOFLAGS=-trimpath
 
 echo "Deleting 'bootstrap' binary..."
-rm ./tf_generated/bootstrap
+rm -rf ./tf_generated/bootstrap
+mkdir -p ./tf_generated
 echo "Deleted 'bootstrap' binary."
 
 echo "Building 'bootstrap' binary..."
