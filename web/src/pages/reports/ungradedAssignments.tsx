@@ -19,7 +19,7 @@ import { APP } from '../../constants';
 import { useSupabase } from '../../hooks/supabase';
 import { Account } from '../../supabase/accounts';
 import { getDateTimeString, getFormattedName } from '../../utils';
-import Callout from '../callout';
+import Callout from "../../components/callout"
 
 interface IUngradedAssignments {
   account: Account;
