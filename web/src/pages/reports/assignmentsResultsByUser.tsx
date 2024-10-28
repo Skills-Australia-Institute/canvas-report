@@ -5,8 +5,8 @@ import { getAssignmentsResultsByUserID } from '../../canvas/assignments';
 import { useSupabase } from '../../hooks/supabase';
 import { User } from '../../supabase/users';
 import { getDateTimeString, getFormattedName } from '../../utils';
-import Callout from '../callout';
-import Loading from '../loading';
+import Callout from "../../components/callout"
+import Loading from '../../components/loading';
 
 interface IAssignmentsResults {
   user: User;

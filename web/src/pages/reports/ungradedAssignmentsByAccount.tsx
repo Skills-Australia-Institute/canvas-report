@@ -6,8 +6,9 @@ import { Course } from '../../canvas/courses';
 import { useSupabase } from '../../hooks/supabase';
 import { Account } from '../../supabase/accounts';
 import { getDateTimeString, getFormattedName } from '../../utils';
-import Callout from '../callout';
-import Loading from '../loading';
+import Callout from "../../components/callout"
+import Loading from '../../components/loading';
+
 
 interface IUngradedAssignments {
   account: Account;

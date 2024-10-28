@@ -30,11 +30,11 @@ import {
 } from 'react';
 import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 import { getGradeChangeLogs, GradeChangeLog } from '../../canvas/gardes';
+import Callout from '../../components/callout';
+import Loading from '../../components/loading';
 import { useDebounce } from '../../hooks/debounce';
 import { useSupabase } from '../../hooks/supabase';
 import { getUsersBySearchTerm, User } from '../../supabase/users';
-import Callout from '../callout';
-import Loading from '../loading';
 
 export default function MarkChangeActivity() {
   const [dates, setDates] = useState<DateValueType>(null);
@@ -706,6 +706,22 @@ interface LogAggregateByDateRow {
   }[];
 }
 
+function getYearMonthDay(date: Date) {
+  const year = date.getFullYear();
+  let month = '' + (date.getMonth() + 1);
+  let day = '' + date.getDate();
+
+  if (month.length < 2) {
+    month = '0' + month;
+  }
+
+  if (day.length < 2) {
+    day = '0' + day;
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
 function aggregateGradeChangeLogsByDate(
   logs: GradeChangeLog[]
 ): LogAggregateByDateRow[] {
@@ -721,8 +737,9 @@ function aggregateGradeChangeLogsByDate(
       user_id,
     } = log;
 
-    const date = new Date(created_at);
-    const ymd = date.toISOString().split('T')[0];
+    const createdAtLocale = new Date(created_at).toLocaleString();
+    const date = new Date(createdAtLocale);
+    const ymd = getYearMonthDay(date);
 
     if (!dateMap[ymd]) {
       dateMap[ymd] = {
@@ -738,7 +755,7 @@ function aggregateGradeChangeLogsByDate(
 
     dateMap[ymd].grade_changes += 1;
 
-    dateMap[ymd].timestamps.push(created_at);
+    dateMap[ymd].timestamps.push(createdAtLocale);
 
     dateMap[ymd].unique_students.add(user_id);
 
