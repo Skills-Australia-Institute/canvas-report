@@ -1,5 +1,6 @@
 import { ArrowDownIcon, ArrowUpIcon } from '@radix-ui/react-icons';
 import {
+  Badge,
   Button,
   Flex,
   Progress,
@@ -108,6 +109,7 @@ interface UngradedAssignmentsTableProps {
   successCount: number;
   coursesCount: number;
 }
+
 type SortBy =
   | 'course-asc'
   | 'course-desc'
@@ -128,9 +130,41 @@ const UngradedAssignmentsTable = ({
   let sorted: UngradedAssignmentWithAccountCourseInfo[] = [];
 
   let totalNeedsGrading = 0;
+  let perthNeedsGrading = 0;
+  let adelaideNeedsGrading = 0;
+
+  let perthData: UngradedAssignmentWithAccountCourseInfo[] = [];
+  let adelaideData: UngradedAssignmentWithAccountCourseInfo[] = [];
 
   if (isAllSuccess) {
     sorted = sort(data, sortBy);
+
+    perthData = sorted.filter(
+      (d) =>
+        !(
+          d.section.includes('ADL') ||
+          d.section.includes('Adl') ||
+          d.section.includes('ADELAIDE') ||
+          d.section.includes('Adelaide')
+        )
+    );
+    perthNeedsGrading = perthData.reduce(
+      (acc, val) => acc + val.needs_grading_section,
+      0
+    );
+
+    adelaideData = sorted.filter(
+      (d) =>
+        d.section.includes('ADL') ||
+        d.section.includes('Adl') ||
+        d.section.includes('ADELAIDE') ||
+        d.section.includes('Adelaide')
+    );
+    adelaideNeedsGrading = adelaideData.reduce(
+      (acc, val) => acc + val.needs_grading_section,
+      0
+    );
+
     totalNeedsGrading = sorted.reduce(
       (acc, val) => acc + val.needs_grading_section,
       0
@@ -150,7 +184,6 @@ const UngradedAssignmentsTable = ({
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
                   <Tooltip
                     content={`Click to sort by course ${
@@ -214,7 +247,7 @@ const UngradedAssignmentsTable = ({
                           }
                         }}
                       >
-                        <span>Name</span>
+                        <span>Assignment</span>
 
                         {sortBy === 'name-asc' && (
                           <ArrowUpIcon className="cursor-pointer text-blue-500" />
@@ -265,20 +298,25 @@ const UngradedAssignmentsTable = ({
                     </div>
                   </Tooltip>
                 </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Needs Grading</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Needs grading</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Teachers</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Gradebook URL</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Gradebook</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {sorted.map((a) => (
                 <Table.Row key={a.account + a.course_name + a.section + a.name}>
-                  <Table.Cell className="max-w-sm">{a.account}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.course_name}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.name}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.section}</Table.Cell>
                   <Table.Cell>{a.needs_grading_section}</Table.Cell>
-                  <Table.Cell className="max-w-sm">{a.teachers}</Table.Cell>
+                  <Table.Cell className="max-w-sm">
+                    <div className="flex gap-2 flex-wrap">
+                      {a.teachers.split(';').map((t, i) => (
+                        <Badge key={t + i}>{t}</Badge>
+                      ))}
+                    </div>
+                  </Table.Cell>
                   <Table.Cell>
                     <a
                       href={a.gradebook_url}
@@ -307,15 +345,7 @@ const UngradedAssignmentsTable = ({
           <div className="flex justify-between">
             <div>
               <CSVLink
-                data={sorted.filter(
-                  (d) =>
-                    !(
-                      d.section.includes('ADL') ||
-                      d.section.includes('Adl') ||
-                      d.section.includes('ADELAIDE') ||
-                      d.section.includes('Adelaide')
-                    )
-                )}
+                data={perthData}
                 headers={headers}
                 filename={`PERTH_${accountName}_ungraded_assignments-${getDateTimeString()}`}
               >
@@ -324,13 +354,7 @@ const UngradedAssignmentsTable = ({
                 </Button>
               </CSVLink>
               <CSVLink
-                data={sorted.filter(
-                  (d) =>
-                    d.section.includes('ADL') ||
-                    d.section.includes('Adl') ||
-                    d.section.includes('ADELAIDE') ||
-                    d.section.includes('Adelaide')
-                )}
+                data={adelaideData}
                 headers={headers}
                 filename={`ADL_${accountName}_ungraded_assignments-${getDateTimeString()}`}
               >
@@ -339,9 +363,17 @@ const UngradedAssignmentsTable = ({
                 </Button>
               </CSVLink>
             </div>
-            <Text className="block font-bold mr-2" size="3">
-              {`Total needs grading: ${totalNeedsGrading}`}
-            </Text>
+            <div>
+              <Text className="block font-bold mr-2" size="3">
+                {`Total: ${totalNeedsGrading}`}
+              </Text>
+              <Text className="block font-bold mr-2" size="3">
+                {`Perth: ${perthNeedsGrading}`}
+              </Text>
+              <Text className="block font-bold mr-2" size="3">
+                {`Adelaide: ${adelaideNeedsGrading}`}
+              </Text>
+            </div>
           </div>
         )}
         {isAllSuccess && APP === 'stanley' && (
@@ -356,7 +388,7 @@ const UngradedAssignmentsTable = ({
               </Button>
             </CSVLink>
             <Text className="block font-bold mr-2" size="3">
-              {`Total needs grading: ${totalNeedsGrading}`}
+              {`Total: ${totalNeedsGrading}`}
             </Text>
           </div>
         )}

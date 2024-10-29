@@ -6,7 +6,7 @@ import Callout from '../components/callout';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
-import UngradedAssignments from '../pages/reports/ungradedAssignments';
+import UngradedAssignments from '../components/reports/ungradedAssignments';
 import { ACTIONS, AppRole } from '../constants';
 import { useAuth } from '../hooks/auth';
 import { useSupabase } from '../hooks/supabase';

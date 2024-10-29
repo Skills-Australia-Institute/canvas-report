@@ -22,7 +22,7 @@ const gradeChangeLogSemaphore = new Semaphore(10);
 export const getGradeChangeLogs = async (
   signal: AbortSignal,
   supabase: SupabaseClient,
-  garderID: number,
+  graderID: number,
   startTime: Date,
   endTime: Date
 ) => {
@@ -32,7 +32,7 @@ export const getGradeChangeLogs = async (
         ?.access_token;
 
       const { data, status } = await axios(
-        `/users/${garderID}/grade-change-logs`,
+        `/users/${graderID}/grade-change-logs`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -47,7 +47,7 @@ export const getGradeChangeLogs = async (
 
       if (status !== 200) {
         throw new Error(
-          `Error fetching grade change logs of grader: ${garderID}}`
+          `Error fetching grade change logs of grader: ${graderID}}`
         );
       }
 

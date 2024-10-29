@@ -1,5 +1,6 @@
 import { PropsWithChildren, useContext } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import NotFound from './components/notFound';
 import { useAuth } from './hooks/auth';
 import Account from './pages/account';
 import Accounts from './pages/accounts';
@@ -8,18 +9,21 @@ import Courses from './pages/courses';
 import Dashboard from './pages/dashboard';
 import ForgotPassword from './pages/forgotPassword';
 import Login from './pages/login';
-import NotFound from './pages/notFound';
+import NotFoundPage from './pages/notFound';
 import Profile from './pages/profile';
 import Reports, { reportsPath } from './pages/reports';
 import AdditionalAttemptAssigments from './pages/reports/additionalAttemptAssignments';
-import MarkChangeActivity, {
-  GraderProvider,
-} from './pages/reports/markChangeActivity';
+import StudentAssignmentsResultPage from './pages/reports/assignmentsResultByUser';
+import StudentEnrollmentsResultPage from './pages/reports/enrollmentsResultByUser';
+import MarkChangeActivity from './pages/reports/markChangeActivity';
+import UngradedAssignmentsByAccountPage from './pages/reports/ungradedAssignmentsByAccount';
+import StudentUngradedAssignmentsPage from './pages/reports/ungradedAssignmentsByUser';
 import ResetPassword from './pages/resetPassword';
 import Superadmin from './pages/superadmin';
 import User from './pages/user';
 import Users from './pages/users';
 import { SessionContext } from './providers/session';
+import { SupabaseUserProvider } from './providers/supabaseUser';
 
 export const router = createBrowserRouter([
   {
@@ -29,11 +33,11 @@ export const router = createBrowserRouter([
         <Dashboard />
       </RequireAuth>
     ),
-    errorElement: <NotFound />,
+    errorElement: <NotFoundPage />,
     children: [
       {
         path: '',
-        element: <Navigate to="/accounts" />,
+        element: <Navigate to="/reports" />,
       },
       {
         path: '/profile',
@@ -66,22 +70,56 @@ export const router = createBrowserRouter([
       {
         path: 'reports',
         element: <Reports />,
-        errorElement: <NotFound />,
+        errorElement: <NotFoundPage />,
       },
       {
         path: `reports/${reportsPath.MarkChangeActivity}`,
         element: (
-          <GraderProvider>
-            <MarkChangeActivity />
-          </GraderProvider>
+          <RequireComplianceRole>
+            <SupabaseUserProvider>
+              <MarkChangeActivity />
+            </SupabaseUserProvider>
+          </RequireComplianceRole>
         ),
       },
       {
         path: `reports/${reportsPath.AdditionalAttemptAssignments}`,
         element: (
-          <GraderProvider>
+          <RequireComplianceRole>
             <AdditionalAttemptAssigments />
-          </GraderProvider>
+          </RequireComplianceRole>
+        ),
+      },
+      {
+        path: `reports/${reportsPath.StudentEnrollmentsResult}`,
+        element: (
+          <SupabaseUserProvider>
+            <StudentEnrollmentsResultPage />
+          </SupabaseUserProvider>
+        ),
+      },
+      {
+        path: `reports/${reportsPath.StudentAssignmentsResult}`,
+        element: (
+          <SupabaseUserProvider>
+            <StudentAssignmentsResultPage />
+          </SupabaseUserProvider>
+        ),
+      },
+      {
+        path: `reports/${reportsPath.StudentUngradedAssignments}`,
+        element: (
+          <SupabaseUserProvider>
+            <StudentUngradedAssignmentsPage />
+          </SupabaseUserProvider>
+        ),
+      },
+      {
+        path: `reports/${reportsPath.UngradedAssignments}`,
+        element: (
+          <RequireComplianceRole>
+            <UngradedAssignmentsByAccountPage />
+          </RequireComplianceRole>
         ),
       },
     ],
@@ -101,11 +139,11 @@ export const router = createBrowserRouter([
   {
     path: '/app',
     element: (
-      <RequireSuperadmin>
+      <RequireSuperadminRole>
         <Dashboard />
-      </RequireSuperadmin>
+      </RequireSuperadminRole>
     ),
-    errorElement: <NotFound />,
+    errorElement: <NotFoundPage />,
     children: [
       {
         path: '',
@@ -125,14 +163,31 @@ function RequireAuth(props: PropsWithChildren) {
   }
 }
 
-function RequireSuperadmin(props: PropsWithChildren) {
+function RequireSuperadminRole(props: PropsWithChildren) {
   const { user } = useAuth();
 
   if (!user) {
     return <Navigate to="/login" />;
   } else if (user.app_role !== 'Superadmin') {
-    return <Navigate to="/" />;
+    return <NotFound />;
   } else {
     return <>{props.children}</>;
+  }
+}
+
+function RequireComplianceRole(props: PropsWithChildren) {
+  const { user } = useAuth();
+  user?.app_role;
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  } else if (
+    user.app_role == 'Superadmin' ||
+    user.app_role == 'Admin' ||
+    user.app_role == 'Compliance'
+  ) {
+    return <>{props.children}</>;
+  } else {
+    return <NotFound />;
   }
 }

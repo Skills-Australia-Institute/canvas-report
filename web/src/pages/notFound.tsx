@@ -2,7 +2,7 @@ import NotFoundImg from '../assets/not-found.png';
 import { useAuth } from '../hooks/auth';
 import Layout from './layout';
 
-export default function NotFound() {
+export default function NotFoundPage() {
   const { isLoggedIn } = useAuth();
 
   if (isLoggedIn) {
