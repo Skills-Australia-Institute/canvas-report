@@ -4,10 +4,10 @@ import { useParams } from 'react-router-dom';
 import ErrorQuery from '../components/errorQuery';
 import Loading from '../components/loading';
 import OutletHeader from '../components/outletHeader';
+import { AssignmentsResultsByUser } from '../components/reports/assignmentsResultsByUser';
+import EnrollmentsResultsByUser from '../components/reports/enrollmentsResultsByUser';
 import { ACTIONS } from '../constants';
 import { useSupabase } from '../hooks/supabase';
-import { AssignmentsResultsByUser } from '../pages/reports/assignmentsResultsByUser';
-import EnrollmentsResultsByUser from '../pages/reports/enrollmentsResultsByUser';
 import { getUserByID } from '../supabase/users';
 
 export default function User() {

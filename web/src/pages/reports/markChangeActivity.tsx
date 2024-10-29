@@ -21,24 +21,20 @@ import {
 } from '@radix-ui/themes';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import {
-  createContext,
-  FormEvent,
-  PropsWithChildren,
-  useContext,
-  useState,
-} from 'react';
+import { FormEvent, useContext, useState } from 'react';
 import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 import { getGradeChangeLogs, GradeChangeLog } from '../../canvas/gardes';
 import Callout from '../../components/callout';
 import Loading from '../../components/loading';
 import { useDebounce } from '../../hooks/debounce';
 import { useSupabase } from '../../hooks/supabase';
+import { SupabaseUserContext } from '../../providers/supabaseUser';
 import { getUsersBySearchTerm, User } from '../../supabase/users';
+import { getYearMonthDay } from '../../utils';
 
 export default function MarkChangeActivity() {
   const [dates, setDates] = useState<DateValueType>(null);
-  const { grader } = useContext(GraderContext);
+  const { user: grader } = useContext(SupabaseUserContext);
   const [errMsg, setErrMsg] = useState('');
   const [isProgress, setIsProgress] = useState(false);
 
@@ -47,7 +43,7 @@ export default function MarkChangeActivity() {
     setErrMsg('');
 
     if (!grader) {
-      setErrMsg('Please select a trainer.');
+      setErrMsg('Please select a grader.');
       setIsProgress(false);
       return;
     }
@@ -63,7 +59,7 @@ export default function MarkChangeActivity() {
       <form onSubmit={handleSubmit}>
         <div className="flex gap-20 pr-10">
           <div className="mb-3 w-full">
-            <Text className="font-bold block mb-1 border-blue-900" size="2">
+            <Text className="font-bold block mb-1" size="2">
               Select date range
             </Text>
             <Datepicker
@@ -79,7 +75,7 @@ export default function MarkChangeActivity() {
           </div>
           <div className="mb-3 w-full">
             <Text className="font-bold block mb-1 border-blue-900" size="2">
-              {grader ? 'Selected trainer' : 'Search trainer'}
+              {grader ? 'Selected grader' : 'Search grader'}
             </Text>
             <SearchAndSelect onChange={() => setIsProgress(false)} />
           </div>
@@ -103,31 +99,8 @@ export default function MarkChangeActivity() {
   );
 }
 
-interface IGraderContext {
-  grader: User | null;
-  setGrader: React.Dispatch<React.SetStateAction<User | null>>;
-}
-
-export const GraderContext = createContext<IGraderContext>(
-  {} as IGraderContext
-);
-
-export function GraderProvider(props: PropsWithChildren) {
-  const [grader, setGrader] = useState<User | null>(null);
-  return (
-    <GraderContext.Provider
-      value={{
-        grader,
-        setGrader,
-      }}
-    >
-      {props.children}
-    </GraderContext.Provider>
-  );
-}
-
 function SearchAndSelect({ onChange }: { onChange: () => void }) {
-  const { grader, setGrader } = useContext(GraderContext);
+  const { user: grader, setUser: setGrader } = useContext(SupabaseUserContext);
   const [value, setValue] = useState(grader ? grader.name : '');
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSetSearchTerm = useDebounce(setSearchTerm);
@@ -142,7 +115,7 @@ function SearchAndSelect({ onChange }: { onChange: () => void }) {
     <div className="relative">
       {grader ? (
         <TextField.Root
-          placeholder="Enter trainer name or email"
+          placeholder="Enter grader name or email"
           variant="soft"
           onChange={handleChange}
           value={grader.name}
@@ -151,7 +124,10 @@ function SearchAndSelect({ onChange }: { onChange: () => void }) {
           <TextField.Slot
             side="right"
             className="cursor-pointer"
-            onClick={() => setGrader(null)}
+            onClick={() => {
+              onChange();
+              setGrader(null);
+            }}
           >
             <Cross1Icon height="16" width="16" fontWeight="bold" color="red" />
           </TextField.Slot>
@@ -159,7 +135,7 @@ function SearchAndSelect({ onChange }: { onChange: () => void }) {
       ) : (
         <div>
           <TextField.Root
-            placeholder="Enter trainer name or email"
+            placeholder="Enter grader name or email"
             variant="soft"
             onChange={handleChange}
             value={value}
@@ -183,7 +159,7 @@ interface GraderSelectProps {
 
 function GraderSelect({ searchTerm }: GraderSelectProps) {
   const supabase = useSupabase();
-  const { setGrader } = useContext(GraderContext);
+  const { setUser: setGrader } = useContext(SupabaseUserContext);
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', searchTerm, 'search-term'],
     queryFn: async () => {
@@ -704,22 +680,6 @@ interface LogAggregateByDateRow {
       grade_changes: number;
     }[];
   }[];
-}
-
-function getYearMonthDay(date: Date) {
-  const year = date.getFullYear();
-  let month = '' + (date.getMonth() + 1);
-  let day = '' + date.getDate();
-
-  if (month.length < 2) {
-    month = '0' + month;
-  }
-
-  if (day.length < 2) {
-    day = '0' + day;
-  }
-
-  return `${year}-${month}-${day}`;
 }
 
 function aggregateGradeChangeLogsByDate(
