@@ -31,6 +31,10 @@ export const ACTIONS = {
     key: 'EnrollmentsResultsByUser',
     value: 'Enrollments results',
   },
+  UngradedAssignmentsByCourse: {
+    key: 'UngradedAssignmentsByCourse',
+    value: 'Ungraded assignments',
+  },
 };
 
 export const APP_ROLES = [

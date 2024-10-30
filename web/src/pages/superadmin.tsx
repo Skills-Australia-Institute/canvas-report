@@ -60,7 +60,12 @@ const RoleColorMap = new Map<string, Color>([
 
 function AuthUsersTable({ users }: { users: AuthUser[] }) {
   return (
-    <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
+    <ScrollArea
+      type="auto"
+      scrollbars="vertical"
+      className="pr-4"
+      style={{ maxHeight: 600 }}
+    >
       <Table.Root size="1">
         <Table.Header>
           <Table.Row>

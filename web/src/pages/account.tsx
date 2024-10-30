@@ -105,7 +105,12 @@ export default function Account() {
 function CoursesTable({ courses }: { courses: Course[] }) {
   const navigate = useNavigate();
   return (
-    <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
+    <ScrollArea
+      type="auto"
+      scrollbars="vertical"
+      className="pr-4"
+      style={{ maxHeight: 600 }}
+    >
       <Table.Root size="1">
         <Table.Header>
           <Table.Row>

@@ -364,7 +364,12 @@ function GradeChangeLogsByCourseTable({ data }: { data: GradeChangeLog[] }) {
   const sorted = sortCourses(aggregateGradeChangeLogsByCourse(data), sortBy);
 
   return (
-    <ScrollArea scrollbars="vertical" className="pr-4" style={{ height: 600 }}>
+    <ScrollArea
+      type="auto"
+      scrollbars="vertical"
+      className="pr-4"
+      style={{ maxHeight: 600 }}
+    >
       <Table.Root size="1">
         <Table.Header>
           <Table.Row>
@@ -452,7 +457,12 @@ function GradeChangeLogsByDateTable({
   const sorted = sortDates(data, sortBy);
 
   return (
-    <ScrollArea scrollbars="vertical" className="pr-4" style={{ height: 600 }}>
+    <ScrollArea
+      type="auto"
+      scrollbars="vertical"
+      className="pr-4"
+      style={{ maxHeight: 600 }}
+    >
       <Table.Root size="1">
         <Table.Header>
           <Table.Row>

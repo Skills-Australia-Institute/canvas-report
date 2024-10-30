@@ -142,7 +142,7 @@ function UserSelect({ searchTerm }: UserSelectProps) {
           <ScrollArea
             type="auto"
             scrollbars="vertical"
-            style={{ maxHeight: 400 }}
+            style={{ maxHeight: 600 }}
           >
             <Box mr="4">
               {data.map((user) => (

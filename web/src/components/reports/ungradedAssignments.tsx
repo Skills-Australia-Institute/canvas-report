@@ -179,7 +179,12 @@ const UngradedAssignmentsTable = ({
 
   return (
     <div>
-      <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
+      <ScrollArea
+        type="auto"
+        scrollbars="vertical"
+        className="pr-4"
+        style={{ maxHeight: 600 }}
+      >
         {sorted.length > 0 && (
           <Table.Root size="1">
             <Table.Header>
