@@ -1,21 +1,21 @@
 import { Button, Text } from '@radix-ui/themes';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { AppRole } from '../constants';
 import { useAuth } from '../hooks/auth';
-import { UserRole } from '../supabase/authUsers';
 
 // User has access to their value and higher values
-const AppRoleValue = new Map<UserRole, number>([
-  ['Superadmin', 4],
-  ['Admin', 3],
-  ['Compliance', 2],
-  ['Student Services', 1],
+const AppRoleValue = new Map<AppRole, number>([
+  [AppRole.Superadmin, 4],
+  [AppRole.Admin, 3],
+  [AppRole.Compliance, 2],
+  [AppRole.StudentServices, 1],
 ]);
 
 interface ReportActionProps {
   title: string;
   description: string;
   path: string;
-  access?: UserRole;
+  access?: AppRole;
 }
 
 export const reportsPath = {
@@ -32,19 +32,19 @@ const reports: ReportActionProps[] = [
     title: 'Ungraded Assignments',
     description: 'View ungraded assignments of an account',
     path: reportsPath.UngradedAssignments,
-    access: 'Compliance',
+    access: AppRole.Compliance,
   },
   {
     title: 'Mark Change Activity',
     description: 'Mark change activities by trainer in their courses.',
     path: reportsPath.MarkChangeActivity,
-    access: 'Compliance',
+    access: AppRole.Compliance,
   },
   {
     title: 'Additional Attempt Assignments',
     description: 'View additional attempt assignments',
     path: reportsPath.AdditionalAttemptAssignments,
-    access: 'Compliance',
+    access: AppRole.Compliance,
   },
   {
     title: 'Student Enrollments Result',
@@ -101,7 +101,7 @@ function ReportAction({ title, description, path, access }: ReportActionProps) {
   }
 
   return (
-    <div className="p-6 rounded-md bg-slate-600 text-white color hover:bg-slate-700 max-w-sm">
+    <div className="p-6 rounded-md bg-slate-700 text-white color hover:bg-slate-600 max-w-sm">
       <Text className="block font-bold mb-1">{title}</Text>
       <Text className="block" size="2">
         {description}

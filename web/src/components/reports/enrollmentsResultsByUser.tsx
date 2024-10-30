@@ -69,7 +69,12 @@ export default function EnrollmentsResultsByUser({
 
   return (
     <div>
-      <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
+      <ScrollArea
+        type="auto"
+        scrollbars="vertical"
+        className="pr-4"
+        style={{ maxHeight: 600 }}
+      >
         {data && (
           <Table.Root size="1">
             <Table.Header>

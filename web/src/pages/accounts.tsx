@@ -52,9 +52,10 @@ export default function Accounts() {
       {displayedData.length > 0 && (
         <>
           <ScrollArea
-            scrollbars="both"
+            type="auto"
+            scrollbars="vertical"
             className="pr-4 mt-4"
-            style={{ height: 600 }}
+            style={{ maxHeight: 600 }}
           >
             <Table.Root size="1">
               <Table.Header>

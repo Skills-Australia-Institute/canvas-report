@@ -209,9 +209,10 @@ function AdditionalAttemptAssigmentsTable({
       {data && data.length > 0 ? (
         <>
           <ScrollArea
+            type="auto"
             scrollbars="vertical"
             className="pr-4 mt-2"
-            style={{ height: 600 }}
+            style={{ maxHeight: 600 }}
           >
             <Table.Root size="1">
               <Table.Header>
