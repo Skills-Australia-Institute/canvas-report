@@ -15,6 +15,7 @@ import Reports, { reportsPath } from './pages/reports';
 import AdditionalAttemptAssigments from './pages/reports/additionalAttemptAssignments';
 import StudentAssignmentsResultPage from './pages/reports/assignmentsResultByUser';
 import StudentEnrollmentsResultPage from './pages/reports/enrollmentsResultByUser';
+import EnrollmentsResultInCoursesPage from './pages/reports/enrollmentsResultInCourses';
 import MarkChangeActivity from './pages/reports/markChangeActivity';
 import UngradedAssignmentsByAccountPage from './pages/reports/ungradedAssignmentsByAccount';
 import StudentUngradedAssignmentsPage from './pages/reports/ungradedAssignmentsByUser';
@@ -23,6 +24,7 @@ import Superadmin from './pages/superadmin';
 import User from './pages/user';
 import Users from './pages/users';
 import { SessionContext } from './providers/session';
+import { SupabaseCoursesProvider } from './providers/supabaseCourses';
 import { SupabaseUserProvider } from './providers/supabaseUser';
 
 export const router = createBrowserRouter([
@@ -120,6 +122,14 @@ export const router = createBrowserRouter([
           <RequireComplianceRole>
             <UngradedAssignmentsByAccountPage />
           </RequireComplianceRole>
+        ),
+      },
+      {
+        path: `reports/${reportsPath.CoursesEnrollmentsResult}`,
+        element: (
+          <SupabaseCoursesProvider>
+            <EnrollmentsResultInCoursesPage />
+          </SupabaseCoursesProvider>
         ),
       },
     ],
