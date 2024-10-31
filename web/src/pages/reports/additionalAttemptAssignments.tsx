@@ -198,8 +198,10 @@ function AdditionalAttemptAssigmentsTable({
   }
 
   const data = result?.map((d) => {
-    d.updated_at = d.updated_at ? new Date(d.updated_at).toLocaleString() : '';
-    d.lock_at = d.lock_at ? new Date(d.lock_at).toLocaleString() : '';
+    d.updated_at = d.updated_at
+      ? new Date(d.updated_at).toLocaleString('en-AU')
+      : '';
+    d.lock_at = d.lock_at ? new Date(d.lock_at).toLocaleString('en-AU') : '';
 
     return d;
   });

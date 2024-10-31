@@ -21,6 +21,7 @@ import {
 } from '@radix-ui/themes';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
+import customformat from 'dayjs/plugin/customParseFormat';
 import { FormEvent, useContext, useState } from 'react';
 import Datepicker, { DateValueType } from 'react-tailwindcss-datepicker';
 import { getGradeChangeLogs, GradeChangeLog } from '../../canvas/gardes';
@@ -30,7 +31,8 @@ import { useDebounce } from '../../hooks/debounce';
 import { useSupabase } from '../../hooks/supabase';
 import { SupabaseUserContext } from '../../providers/supabaseUser';
 import { getUsersBySearchTerm, User } from '../../supabase/users';
-import { getYearMonthDay } from '../../utils';
+
+dayjs.extend(customformat);
 
 export default function MarkChangeActivity() {
   const [dates, setDates] = useState<DateValueType>(null);
@@ -517,11 +519,19 @@ function GradeChangeLogsByDateTable({
                 <Text className="block font-bold">{d.date}</Text>
                 <Text className="block mt-2">
                   {`First: `}
-                  <Code>{dayjs(d.start_time).format('h:mm A')}</Code>
+                  <Code>
+                    {dayjs(
+                      dayjs(d.start_time, 'DD/MM/YYYY, h:mm:ss a').toDate()
+                    ).format('h:mm a')}
+                  </Code>
                 </Text>
                 <Text className="block mt-2">
                   {`Last: `}
-                  <Code>{dayjs(d.end_time).format('h:mm A')}</Code>
+                  <Code>
+                    {dayjs(
+                      dayjs(d.end_time, 'DD/MM/YYYY, h:mm:ss a').toDate()
+                    ).format('h:mm a')}
+                  </Code>
                 </Text>
               </Table.RowHeaderCell>
               <Table.Cell>
@@ -592,11 +602,15 @@ function sortDates(data: LogAggregateByDateRow[], by: SortBy) {
   switch (by) {
     case 'date-asc':
       return sorted.sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        (a, b) =>
+          dayjs(a.date, 'DD/MM/YYYY').toDate().getTime() -
+          dayjs(b.date, 'DD/MM/YYYY').toDate().getTime()
       );
     case 'date-desc':
       return sorted.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        (a, b) =>
+          dayjs(b.date, 'DD/MM/YYYY').toDate().getTime() -
+          dayjs(a.date, 'DD/MM/YYYY').toDate().getTime()
       );
     default:
       return sorted;
@@ -707,9 +721,9 @@ function aggregateGradeChangeLogsByDate(
       user_id,
     } = log;
 
-    const createdAtLocale = new Date(created_at).toLocaleString();
-    const date = new Date(createdAtLocale);
-    const ymd = getYearMonthDay(date);
+    const createdAtLocale = new Date(created_at).toLocaleString('en-AU');
+    const date = dayjs(createdAtLocale, 'DD/MM/YYYY, h:mm:ss a').toDate();
+    const ymd = dayjs(date).format('DD/MM/YYYY');
 
     if (!dateMap[ymd]) {
       dateMap[ymd] = {
