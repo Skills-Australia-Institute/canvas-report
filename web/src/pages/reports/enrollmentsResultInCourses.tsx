@@ -1,4 +1,9 @@
-import { Cross2Icon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  Cross2Icon,
+  MagnifyingGlassIcon,
+} from '@radix-ui/react-icons';
 import {
   Badge,
   Box,
@@ -9,12 +14,16 @@ import {
   Table,
   Text,
   TextField,
+  Tooltip,
 } from '@radix-ui/themes';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { useContext, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import toast from 'react-hot-toast';
-import { getEnrollmentsResultsByCourse } from '../../canvas/enrollments';
+import {
+  EnrollmentResult,
+  getEnrollmentsResultsByCourse,
+} from '../../canvas/enrollments';
 import Callout from '../../components/callout';
 import { useDebounce } from '../../hooks/debounce';
 import { useSupabase } from '../../hooks/supabase';
@@ -183,6 +192,7 @@ function CourseSelect({ searchTerm }: CourseSelectProps) {
 
 function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
   const supabase = useSupabase();
+  const [sortBy, setSortBy] = useState<SortBy>('section-asc');
   const { result, isAllSuccess, successCount, errors } = useQueries({
     queries: courses.map((course) => {
       return {
@@ -233,6 +243,13 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
       ></Callout>
     );
   }
+  let sorted: EnrollmentResult[] = [];
+
+  if (isAllSuccess) {
+    sorted = sort(data, sortBy);
+  } else {
+    sorted = data;
+  }
 
   return (
     <div>
@@ -245,18 +262,203 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
         <Table.Root>
           <Table.Header>
             <Table.Row>
-              <Table.ColumnHeaderCell>SIS ID</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Section</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>
+                <Tooltip
+                  content={`Click to sort by SIS ID ${
+                    sortBy === 'sis-asc'
+                      ? 'descending'
+                      : sortBy === 'sis-desc'
+                      ? 'ascending'
+                      : 'ascending'
+                  }`}
+                >
+                  <div className="inline-block">
+                    <Flex
+                      gap="1"
+                      align="center"
+                      className="cursor-pointer"
+                      onClick={() => {
+                        if (sortBy === 'sis-asc') {
+                          setSortBy('sis-desc');
+                        } else if (sortBy === 'sis-desc') {
+                          setSortBy('sis-asc');
+                        } else {
+                          setSortBy('sis-asc');
+                        }
+                      }}
+                    >
+                      <span>SIS ID</span>
+
+                      {sortBy === 'sis-asc' && (
+                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                      )}
+
+                      {sortBy === 'sis-desc' && (
+                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                      )}
+                    </Flex>
+                  </div>
+                </Tooltip>
+              </Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>
+                <Tooltip
+                  content={`Click to sort by name ${
+                    sortBy === 'name-asc'
+                      ? 'descending'
+                      : sortBy === 'name-desc'
+                      ? 'ascending'
+                      : 'ascending'
+                  }`}
+                >
+                  <div className="inline-block">
+                    <Flex
+                      gap="1"
+                      align="center"
+                      className="cursor-pointer"
+                      onClick={() => {
+                        if (sortBy === 'name-asc') {
+                          setSortBy('name-desc');
+                        } else if (sortBy === 'name-desc') {
+                          setSortBy('name-asc');
+                        } else {
+                          setSortBy('name-asc');
+                        }
+                      }}
+                    >
+                      <span>Name</span>
+
+                      {sortBy === 'name-asc' && (
+                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                      )}
+
+                      {sortBy === 'name-desc' && (
+                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                      )}
+                    </Flex>
+                  </div>
+                </Tooltip>
+              </Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>
+                <Tooltip
+                  content={`Click to sort by account ${
+                    sortBy === 'account-asc'
+                      ? 'descending'
+                      : sortBy === 'account-desc'
+                      ? 'ascending'
+                      : 'ascending'
+                  }`}
+                >
+                  <div className="inline-block">
+                    <Flex
+                      gap="1"
+                      align="center"
+                      className="cursor-pointer"
+                      onClick={() => {
+                        if (sortBy === 'account-asc') {
+                          setSortBy('account-desc');
+                        } else if (sortBy === 'account-desc') {
+                          setSortBy('account-asc');
+                        } else {
+                          setSortBy('account-asc');
+                        }
+                      }}
+                    >
+                      <span>Account</span>
+
+                      {sortBy === 'account-asc' && (
+                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                      )}
+
+                      {sortBy === 'account-desc' && (
+                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                      )}
+                    </Flex>
+                  </div>
+                </Tooltip>
+              </Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>
+                <Tooltip
+                  content={`Click to sort by course ${
+                    sortBy === 'course-asc'
+                      ? 'descending'
+                      : sortBy === 'course-desc'
+                      ? 'ascending'
+                      : 'ascending'
+                  }`}
+                >
+                  <div className="inline-block">
+                    <Flex
+                      className="cursor-pointer"
+                      align="center"
+                      gap="1"
+                      onClick={() => {
+                        if (sortBy === 'course-asc') {
+                          setSortBy('course-desc');
+                        } else if (sortBy === 'course-desc') {
+                          setSortBy('course-asc');
+                        } else {
+                          setSortBy('course-asc');
+                        }
+                      }}
+                    >
+                      <span>Course</span>
+
+                      {sortBy === 'course-asc' && (
+                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                      )}
+
+                      {sortBy === 'course-desc' && (
+                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                      )}
+                    </Flex>
+                  </div>
+                </Tooltip>
+              </Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>
+                <Tooltip
+                  content={`Click to sort by section ${
+                    sortBy === 'section-asc'
+                      ? 'descending'
+                      : sortBy === 'section-desc'
+                      ? 'ascending'
+                      : 'ascending'
+                  }`}
+                >
+                  <div className="inline-block">
+                    <Flex
+                      align="center"
+                      gap="1"
+                      className="cursor-pointer"
+                      onClick={() => {
+                        if (sortBy === 'section-asc') {
+                          setSortBy('section-desc');
+                        } else if (sortBy === 'section-desc') {
+                          setSortBy('section-asc');
+                        } else {
+                          setSortBy('section-asc');
+                        }
+                      }}
+                    >
+                      <span>Section</span>
+
+                      {sortBy === 'section-asc' && (
+                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                      )}
+
+                      {sortBy === 'section-desc' && (
+                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                      )}
+                    </Flex>
+                  </div>
+                </Tooltip>
+              </Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Grade</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Grade link</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Enrollment</Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {data.map((d) => (
+            {sorted.map((d) => (
               <Table.Row key={d.sis_id + d.course_name + d.section}>
                 <Table.Cell className="max-w-sm">{d.sis_id}</Table.Cell>
                 <Table.Cell className="max-w-sm">{d.name}</Table.Cell>
@@ -310,6 +512,47 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
       </div>
     </div>
   );
+}
+
+type SortBy =
+  | 'course-asc'
+  | 'course-desc'
+  | 'name-asc'
+  | 'name-desc'
+  | 'account-desc'
+  | 'account-asc'
+  | 'section-asc'
+  | 'section-desc'
+  | 'sis-asc'
+  | 'sis-desc';
+
+function sort(data: EnrollmentResult[], by: SortBy) {
+  const sorted = [...data];
+
+  switch (by) {
+    case 'course-asc':
+      return sorted.sort((a, b) => a.course_name.localeCompare(b.course_name));
+    case 'course-desc':
+      return sorted.sort((a, b) => b.course_name.localeCompare(a.course_name));
+    case 'name-asc':
+      return sorted.sort((a, b) => a.name.localeCompare(b.name));
+    case 'name-desc':
+      return sorted.sort((a, b) => b.name.localeCompare(a.name));
+    case 'section-asc':
+      return sorted.sort((a, b) => a.section.localeCompare(b.section));
+    case 'section-desc':
+      return sorted.sort((a, b) => b.section.localeCompare(a.section));
+    case 'account-asc':
+      return sorted.sort((a, b) => a.account.localeCompare(b.account));
+    case 'account-desc':
+      return sorted.sort((a, b) => b.account.localeCompare(a.account));
+    case 'sis-asc':
+      return sorted.sort((a, b) => a.sis_id.localeCompare(b.sis_id));
+    case 'sis-desc':
+      return sorted.sort((a, b) => b.sis_id.localeCompare(a.sis_id));
+    default:
+      return sorted;
+  }
 }
 
 const headers = [
