@@ -150,7 +150,7 @@ function UserSelect({ searchTerm }: UserSelectProps) {
               {data.map((user) => (
                 <Text
                   key={user.id + user.unique_id}
-                  className="block p-2 rounded hover:bg-gray-100"
+                  className="block p-2 rounded hover:bg-gray-200"
                   onClick={() => setUser(user)}
                 >
                   {user.name + ' - ' + user.unique_id}

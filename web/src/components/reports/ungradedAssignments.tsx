@@ -337,7 +337,7 @@ const UngradedAssignmentsTable = ({
           </Table.Root>
         )}
       </ScrollArea>
-      <div className="mt-4 border-t pt-4">
+      <div className="pt-6">
         {!isAllSuccess && (
           <Progress
             value={(successCount / coursesCount) * 100}

@@ -46,7 +46,7 @@ func NewRouter(c *APIController, webUrl string) *chi.Mux {
 
 	r.Route("/", func(r chi.Router) {
 		r.Get("/courses/{course_id}/ungraded-assignments", withError(withAuth(c, c.GetUngradedAssignmentsByCourse)))
-		r.Get("/courses/{course_id}/enrollments-results", withError(withAuth(c, withCourse(c, c.GetEnrollmentResultsByCourse))))
+		r.Get("/courses/{course_id}/enrollments-results", withError(withAuth(c, c.GetEnrollmentResultsByCourse)))
 		r.Get("/courses/ungraded-assignments", withError(withAuth(c, c.GetUngradedAssignmentsByCourses)))
 
 		r.Get("/users/{user_id}/assignments-results", withError(withAuth(c, withUser(c, c.GetAssignmentsResultsByUser))))

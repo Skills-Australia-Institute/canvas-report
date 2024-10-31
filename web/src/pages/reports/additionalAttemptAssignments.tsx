@@ -146,7 +146,7 @@ function SearchTermsInput({
       </TextField.Root>
       <Flex mt="2" gap="1">
         {searchTerms.map((value, i) => (
-          <Badge key={i + value} className="relative" size="2">
+          <Badge key={i + value} size="2">
             {value}
             <Cross2Icon
               color="red"

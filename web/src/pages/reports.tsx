@@ -25,6 +25,7 @@ export const reportsPath = {
   StudentAssignmentsResult: 'student-assignments-result',
   StudentUngradedAssignments: 'student-ungraded-assignments',
   UngradedAssignments: 'ungraded-assignments',
+  CoursesEnrollmentsResult: 'courses-enrollments-result',
 };
 
 const reports: ReportActionProps[] = [
@@ -60,6 +61,11 @@ const reports: ReportActionProps[] = [
     title: 'Student Ungraded Assignments',
     description: `View student's all ungraded assignments`,
     path: reportsPath.StudentUngradedAssignments,
+  },
+  {
+    title: 'Courses Enrollments Result',
+    description: `View courses'student enrollments result`,
+    path: reportsPath.CoursesEnrollmentsResult,
   },
 ];
 
