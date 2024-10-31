@@ -123,7 +123,7 @@ export function AssignmentsResultsByUser({
                   </Table.Cell>
                   <Table.Cell className="max-w-sm">
                     {d.submitted_at !== '' &&
-                      new Date(d.submitted_at).toLocaleString()}
+                      new Date(d.submitted_at).toLocaleString('en-AU')}
                   </Table.Cell>
                   <Table.Cell>
                     {d.course_name !== 'Total' && (
