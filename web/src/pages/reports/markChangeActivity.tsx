@@ -768,7 +768,11 @@ function aggregateGradeChangeLogsByDate(
   });
 
   return Object.values(dateMap).map((d) => {
-    d.timestamps.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    d.timestamps.sort(
+      (a, b) =>
+        dayjs(a, 'DD/MM/YYYY, h:mm:ss a').toDate().getTime() -
+        dayjs(b, 'DD/MM/YYYY, h:mm:ss a').toDate().getTime()
+    );
 
     return {
       date: d.date,
