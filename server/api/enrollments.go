@@ -3,8 +3,11 @@ package api
 import (
 	"canvas-admin/canvas"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/guregu/null/v5"
 )
 
@@ -23,14 +26,34 @@ type EnrollmentResult struct {
 }
 
 // StudentEnrollment only
-func (c *APIController) GetEnrollmentResultsByCourse(w http.ResponseWriter, r *http.Request, course canvas.Course) (int, error) {
+func (c *APIController) GetEnrollmentResultsByCourse(w http.ResponseWriter, r *http.Request) (int, error) {
+	courseName := r.URL.Query().Get("course_name")
+	if courseName == "" {
+		return http.StatusBadRequest, fmt.Errorf("missing course_name query paramater")
+	}
+
+	accountName := r.URL.Query().Get("account_name")
+	if accountName == "" {
+		return http.StatusBadRequest, fmt.Errorf("missing account_name query parameter")
+	}
+
+	courseWorkflowState := r.URL.Query().Get("course_workflow_state")
+	if courseWorkflowState == "" {
+		return http.StatusBadRequest, fmt.Errorf("missing course_workflow_state query parameter")
+	}
+
+	courseID, err := strconv.Atoi(chi.URLParam(r, "course_id"))
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
 	results := []EnrollmentResult{}
 
 	states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
 
 	types := []canvas.EnrollmentType{canvas.StudentEnrollment}
 
-	enrollments, code, err := c.canvas.GetEnrollmentsByCourseID(course.ID, states, types)
+	enrollments, code, err := c.canvas.GetEnrollmentsByCourseID(courseID, states, types)
 	if err != nil {
 		return code, err
 	}
@@ -45,9 +68,9 @@ func (c *APIController) GetEnrollmentResultsByCourse(w http.ResponseWriter, r *h
 			EnrollmentState: enrollment.EnrollmentState,
 			EnrollmentRole:  enrollment.Role,
 			Section:         enrollment.SISSectionID,
-			Account:         course.Account.Name,
-			CourseName:      course.Name,
-			CourseState:     course.WorkflowState,
+			Account:         accountName,
+			CourseName:      courseName,
+			CourseState:     courseWorkflowState,
 		}
 
 		results = append(results, result)

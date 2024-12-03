@@ -2,11 +2,11 @@ import { Badge, Button, ScrollArea, Table, Text } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import { CSVLink } from 'react-csv';
 import { getAssignmentsResultsByUserID } from '../../canvas/assignments';
+import Callout from '../../components/callout';
+import Loading from '../../components/loading';
 import { useSupabase } from '../../hooks/supabase';
 import { User } from '../../supabase/users';
 import { getDateTimeString, getFormattedName } from '../../utils';
-import Callout from '../callout';
-import Loading from '../loading';
 
 interface IAssignmentsResults {
   user: User;
@@ -52,7 +52,12 @@ export function AssignmentsResultsByUser({
 
   return (
     <div>
-      <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
+      <ScrollArea
+        type="auto"
+        scrollbars="vertical"
+        className="pr-4"
+        style={{ maxHeight: 600 }}
+      >
         {filterData && (
           <Table.Root size="1">
             <Table.Header>
@@ -118,7 +123,7 @@ export function AssignmentsResultsByUser({
                   </Table.Cell>
                   <Table.Cell className="max-w-sm">
                     {d.submitted_at !== '' &&
-                      new Date(d.submitted_at).toLocaleString()}
+                      new Date(d.submitted_at).toLocaleString('en-AU')}
                   </Table.Cell>
                   <Table.Cell>
                     {d.course_name !== 'Total' && (

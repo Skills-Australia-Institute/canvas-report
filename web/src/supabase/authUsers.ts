@@ -1,11 +1,12 @@
 import { Session, SupabaseClient } from '@supabase/supabase-js';
+import { AppRole } from '../constants';
 
 export interface AuthUser {
   id: string;
   first_name: string | null;
   last_name: string | null;
   email: string | null;
-  app_role: string | null;
+  app_role: AppRole | null;
   created_at: string;
   last_sign_in_at: string | null;
 }

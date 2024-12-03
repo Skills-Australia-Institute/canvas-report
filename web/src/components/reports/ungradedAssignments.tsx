@@ -1,10 +1,12 @@
 import { ArrowDownIcon, ArrowUpIcon } from '@radix-ui/react-icons';
 import {
+  Badge,
   Button,
   Flex,
   Progress,
   ScrollArea,
   Table,
+  Text,
   Tooltip,
 } from '@radix-ui/themes';
 import { useQueries } from '@tanstack/react-query';
@@ -15,11 +17,11 @@ import {
   UngradedAssignmentWithAccountCourseInfo,
 } from '../../canvas/assignments';
 import { Course } from '../../canvas/courses';
+import Callout from '../../components/callout';
 import { APP } from '../../constants';
 import { useSupabase } from '../../hooks/supabase';
 import { Account } from '../../supabase/accounts';
 import { getDateTimeString, getFormattedName } from '../../utils';
-import Callout from '../callout';
 
 interface IUngradedAssignments {
   account: Account;
@@ -107,6 +109,7 @@ interface UngradedAssignmentsTableProps {
   successCount: number;
   coursesCount: number;
 }
+
 type SortBy =
   | 'course-asc'
   | 'course-desc'
@@ -126,18 +129,66 @@ const UngradedAssignmentsTable = ({
 
   let sorted: UngradedAssignmentWithAccountCourseInfo[] = [];
 
+  let totalNeedsGrading = 0;
+  let perthNeedsGrading = 0;
+  let adelaideNeedsGrading = 0;
+
+  let perthData: UngradedAssignmentWithAccountCourseInfo[] = [];
+  let adelaideData: UngradedAssignmentWithAccountCourseInfo[] = [];
+
   if (isAllSuccess) {
     sorted = sort(data, sortBy);
+
+    perthData = sorted.filter(
+      (d) =>
+        !(
+          d.section.includes('ADL') ||
+          d.section.includes('Adl') ||
+          d.section.includes('ADELAIDE') ||
+          d.section.includes('Adelaide')
+        )
+    );
+    perthNeedsGrading = perthData.reduce(
+      (acc, val) => acc + val.needs_grading_section,
+      0
+    );
+
+    adelaideData = sorted.filter(
+      (d) =>
+        d.section.includes('ADL') ||
+        d.section.includes('Adl') ||
+        d.section.includes('ADELAIDE') ||
+        d.section.includes('Adelaide')
+    );
+    adelaideNeedsGrading = adelaideData.reduce(
+      (acc, val) => acc + val.needs_grading_section,
+      0
+    );
+
+    totalNeedsGrading = sorted.reduce(
+      (acc, val) => acc + val.needs_grading_section,
+      0
+    );
+  } else {
+    sorted = data;
+  }
+
+  if (isAllSuccess && sorted.length === 0) {
+    return <Callout msg="No items to display" type={'error'}></Callout>;
   }
 
   return (
     <div>
-      <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
-        {data.length > 0 && (
+      <ScrollArea
+        type="auto"
+        scrollbars="vertical"
+        className="pr-4"
+        style={{ maxHeight: 600 }}
+      >
+        {sorted.length > 0 && (
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
                   <Tooltip
                     content={`Click to sort by course ${
@@ -201,7 +252,7 @@ const UngradedAssignmentsTable = ({
                           }
                         }}
                       >
-                        <span>Name</span>
+                        <span>Assignment</span>
 
                         {sortBy === 'name-asc' && (
                           <ArrowUpIcon className="cursor-pointer text-blue-500" />
@@ -252,20 +303,25 @@ const UngradedAssignmentsTable = ({
                     </div>
                   </Tooltip>
                 </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Needs Grading</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Needs grading</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Teachers</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Gradebook URL</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Gradebook</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {sorted.map((a) => (
                 <Table.Row key={a.account + a.course_name + a.section + a.name}>
-                  <Table.Cell className="max-w-sm">{a.account}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.course_name}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.name}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.section}</Table.Cell>
                   <Table.Cell>{a.needs_grading_section}</Table.Cell>
-                  <Table.Cell className="max-w-sm">{a.teachers}</Table.Cell>
+                  <Table.Cell className="max-w-sm">
+                    <div className="flex gap-2 flex-wrap">
+                      {a.teachers.split(';').map((t, i) => (
+                        <Badge key={t + i}>{t}</Badge>
+                      ))}
+                    </div>
+                  </Table.Cell>
                   <Table.Cell>
                     <a
                       href={a.gradebook_url}
@@ -281,7 +337,7 @@ const UngradedAssignmentsTable = ({
           </Table.Root>
         )}
       </ScrollArea>
-      <div className="mt-4 border-t pt-4">
+      <div className="pt-6">
         {!isAllSuccess && (
           <Progress
             value={(successCount / coursesCount) * 100}
@@ -291,51 +347,55 @@ const UngradedAssignmentsTable = ({
           />
         )}
         {isAllSuccess && APP === 'sai' && (
-          <>
-            <CSVLink
-              data={sorted.filter(
-                (d) =>
-                  !(
-                    d.section.includes('ADL') ||
-                    d.section.includes('Adl') ||
-                    d.section.includes('ADELAIDE') ||
-                    d.section.includes('Adelaide')
-                  )
-              )}
-              headers={headers}
-              filename={`PERTH_${accountName}_ungraded_assignments-${getDateTimeString()}`}
-            >
-              <Button className="cursor-pointer mr-4" color="teal">
-                Download Perth
-              </Button>
-            </CSVLink>
-            <CSVLink
-              data={sorted.filter(
-                (d) =>
-                  d.section.includes('ADL') ||
-                  d.section.includes('Adl') ||
-                  d.section.includes('ADELAIDE') ||
-                  d.section.includes('Adelaide')
-              )}
-              headers={headers}
-              filename={`ADL_${accountName}_ungraded_assignments-${getDateTimeString()}`}
-            >
-              <Button className="cursor-pointer" color="cyan">
-                Download Adelaide
-              </Button>
-            </CSVLink>
-          </>
+          <div className="flex justify-between">
+            <div>
+              <CSVLink
+                data={perthData}
+                headers={headers}
+                filename={`PERTH_${accountName}_ungraded_assignments-${getDateTimeString()}`}
+              >
+                <Button className="cursor-pointer mr-4" color="teal">
+                  Download Perth
+                </Button>
+              </CSVLink>
+              <CSVLink
+                data={adelaideData}
+                headers={headers}
+                filename={`ADL_${accountName}_ungraded_assignments-${getDateTimeString()}`}
+              >
+                <Button className="cursor-pointer" color="cyan">
+                  Download Adelaide
+                </Button>
+              </CSVLink>
+            </div>
+            <div>
+              <Text className="block font-bold mr-2" size="3">
+                {`Total: ${totalNeedsGrading}`}
+              </Text>
+              <Text className="block font-bold mr-2" size="3">
+                {`Perth: ${perthNeedsGrading}`}
+              </Text>
+              <Text className="block font-bold mr-2" size="3">
+                {`Adelaide: ${adelaideNeedsGrading}`}
+              </Text>
+            </div>
+          </div>
         )}
         {isAllSuccess && APP === 'stanley' && (
-          <CSVLink
-            data={sorted}
-            headers={headers}
-            filename={`${accountName}_ungraded_assignments-${getDateTimeString()}`}
-          >
-            <Button className="cursor-pointer" color="cyan">
-              Download
-            </Button>
-          </CSVLink>
+          <div className="flex justify-between">
+            <CSVLink
+              data={sorted}
+              headers={headers}
+              filename={`${accountName}_ungraded_assignments-${getDateTimeString()}`}
+            >
+              <Button className="cursor-pointer" color="cyan">
+                Download
+              </Button>
+            </CSVLink>
+            <Text className="block font-bold mr-2" size="3">
+              {`Total: ${totalNeedsGrading}`}
+            </Text>
+          </div>
         )}
       </div>
     </div>

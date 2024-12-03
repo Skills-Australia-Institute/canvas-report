@@ -60,7 +60,12 @@ const RoleColorMap = new Map<string, Color>([
 
 function AuthUsersTable({ users }: { users: AuthUser[] }) {
   return (
-    <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
+    <ScrollArea
+      type="auto"
+      scrollbars="vertical"
+      className="pr-4"
+      style={{ maxHeight: 600 }}
+    >
       <Table.Root size="1">
         <Table.Header>
           <Table.Row>
@@ -89,10 +94,10 @@ function AuthUsersTable({ users }: { users: AuthUser[] }) {
               </Table.Cell>
               <Table.Cell>
                 {u.last_sign_in_at &&
-                  new Date(u.last_sign_in_at).toLocaleString()}
+                  new Date(u.last_sign_in_at).toLocaleString('en-AU')}
               </Table.Cell>
               <Table.Cell>
-                {u.created_at && new Date(u.created_at).toLocaleString()}
+                {u.created_at && new Date(u.created_at).toLocaleString('en-AU')}
               </Table.Cell>
             </Table.Row>
           ))}

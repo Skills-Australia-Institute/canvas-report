@@ -1,21 +1,42 @@
-import { Badge, Button, ScrollArea, Table } from '@radix-ui/themes';
+import { ArrowDownIcon, ArrowUpIcon } from '@radix-ui/react-icons';
+import {
+  Badge,
+  Button,
+  Flex,
+  ScrollArea,
+  Table,
+  Tooltip,
+} from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { CSVLink } from 'react-csv';
-import { getEnrollmentsResultsByUserID } from '../../canvas/enrollments';
+import {
+  EnrollmentResult,
+  getEnrollmentsResultsByUserID,
+} from '../../canvas/enrollments';
+import Callout from '../../components/callout';
+import Loading from '../../components/loading';
 import { useSupabase } from '../../hooks/supabase';
 import { User } from '../../supabase/users';
 import { getDateTimeString, getFormattedName } from '../../utils';
-import Callout from '../callout';
-import Loading from '../loading';
 
 interface IEnrollmentsResults {
   user: User;
 }
 
+type SortBy =
+  | 'account-asc'
+  | 'account-desc'
+  | 'course-asc'
+  | 'course-desc'
+  | 'section-asc'
+  | 'section-desc';
+
 export default function EnrollmentsResultsByUser({
   user,
 }: IEnrollmentsResults) {
   const supabase = useSupabase();
+  const [sortBy, setSortBy] = useState<SortBy>('section-asc');
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'enrollments-results'],
     queryFn: () => getEnrollmentsResultsByUserID(supabase, user.id),
@@ -44,16 +65,136 @@ export default function EnrollmentsResultsByUser({
     );
   }
 
+  const sorted = data ? sort(data, sortBy) : [];
+
   return (
     <div>
-      <ScrollArea scrollbars="both" className="pr-4" style={{ height: 600 }}>
+      <ScrollArea
+        type="auto"
+        scrollbars="vertical"
+        className="pr-4"
+        style={{ maxHeight: 600 }}
+      >
         {data && (
           <Table.Root size="1">
             <Table.Header>
               <Table.Row>
-                <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Course</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Section</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  <Tooltip
+                    content={`Click to sort by account ${
+                      sortBy === 'account-asc'
+                        ? 'descending'
+                        : sortBy === 'account-desc'
+                        ? 'ascending'
+                        : 'ascending'
+                    }`}
+                  >
+                    <div className="inline-block">
+                      <Flex
+                        className="cursor-pointer"
+                        align="center"
+                        gap="1"
+                        onClick={() => {
+                          if (sortBy === 'account-asc') {
+                            setSortBy('account-desc');
+                          } else if (sortBy === 'account-desc') {
+                            setSortBy('account-asc');
+                          } else {
+                            setSortBy('account-asc');
+                          }
+                        }}
+                      >
+                        <span>Account</span>
+                        {sortBy === 'account-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        )}
+
+                        {sortBy === 'account-desc' && (
+                          <ArrowDownIcon
+                            className="cursor-pointer text-blue-500"
+                            fontSize="20"
+                          />
+                        )}
+                      </Flex>
+                    </div>
+                  </Tooltip>
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  <Tooltip
+                    content={`Click to sort by course ${
+                      sortBy === 'course-asc'
+                        ? 'descending'
+                        : sortBy === 'course-desc'
+                        ? 'ascending'
+                        : 'ascending'
+                    }`}
+                  >
+                    <div className="inline-block">
+                      <Flex
+                        className="cursor-pointer"
+                        align="center"
+                        gap="1"
+                        onClick={() => {
+                          if (sortBy === 'course-asc') {
+                            setSortBy('course-desc');
+                          } else if (sortBy === 'course-desc') {
+                            setSortBy('course-asc');
+                          } else {
+                            setSortBy('course-asc');
+                          }
+                        }}
+                      >
+                        <span>Course</span>
+
+                        {sortBy === 'course-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        )}
+
+                        {sortBy === 'course-desc' && (
+                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        )}
+                      </Flex>
+                    </div>
+                  </Tooltip>
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  <Tooltip
+                    content={`Click to sort by section ${
+                      sortBy === 'section-asc'
+                        ? 'descending'
+                        : sortBy === 'section-desc'
+                        ? 'ascending'
+                        : 'ascending'
+                    }`}
+                  >
+                    <div className="inline-block">
+                      <Flex
+                        align="center"
+                        gap="1"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          if (sortBy === 'section-asc') {
+                            setSortBy('section-desc');
+                          } else if (sortBy === 'section-desc') {
+                            setSortBy('section-asc');
+                          } else {
+                            setSortBy('section-asc');
+                          }
+                        }}
+                      >
+                        <span>Section</span>
+
+                        {sortBy === 'section-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        )}
+
+                        {sortBy === 'section-desc' && (
+                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        )}
+                      </Flex>
+                    </div>
+                  </Tooltip>
+                </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Grade</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Score</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Enrollment</Table.ColumnHeaderCell>
@@ -61,7 +202,7 @@ export default function EnrollmentsResultsByUser({
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.map((d) => (
+              {sorted.map((d) => (
                 <Table.Row key={d.name + d.course_name + d.section}>
                   <Table.Cell>{d.account}</Table.Cell>
                   <Table.Cell>{d.course_name}</Table.Cell>
@@ -105,6 +246,27 @@ export default function EnrollmentsResultsByUser({
       </div>
     </div>
   );
+}
+
+function sort(data: EnrollmentResult[], by: SortBy) {
+  const sorted = [...data];
+
+  switch (by) {
+    case 'account-asc':
+      return sorted.sort((a, b) => a.account.localeCompare(b.account));
+    case 'account-desc':
+      return sorted.sort((a, b) => b.account.localeCompare(a.account));
+    case 'course-asc':
+      return sorted.sort((a, b) => a.course_name.localeCompare(b.course_name));
+    case 'course-desc':
+      return sorted.sort((a, b) => b.course_name.localeCompare(a.course_name));
+    case 'section-asc':
+      return sorted.sort((a, b) => a.section.localeCompare(b.section));
+    case 'section-desc':
+      return sorted.sort((a, b) => b.section.localeCompare(a.section));
+    default:
+      return sorted;
+  }
 }
 
 const headers = [

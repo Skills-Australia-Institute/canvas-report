@@ -4,8 +4,9 @@ import {
   ExitIcon,
   GearIcon,
   PersonIcon,
+  ReaderIcon,
 } from '@radix-ui/react-icons';
-import { Avatar, Flex, IconProps, Tooltip } from '@radix-ui/themes';
+import { Avatar, Flex, IconProps, Text, Tooltip } from '@radix-ui/themes';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppRole, LOGO } from '../constants';
@@ -19,7 +20,7 @@ const navs = [
     icon: AccessibilityIcon,
   },
   {
-    title: 'Users',
+    title: 'Students',
     path: '/users',
     icon: PersonIcon,
   },
@@ -27,6 +28,11 @@ const navs = [
     title: 'Courses',
     path: '/courses',
     icon: BackpackIcon,
+  },
+  {
+    title: 'Reports',
+    path: '/reports',
+    icon: ReaderIcon,
   },
 ];
 
@@ -50,7 +56,7 @@ export default function SideBar() {
         <SideNav
           key={'/app'}
           navigation={{
-            title: 'App',
+            title: 'Admin',
             path: '/app',
             icon: GearIcon,
           }}
@@ -78,8 +84,12 @@ function SideNav({ navigation: { title, path, icon: Icon } }: ISideNavProps) {
 
   return (
     <Tooltip content={title}>
-      <div className="cursor-pointer" onClick={() => navigate(path)}>
+      <div
+        className="cursor-pointer hover:text-blue-600"
+        onClick={() => navigate(path)}
+      >
         <Icon className={isActive ? 'w-6 h-6 text-blue-600' : 'w-6 h-6'} />
+        <Text size="2">{title}</Text>
       </div>
     </Tooltip>
   );
@@ -103,10 +113,10 @@ function LogoutButton() {
 
   return (
     <Tooltip content="Click to logout">
-      <ExitIcon
-        className="w-6 h-6 absolute bottom-2 cursor-pointer"
-        onClick={handleLogout}
-      />
+      <div className="absolute bottom-2 cursor-pointer hover:text-blue-600">
+        <ExitIcon className="w-6 h-6" onClick={handleLogout} />
+        <Text size="2">Logout</Text>
+      </div>
     </Tooltip>
   );
 }

@@ -21,7 +21,7 @@ func New(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canv
 		accessToken: accessToken,
 		pageSize:    pageSize,
 		client: &http.Client{
-			Timeout: time.Second * 5,
+			Timeout: time.Second * 15,
 		},
 		HtmlUrl: htmlUrl,
 	}

@@ -14,6 +14,10 @@ export interface Course {
   sections?: Section[];
 }
 
+const isEmpty = (course: Course) => {
+  return Object.values(course).every((value) => value === null);
+};
+
 export const getCoursesByAccountID = async (
   supabase: SupabaseClient,
   accountID: number
@@ -69,7 +73,13 @@ export const getCourseByID = async (supabase: SupabaseClient, id: number) => {
       throw new Error(error.message);
     }
 
-    return data as Course;
+    const course = data as Course;
+
+    if (isEmpty(course)) {
+      throw new Error('course not found');
+    }
+
+    return course;
   } catch (err) {
     throw err as Error;
   }
