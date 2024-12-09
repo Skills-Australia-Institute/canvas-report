@@ -9,6 +9,7 @@ import EnrollmentsResultsByUser from '../components/reports/enrollmentsResultsBy
 import { ACTIONS } from '../constants';
 import { useSupabase } from '../hooks/supabase';
 import { getUserByID } from '../supabase/users';
+import { UngradedAssignmentsByUser } from './reports/ungradedAssignmentsByUser';
 
 export default function User() {
   const { userID } = useParams();
@@ -57,10 +58,10 @@ export default function User() {
             {ACTIONS.AssignmentsResultsByUser.value}
           </Tabs.Trigger>
           <Tabs.Trigger
-            value={ACTIONS.UngradedAssignmentsResultsByUser.key}
+            value={ACTIONS.UngradedAssignmentsByUser.key}
             className="cursor-pointer"
           >
-            {ACTIONS.UngradedAssignmentsResultsByUser.value}
+            {ACTIONS.UngradedAssignmentsByUser.value}
           </Tabs.Trigger>
         </Tabs.List>
         <Box pt="2">
@@ -70,8 +71,8 @@ export default function User() {
           <Tabs.Content value={ACTIONS.AssignmentsResultsByUser.key}>
             {data && <AssignmentsResultsByUser user={data} />}
           </Tabs.Content>
-          <Tabs.Content value={ACTIONS.UngradedAssignmentsResultsByUser.key}>
-            {data && <AssignmentsResultsByUser user={data} ungraded={true} />}
+          <Tabs.Content value={ACTIONS.UngradedAssignmentsByUser.key}>
+            {data && <UngradedAssignmentsByUser user={data} />}
           </Tabs.Content>
         </Box>
       </Tabs.Root>
