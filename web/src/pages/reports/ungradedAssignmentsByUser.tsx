@@ -182,7 +182,7 @@ export function UngradedAssignmentsByUser({
 }: UngradedAssignmentsByUserProps) {
   const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
-    queryKey: ['users', user.id, 'assignments-results'],
+    queryKey: ['users', user.id, 'ungraded-assignments'],
     queryFn: ({ signal }: { signal: AbortSignal }) =>
       getUngradedAssignmentsByUserID(signal, supabase, user.id),
   });
