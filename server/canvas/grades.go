@@ -88,8 +88,6 @@ func (c *Canvas) GetGradeChangeLogsByGraderID(graderID int, startTime, endTime s
 			return nil, http.StatusInternalServerError, err
 		}
 
-		fmt.Println(len(log.Events))
-
 		results = append(results, log)
 
 		nextUrl := getNextUrl(res.Header.Get("Link"))
