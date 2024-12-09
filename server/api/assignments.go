@@ -146,6 +146,10 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 						continue
 					}
 
+					if coursesMap[enrollment.CourseID].WorkflowState != string(canvas.AvailableCourseWorkflowState) {
+						continue
+					}
+
 					data, code, err := c.canvas.GetAssignmentsDataOfUserByCourseID(user.ID, enrollment.CourseID)
 					if err != nil {
 						return nil, code, err
