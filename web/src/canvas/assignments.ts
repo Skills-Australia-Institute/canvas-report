@@ -49,6 +49,23 @@ export interface AssignmentResult {
   enrollment_state: string;
 }
 
+export interface UngradedAssignmentByUser {
+  user_sis_id: string;
+  name: string;
+  account: string;
+  course_name: string;
+  section: string;
+  title: string;
+  points_possible: number | null;
+  score: number | null;
+  submitted_at: string;
+  status: string;
+  course_state: string;
+  enrollment_role: string;
+  enrollment_state: string;
+  speedgrader_url: string;
+}
+
 // https://github.com/TanStack/query/discussions/4943
 // Making only 10 API call is parallel
 
@@ -114,6 +131,28 @@ export const getAssignmentsResultsByUserID = async (
     });
 
     return data as AssignmentResult[];
+  } catch (err) {
+    throw err as Error;
+  }
+};
+
+export const getUngradedAssignmentsByUserID = async (
+  signal: AbortSignal,
+  supabase: SupabaseClient,
+  userID: number
+) => {
+  try {
+    const accessToken = (await supabase.auth.getSession()).data.session
+      ?.access_token;
+
+    const { data } = await axios.get(`/users/${userID}/ungraded-assignments`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      signal: signal,
+    });
+
+    return data as UngradedAssignmentByUser[];
   } catch (err) {
     throw err as Error;
   }

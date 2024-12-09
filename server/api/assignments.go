@@ -109,6 +109,131 @@ type AssignmentWithGradingType struct {
 	HTMLUrl       string `json:"html_url"`
 }
 
+type GetUngradedAssignmentsByUserResponse struct {
+	UserSisID       string     `json:"user_sis_id"`
+	Name            string     `json:"name"`
+	Acccount        string     `json:"account"`
+	CourseName      string     `json:"course_name"`
+	Section         string     `json:"section"`
+	Title           string     `json:"title"`
+	PointsPossible  null.Float `json:"points_possible"`
+	Score           null.Float `json:"score"`
+	SubmittedAt     string     `json:"submitted_at"`
+	Status          string     `json:"status"`
+	CourseState     string     `json:"course_state"`
+	EnrollmentRole  string     `json:"enrollment_role"`
+	EnrollmentState string     `json:"enrollment_state"`
+	SpeedGraderUrl  string     `json:"speedgrader_url"`
+}
+
+func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *http.Request, user canvas.User) (int, error) {
+	ctx, cancel := context.WithCancel(r.Context())
+	defer cancel()
+
+	results, code, err := func(ctx context.Context) (results []GetUngradedAssignmentsByUserResponse, code int, err error) {
+		results = []GetUngradedAssignmentsByUserResponse{}
+
+		coursesMap := make(map[int]canvas.Course)
+
+		courses, code, err := c.canvas.GetCoursesByUserID(user.ID)
+		if err != nil {
+			return nil, code, err
+		}
+
+		for _, course := range courses {
+			coursesMap[course.ID] = course
+		}
+
+		// for "invited", "rejected", and "deleted", GetAssignmentsDataOfUserByCourseID return 404 error
+		// so skip those enrollments
+		states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
+
+		enrollments, code, err := c.canvas.GetEnrollmentsByUserID(user.ID, states)
+		if err != nil {
+			return nil, code, err
+		}
+
+		for _, enrollment := range enrollments {
+			select {
+			case <-ctx.Done():
+				return nil, http.StatusRequestTimeout, ctx.Err()
+			default:
+				{
+					if enrollment.Role != string(canvas.StudentEnrollment) {
+						continue
+					}
+
+					if coursesMap[enrollment.CourseID].WorkflowState != string(canvas.AvailableCourseWorkflowState) {
+						continue
+					}
+
+					data, code, err := c.canvas.GetSubmissionsByCourseID(enrollment.CourseID, user.ID, canvas.SubmittedSubmissionWorkflowState)
+					if err != nil {
+						return nil, code, err
+					}
+
+					for _, submission := range data {
+						if strings.Contains(submission.Assignment.Name, "Assessment Coversheet") {
+							continue
+						}
+
+						result := GetUngradedAssignmentsByUserResponse{
+							Title:           submission.Assignment.Name,
+							PointsPossible:  submission.Assignment.PointsPossible,
+							Score:           submission.Score,
+							SubmittedAt:     submission.SubmittedAt.String,
+							UserSisID:       user.SISUserID,
+							Name:            user.Name,
+							Section:         enrollment.SISSectionID,
+							EnrollmentRole:  enrollment.Role,
+							EnrollmentState: enrollment.EnrollmentState,
+							Status:          "on_time",
+							SpeedGraderUrl: fmt.Sprintf("%s/courses/%d/gradebook/speed_grader?assignment_id=%d&student_id=%d",
+								c.canvas.HtmlUrl, enrollment.CourseID, submission.AssignmentID, submission.UserID),
+						}
+
+						if submission.Late {
+							result.Status = "late"
+						}
+
+						if course, ok := coursesMap[enrollment.CourseID]; ok {
+							result.Acccount = course.Account.Name
+							result.CourseName = course.Name
+							result.CourseState = course.WorkflowState
+
+						} else {
+							course, code, err := c.canvas.GetCourseByID(enrollment.CourseID)
+							if err != nil {
+								return nil, code, err
+							}
+
+							coursesMap[enrollment.CourseID] = course
+
+							result.Acccount = course.Account.Name
+							result.CourseName = course.Name
+							result.CourseState = course.WorkflowState
+						}
+
+						results = append(results, result)
+					}
+				}
+			}
+		}
+
+		return results, code, err
+	}(ctx)
+
+	if err != nil {
+		return code, err
+	}
+
+	if err := json.NewEncoder(w).Encode(results); err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
 func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *http.Request, user canvas.User) (int, error) {
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
