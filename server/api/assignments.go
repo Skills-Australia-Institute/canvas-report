@@ -172,6 +172,17 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 						return nil, code, err
 					}
 
+					sectionName := enrollment.SISSectionID
+
+					if sectionName == "" {
+						section, code, err := c.canvas.GetSectionByID(enrollment.CourseSectionID)
+						if err != nil {
+							return nil, code, err
+						}
+
+						sectionName = section.Name
+					}
+
 					for _, submission := range data {
 						if strings.Contains(submission.Assignment.Name, "Assessment Coversheet") {
 							continue
@@ -184,7 +195,7 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 							SubmittedAt:     submission.SubmittedAt.String,
 							UserSisID:       user.SISUserID,
 							Name:            user.Name,
-							Section:         enrollment.SISSectionID,
+							Section:         sectionName,
 							EnrollmentRole:  enrollment.Role,
 							EnrollmentState: enrollment.EnrollmentState,
 							Status:          "on_time",
@@ -280,6 +291,17 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 						return nil, code, err
 					}
 
+					sectionName := enrollment.SISSectionID
+
+					if sectionName == "" {
+						section, code, err := c.canvas.GetSectionByID(enrollment.CourseSectionID)
+						if err != nil {
+							return nil, code, err
+						}
+
+						sectionName = section.Name
+					}
+
 					var pointsPossibleTotal float64
 					var scoreTotal float64
 
@@ -301,7 +323,7 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 							SubmittedAt:     ad.Submission.SubmittedAt,
 							UserSisID:       user.SISUserID,
 							Name:            user.Name,
-							Section:         enrollment.SISSectionID,
+							Section:         sectionName,
 							EnrollmentRole:  enrollment.Role,
 							EnrollmentState: enrollment.EnrollmentState,
 							Status:          ad.Status,
