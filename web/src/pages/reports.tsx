@@ -37,7 +37,7 @@ const reports: ReportActionProps[] = [
   },
   {
     title: 'Mark Change Activity',
-    description: 'Mark change activities by trainer in their courses.',
+    description: 'Mark change activities by trainer in their courses',
     path: reportsPath.MarkChangeActivity,
     access: AppRole.Compliance,
   },

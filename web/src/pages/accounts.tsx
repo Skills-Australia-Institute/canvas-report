@@ -60,7 +60,7 @@ export default function Accounts() {
             <Table.Root size="1">
               <Table.Header>
                 <Table.Row>
-                  <Table.ColumnHeaderCell>Account</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                   <Table.ColumnHeaderCell>Courses</Table.ColumnHeaderCell>
                 </Table.Row>
