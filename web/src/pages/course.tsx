@@ -42,7 +42,7 @@ export default function Course() {
 
   return (
     <div className="w-full">
-      <OutletHeader title="Accounts" subTitle={data?.name || undefined} />
+      <OutletHeader title="Courses" subTitle={data?.name || undefined} />
       <Tabs.Root>
         <Tabs.List>
           {user?.app_role !== AppRole.StudentServices && (
