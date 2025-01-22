@@ -174,7 +174,13 @@ const UngradedAssignmentsTable = ({
   }
 
   if (isAllSuccess && sorted.length === 0) {
-    return <Callout msg="No items to display" type={'error'}></Callout>;
+    return (
+      <Callout
+        msg="No items to display"
+        type={'success'}
+        className="max-w-lg"
+      ></Callout>
+    );
   }
 
   return (
