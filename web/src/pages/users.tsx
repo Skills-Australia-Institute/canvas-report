@@ -70,7 +70,7 @@ function UsersTable({ searchTerm }: { searchTerm: string }) {
                 <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>SIS ID</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Email</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Unique ID</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Integration</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>

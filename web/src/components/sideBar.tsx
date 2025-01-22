@@ -20,7 +20,7 @@ const navs = [
     icon: AccessibilityIcon,
   },
   {
-    title: 'Students',
+    title: 'Users',
     path: '/users',
     icon: PersonIcon,
   },
