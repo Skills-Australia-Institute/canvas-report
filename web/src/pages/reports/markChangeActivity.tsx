@@ -515,7 +515,7 @@ function GradeChangeLogsByDateTable({
         <Table.Body>
           {sorted.map((d) => (
             <Table.Row key={d.date}>
-              <Table.RowHeaderCell>
+              <Table.RowHeaderCell className="min-w-40">
                 <Text className="block font-bold">{d.date}</Text>
                 <Text className="block mt-2">
                   {`First: `}
@@ -534,7 +534,7 @@ function GradeChangeLogsByDateTable({
                   </Code>
                 </Text>
               </Table.RowHeaderCell>
-              <Table.Cell>
+              <Table.Cell className="min-w-40">
                 <Text className="block">
                   {`Grades: `}
                   <span className="font-bold">{d.grade_changes}</span>
