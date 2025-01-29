@@ -1,6 +1,7 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -40,6 +41,12 @@ type Assignment struct {
 	GradingType                string                `json:"grading_type"`
 	OmitFromFinalGrade         bool                  `json:"omit_from_final_grade"`
 	WorkflowState              string                `json:"workflow_state"`
+	Overrides                  []struct {
+		CourseSectionID null.Int    `json:"course_section_id"`
+		DueAt           null.String `json:"due_at"`
+		LockAt          null.String `json:"lock_at"`
+		UnlockAt        null.String `json:"unlock_at"`
+	} `json:"overrides"`
 }
 
 type SectionNeedsGrading struct {
@@ -74,6 +81,31 @@ type AssignmentDate struct {
 	SetType  string   `json:"set_type"` // "Group", "CourseSection", "ADHOC", "Noop"
 	SetID    null.Int `json:"set_id"`   // set_id is null when set_type is "ADHOC"
 	Base     bool     `json:"base"`
+}
+
+func (c *Canvas) GetAssignmentByID(ctx context.Context, assignmentID, courseID int, includeOverrides bool) (Assignment, error) {
+	requestUrl := fmt.Sprintf("%s/courses/%d/assignments/%d", c.baseUrl, courseID, assignmentID)
+
+	if includeOverrides {
+		requestUrl += "?include[]=overrides"
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return Assignment{}, err
+	}
+
+	data, err := c.httpClient.do(req)
+	if err != nil {
+		return Assignment{}, fmt.Errorf("error fetching assignment: %d", assignmentID)
+	}
+
+	var result Assignment
+	if err := json.Unmarshal(data, &result); err != nil {
+		return Assignment{}, err
+	}
+
+	return result, nil
 }
 
 func (c *Canvas) GetAssignmentsDataOfUserByCourseID(userID, courseID int) (results []AssignmentData, code int, err error) {

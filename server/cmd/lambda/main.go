@@ -49,7 +49,7 @@ func init() {
 
 	canvasHtmlUrl := strings.TrimSuffix(canvasBaseUrl, "/api/v1")
 
-	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl)
+	canvas := canvas.NewCanvas(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl)
 
 	supabaseBaseUrl := os.Getenv("SUPABASE_BASE_URL")
 	if supabaseBaseUrl == "" {

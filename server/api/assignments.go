@@ -441,9 +441,30 @@ func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r 
 
 						datesMap := make(map[int]canvas.AssignmentDate)
 
-						for _, date := range assignment.AllDates {
-							if date.SetID.Valid && date.SetType == "CourseSection" {
-								datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+						// When there are many assignment overrides, all dates are not returned to avoid heavy payload.
+						// So to get all dates, separate API call is needed.
+						if len(assignment.AllDates) == 0 {
+							assignment, err := c.canvas.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
+							if err != nil {
+								return nil, http.StatusBadRequest, err
+							}
+
+							for _, o := range assignment.Overrides {
+								if o.CourseSectionID.Valid {
+									datesMap[int(o.CourseSectionID.Int64)] = canvas.AssignmentDate{
+										DueAt:    o.DueAt.String,
+										LockAt:   o.LockAt.String,
+										UnlockAt: o.DueAt.String,
+										SetType:  "CourseSection",
+										SetID:    o.CourseSectionID,
+									}
+								}
+							}
+						} else {
+							for _, date := range assignment.AllDates {
+								if date.SetID.Valid && date.SetType == "CourseSection" {
+									datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+								}
 							}
 						}
 
@@ -566,9 +587,30 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 
 							datesMap := make(map[int]canvas.AssignmentDate)
 
-							for _, date := range assignment.AllDates {
-								if date.SetID.Valid && date.SetType == "CourseSection" {
-									datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+							// When there are many assignment overrides, all dates are not returned to avoid heavy payload.
+							// So to get all dates, separate API call is needed.
+							if len(assignment.AllDates) == 0 {
+								assignment, err := c.canvas.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
+								if err != nil {
+									return nil, http.StatusBadRequest, err
+								}
+
+								for _, o := range assignment.Overrides {
+									if o.CourseSectionID.Valid {
+										datesMap[int(o.CourseSectionID.Int64)] = canvas.AssignmentDate{
+											DueAt:    o.DueAt.String,
+											LockAt:   o.LockAt.String,
+											UnlockAt: o.DueAt.String,
+											SetType:  "CourseSection",
+											SetID:    o.CourseSectionID,
+										}
+									}
+								}
+							} else {
+								for _, date := range assignment.AllDates {
+									if date.SetID.Valid && date.SetType == "CourseSection" {
+										datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+									}
 								}
 							}
 
@@ -690,9 +732,30 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 
 							datesMap := make(map[int]canvas.AssignmentDate)
 
-							for _, date := range assignment.AllDates {
-								if date.SetID.Valid && date.SetType == "CourseSection" {
-									datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+							// When there are many assignment overrides, all dates are not returned to avoid heavy payload.
+							// So to get all dates, separate API call is needed.
+							if len(assignment.AllDates) == 0 {
+								assignment, err := c.canvas.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
+								if err != nil {
+									return nil, http.StatusBadRequest, err
+								}
+
+								for _, o := range assignment.Overrides {
+									if o.CourseSectionID.Valid {
+										datesMap[int(o.CourseSectionID.Int64)] = canvas.AssignmentDate{
+											DueAt:    o.DueAt.String,
+											LockAt:   o.LockAt.String,
+											UnlockAt: o.DueAt.String,
+											SetType:  "CourseSection",
+											SetID:    o.CourseSectionID,
+										}
+									}
+								}
+							} else {
+								for _, date := range assignment.AllDates {
+									if date.SetID.Valid && date.SetType == "CourseSection" {
+										datesMap[int(date.SetID.Int64)] = date // in this case set id is section id
+									}
 								}
 							}
 

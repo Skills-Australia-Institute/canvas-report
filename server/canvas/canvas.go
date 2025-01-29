@@ -1,6 +1,8 @@
 package canvas
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
@@ -12,10 +14,49 @@ type Canvas struct {
 	accessToken string
 	pageSize    int
 	client      *http.Client
+	httpClient  *canvasClient
 	HtmlUrl     string
 }
 
-func New(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canvas {
+type canvasClient struct {
+	accessToken string
+	client      *http.Client
+}
+
+func newCanvasClient(accessToken string) *canvasClient {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	return &canvasClient{
+		accessToken: accessToken,
+		client:      client,
+	}
+}
+
+func (c *canvasClient) do(req *http.Request) ([]byte, error) {
+	bearer := "Bearer " + c.accessToken
+	req.Header.Add("Authorization", bearer)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("request unsuccessful")
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
+}
+
+func NewCanvas(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canvas {
 	return &Canvas{
 		baseUrl:     baseUrl,
 		accessToken: accessToken,
@@ -23,7 +64,8 @@ func New(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canv
 		client: &http.Client{
 			Timeout: time.Second * 15,
 		},
-		HtmlUrl: htmlUrl,
+		httpClient: newCanvasClient(accessToken),
+		HtmlUrl:    htmlUrl,
 	}
 }
 
