@@ -135,7 +135,7 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 
 		coursesMap := make(map[int]canvas.Course)
 
-		courses, code, err := c.canvas.GetCoursesByUserID(user.ID)
+		courses, code, err := c.canvasClient.GetCoursesByUserID(ctx, user.ID)
 		if err != nil {
 			return nil, code, err
 		}
@@ -148,7 +148,7 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 		// so skip those enrollments
 		states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
 
-		enrollments, code, err := c.canvas.GetEnrollmentsByUserID(user.ID, states)
+		enrollments, code, err := c.canvasClient.GetEnrollmentsByUserID(ctx, user.ID, states)
 		if err != nil {
 			return nil, code, err
 		}
@@ -167,7 +167,7 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 						continue
 					}
 
-					data, code, err := c.canvas.GetSubmissionsByCourseID(enrollment.CourseID, user.ID, canvas.SubmittedSubmissionWorkflowState)
+					data, code, err := c.canvasClient.GetSubmissionsByCourseID(ctx, enrollment.CourseID, user.ID, canvas.SubmittedSubmissionWorkflowState)
 					if err != nil {
 						return nil, code, err
 					}
@@ -175,7 +175,7 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 					sectionName := enrollment.SISSectionID
 
 					if sectionName == "" {
-						section, code, err := c.canvas.GetSectionByID(enrollment.CourseSectionID)
+						section, code, err := c.canvasClient.GetSectionByID(ctx, enrollment.CourseSectionID)
 						if err != nil {
 							return nil, code, err
 						}
@@ -200,7 +200,7 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 							EnrollmentState: enrollment.EnrollmentState,
 							Status:          "on_time",
 							SpeedGraderUrl: fmt.Sprintf("%s/courses/%d/gradebook/speed_grader?assignment_id=%d&student_id=%d",
-								c.canvas.HtmlUrl, enrollment.CourseID, submission.AssignmentID, submission.UserID),
+								c.canvasClient.HtmlUrl, enrollment.CourseID, submission.AssignmentID, submission.UserID),
 						}
 
 						if submission.Late {
@@ -213,7 +213,7 @@ func (c *APIController) GetUngradedAssignmentsByUser(w http.ResponseWriter, r *h
 							result.CourseState = course.WorkflowState
 
 						} else {
-							course, code, err := c.canvas.GetCourseByID(enrollment.CourseID)
+							course, code, err := c.canvasClient.GetCourseByID(ctx, enrollment.CourseID)
 							if err != nil {
 								return nil, code, err
 							}
@@ -254,7 +254,7 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 
 		coursesMap := make(map[int]canvas.Course)
 
-		courses, code, err := c.canvas.GetCoursesByUserID(user.ID)
+		courses, code, err := c.canvasClient.GetCoursesByUserID(ctx, user.ID)
 		if err != nil {
 			return nil, code, err
 		}
@@ -267,7 +267,7 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 		// so skip those enrollments
 		states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
 
-		enrollments, code, err := c.canvas.GetEnrollmentsByUserID(user.ID, states)
+		enrollments, code, err := c.canvasClient.GetEnrollmentsByUserID(ctx, user.ID, states)
 		if err != nil {
 			return nil, code, err
 		}
@@ -286,7 +286,7 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 						continue
 					}
 
-					data, code, err := c.canvas.GetAssignmentsDataOfUserByCourseID(user.ID, enrollment.CourseID)
+					data, code, err := c.canvasClient.GetAssignmentsDataOfUserByCourseID(ctx, user.ID, enrollment.CourseID)
 					if err != nil {
 						return nil, code, err
 					}
@@ -294,7 +294,7 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 					sectionName := enrollment.SISSectionID
 
 					if sectionName == "" {
-						section, code, err := c.canvas.GetSectionByID(enrollment.CourseSectionID)
+						section, code, err := c.canvasClient.GetSectionByID(ctx, enrollment.CourseSectionID)
 						if err != nil {
 							return nil, code, err
 						}
@@ -340,7 +340,7 @@ func (c *APIController) GetAssignmentsResultsByUser(w http.ResponseWriter, r *ht
 							result.CourseState = course.WorkflowState
 
 						} else {
-							course, code, err := c.canvas.GetCourseByID(enrollment.CourseID)
+							course, code, err := c.canvasClient.GetCourseByID(ctx, enrollment.CourseID)
 							if err != nil {
 								return nil, code, err
 							}
@@ -423,7 +423,7 @@ func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r 
 	results, code, err := func(ctx context.Context) (results []UngradedAssignmentWithAccountCourseInfo, code int, err error) {
 		results = []UngradedAssignmentWithAccountCourseInfo{}
 
-		assignments, code, err := c.canvas.GetAssignmentsByCourseID(courseID, "", canvas.UngradedBucket, true)
+		assignments, code, err := c.canvasClient.GetAssignmentsByCourseID(ctx, courseID, "", canvas.UngradedBucket, true)
 		if err != nil {
 			return nil, code, err
 		}
@@ -444,9 +444,9 @@ func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r 
 						// When there are many assignment overrides, all dates are not returned to avoid heavy payload.
 						// So to get all dates, separate API call is needed.
 						if len(assignment.AllDates) == 0 {
-							assignment, err := c.canvas.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
+							assignment, code, err := c.canvasClient.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
 							if err != nil {
-								return nil, http.StatusBadRequest, err
+								return nil, code, err
 							}
 
 							for _, o := range assignment.Overrides {
@@ -471,7 +471,7 @@ func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r 
 						// no section information at the moment
 						if _, ok := sectionsWithTeachersMap[section.SectionID]; !ok {
 
-							enrollments, code, err := c.canvas.GetEnrollmentsBySectionID(section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
+							enrollments, code, err := c.canvasClient.GetEnrollmentsBySectionID(ctx, section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
 							if err != nil {
 								return nil, code, err
 							}
@@ -494,7 +494,7 @@ func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r 
 
 							// get section when there is no sis section id
 							if st.sisSectionID == "" {
-								_section, code, err := c.canvas.GetSectionByID(section.SectionID)
+								_section, code, err := c.canvasClient.GetSectionByID(ctx, section.SectionID)
 								if err != nil {
 									return nil, code, err
 								}
@@ -512,7 +512,7 @@ func (c *APIController) GetUngradedAssignmentsByCourse(w http.ResponseWriter, r 
 							Published:             assignment.Published,
 							Account:               accountName,
 							CourseName:            courseName,
-							GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvas.HtmlUrl, courseID),
+							GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvasClient.HtmlUrl, courseID),
 						}
 
 						// now we have section information
@@ -573,7 +573,7 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 						return nil, http.StatusBadRequest, fmt.Errorf("invalid course id: %s", id)
 					}
 
-					assignments, code, err := c.canvas.GetAssignmentsByCourseID(courseID, "", canvas.UngradedBucket, true)
+					assignments, code, err := c.canvasClient.GetAssignmentsByCourseID(ctx, courseID, "", canvas.UngradedBucket, true)
 					if err != nil {
 						return nil, code, err
 					}
@@ -590,9 +590,9 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 							// When there are many assignment overrides, all dates are not returned to avoid heavy payload.
 							// So to get all dates, separate API call is needed.
 							if len(assignment.AllDates) == 0 {
-								assignment, err := c.canvas.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
+								assignment, code, err := c.canvasClient.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
 								if err != nil {
-									return nil, http.StatusBadRequest, err
+									return nil, code, err
 								}
 
 								for _, o := range assignment.Overrides {
@@ -617,7 +617,7 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 							// no section information at the moment
 							if _, ok := sectionsWithTeachersMap[section.SectionID]; !ok {
 
-								enrollments, code, err := c.canvas.GetEnrollmentsBySectionID(section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
+								enrollments, code, err := c.canvasClient.GetEnrollmentsBySectionID(ctx, section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
 								if err != nil {
 									return nil, code, err
 								}
@@ -640,7 +640,7 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 
 								// get section when there is no sis section id
 								if st.sisSectionID == "" {
-									_section, code, err := c.canvas.GetSectionByID(section.SectionID)
+									_section, code, err := c.canvasClient.GetSectionByID(ctx, section.SectionID)
 									if err != nil {
 										return nil, code, err
 									}
@@ -656,7 +656,7 @@ func (c *APIController) GetUngradedAssignmentsByCourses(w http.ResponseWriter, r
 								CourseID:              assignment.CourseID,
 								NeedingGradingSection: section.NeedsGradingCount,
 								Published:             assignment.Published,
-								GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvas.HtmlUrl, courseID),
+								GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvasClient.HtmlUrl, courseID),
 							}
 
 							// now we have section information
@@ -707,7 +707,7 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 
 		types := []canvas.CourseEnrollmentType{canvas.StudentCourseEnrollment}
 
-		courses, code, err := c.canvas.GetCoursesByAccountID(accountID, "", types)
+		courses, code, err := c.canvasClient.GetCoursesByAccountID(ctx, accountID, "", types)
 		if err != nil {
 			return nil, code, err
 		}
@@ -718,7 +718,7 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 				return nil, http.StatusRequestTimeout, ctx.Err()
 			default:
 				{
-					assignments, code, err := c.canvas.GetAssignmentsByCourseID(course.ID, "", canvas.UngradedBucket, true)
+					assignments, code, err := c.canvasClient.GetAssignmentsByCourseID(ctx, course.ID, "", canvas.UngradedBucket, true)
 					if err != nil {
 						return nil, code, err
 					}
@@ -735,9 +735,9 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 							// When there are many assignment overrides, all dates are not returned to avoid heavy payload.
 							// So to get all dates, separate API call is needed.
 							if len(assignment.AllDates) == 0 {
-								assignment, err := c.canvas.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
+								assignment, code, err := c.canvasClient.GetAssignmentByID(ctx, assignment.ID, assignment.CourseID, true)
 								if err != nil {
-									return nil, http.StatusBadRequest, err
+									return nil, code, err
 								}
 
 								for _, o := range assignment.Overrides {
@@ -762,7 +762,7 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 							// no section information at the moment
 							if _, ok := sectionsWithTeachersMap[section.SectionID]; !ok {
 
-								enrollments, code, err := c.canvas.GetEnrollmentsBySectionID(section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
+								enrollments, code, err := c.canvasClient.GetEnrollmentsBySectionID(ctx, section.SectionID, nil, []canvas.EnrollmentType{canvas.TeacherEnrollment})
 								if err != nil {
 									return nil, code, err
 								}
@@ -785,7 +785,7 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 
 								// get section when there is no sis section id
 								if st.sisSectionID == "" {
-									_section, code, err := c.canvas.GetSectionByID(section.SectionID)
+									_section, code, err := c.canvasClient.GetSectionByID(ctx, section.SectionID)
 									if err != nil {
 										return nil, code, err
 									}
@@ -803,7 +803,7 @@ func (c *APIController) GetUngradedAssignmentsByAccountID(w http.ResponseWriter,
 								Published:             assignment.Published,
 								Account:               course.Account.Name,
 								CourseName:            course.Name,
-								GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvas.HtmlUrl, course.ID),
+								GradebookURL:          fmt.Sprintf(`%s/courses/%d/gradebook`, c.canvasClient.HtmlUrl, course.ID),
 							}
 
 							// now we have section information

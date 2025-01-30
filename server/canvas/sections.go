@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -22,7 +22,7 @@ type Section struct {
 	CreatedAt     string      `json:"created_at"`
 }
 
-func (c *Canvas) GetSectionsByCourseID(courseID int) (results []Section, code int, err error) {
+func (c *CanvasClient) GetSectionsByCourseID(ctx context.Context, courseID int) (results []Section, code int, err error) {
 	params := url.Values{}
 
 	params.Add("page", "1")
@@ -32,37 +32,24 @@ func (c *Canvas) GetSectionsByCourseID(courseID int) (results []Section, code in
 	requestUrl := fmt.Sprintf("%s/courses/%d/sections?%s", c.baseUrl, courseID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching sections of course: %d", courseID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		sections := []Section{}
-		if err := json.Unmarshal(body, &sections); err != nil {
+		if err := json.Unmarshal(data, &sections); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, sections...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break
@@ -74,7 +61,7 @@ func (c *Canvas) GetSectionsByCourseID(courseID int) (results []Section, code in
 	return results, http.StatusOK, nil
 }
 
-func (c *Canvas) GetSectionByID(sectionID int) (section Section, code int, err error) {
+func (c *CanvasClient) GetSectionByID(ctx context.Context, sectionID int) (section Section, code int, err error) {
 	requestUrl := fmt.Sprintf("%s/sections/%d", c.baseUrl, sectionID)
 
 	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
@@ -82,27 +69,14 @@ func (c *Canvas) GetSectionByID(sectionID int) (section Section, code int, err e
 		return section, http.StatusInternalServerError, err
 	}
 
-	bearer := "Bearer " + c.accessToken
-	req.Header.Add("Authorization", bearer)
-
-	res, err := c.client.Do(req)
+	data, _, code, err := c.httpClient.do(req)
 	if err != nil {
-		return section, http.StatusInternalServerError, err
-	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return section, http.StatusInternalServerError, err
+		return section, code, err
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return section, res.StatusCode, fmt.Errorf("error fetching section: %d", sectionID)
-	}
-
-	if err := json.Unmarshal(body, &section); err != nil {
+	if err := json.Unmarshal(data, &section); err != nil {
 		return section, http.StatusInternalServerError, err
 	}
 
-	return section, http.StatusInternalServerError, nil
+	return section, http.StatusOK, nil
 }

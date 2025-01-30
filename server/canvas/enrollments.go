@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -55,7 +55,7 @@ const (
 	DeletedEnrollment   EnrollmentState = "deleted"
 )
 
-func (c *Canvas) GetEnrollmentsByUserID(userID int, states []EnrollmentState) (results []Enrollment, code int, err error) {
+func (c *CanvasClient) GetEnrollmentsByUserID(ctx context.Context, userID int, states []EnrollmentState) (results []Enrollment, code int, err error) {
 	params := url.Values{}
 
 	params.Add("per_page", strconv.Itoa(c.pageSize))
@@ -67,38 +67,24 @@ func (c *Canvas) GetEnrollmentsByUserID(userID int, states []EnrollmentState) (r
 	requestUrl := fmt.Sprintf("%s/users/%d/enrollments?%s", c.baseUrl, userID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching enrollments of user: %d", userID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		enrollments := []Enrollment{}
-
-		if err := json.Unmarshal(body, &enrollments); err != nil {
+		if err := json.Unmarshal(data, &enrollments); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, enrollments...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break
@@ -110,7 +96,7 @@ func (c *Canvas) GetEnrollmentsByUserID(userID int, states []EnrollmentState) (r
 	return results, http.StatusOK, nil
 }
 
-func (c *Canvas) GetEnrollmentsByCourseID(courseID int, states []EnrollmentState, types []EnrollmentType) (results []Enrollment, code int, err error) {
+func (c *CanvasClient) GetEnrollmentsByCourseID(ctx context.Context, courseID int, states []EnrollmentState, types []EnrollmentType) (results []Enrollment, code int, err error) {
 	params := url.Values{}
 
 	params.Add("per_page", strconv.Itoa(c.pageSize))
@@ -126,38 +112,24 @@ func (c *Canvas) GetEnrollmentsByCourseID(courseID int, states []EnrollmentState
 	requestUrl := fmt.Sprintf("%s/courses/%d/enrollments?%s", c.baseUrl, courseID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching enrollments of course: %d", courseID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		enrollments := []Enrollment{}
-
-		if err := json.Unmarshal(body, &enrollments); err != nil {
+		if err := json.Unmarshal(data, &enrollments); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, enrollments...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break
@@ -169,7 +141,7 @@ func (c *Canvas) GetEnrollmentsByCourseID(courseID int, states []EnrollmentState
 	return results, http.StatusOK, nil
 }
 
-func (c *Canvas) GetEnrollmentsBySectionID(sectionID int, states []EnrollmentState, types []EnrollmentType) (results []Enrollment, code int, err error) {
+func (c *CanvasClient) GetEnrollmentsBySectionID(ctx context.Context, sectionID int, states []EnrollmentState, types []EnrollmentType) (results []Enrollment, code int, err error) {
 	params := url.Values{}
 
 	params.Add("per_page", strconv.Itoa(c.pageSize))
@@ -185,38 +157,24 @@ func (c *Canvas) GetEnrollmentsBySectionID(sectionID int, states []EnrollmentSta
 	requestUrl := fmt.Sprintf("%s/sections/%d/enrollments?%s", c.baseUrl, sectionID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching enrollments of course section: %d", sectionID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		enrollments := []Enrollment{}
-
-		if err := json.Unmarshal(body, &enrollments); err != nil {
+		if err := json.Unmarshal(data, &enrollments); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, enrollments...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break

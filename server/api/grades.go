@@ -61,7 +61,7 @@ func (c *APIController) GetGradeChangeLogsByGraderID(w http.ResponseWriter, r *h
 		return http.StatusBadRequest, fmt.Errorf("invalid end time")
 	}
 
-	results, code, err := c.canvas.GetGradeChangeLogsByGraderID(graderID, startTime, endTime)
+	results, code, err := c.canvasClient.GetGradeChangeLogsByGraderID(r.Context(), graderID, startTime, endTime)
 	if err != nil {
 		return code, err
 	}

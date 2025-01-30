@@ -44,12 +44,42 @@ func withError(next func(w http.ResponseWriter, r *http.Request) (int, error)) h
 	return fn
 }
 
+type auther struct {
+	secret []byte
+}
+
+func newAuther(secret []byte) *auther {
+	return &auther{
+		secret: secret,
+	}
+}
+
 type claims struct {
 	Email       string `json:"email"`
 	AppMetaData struct {
 		AppRole string `json:"app_role"`
 	} `json:"app_metadata"`
 	jwt.RegisteredClaims
+}
+
+func (a *auther) verifyAccessToken(token string) (email string, err error) {
+	t, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return a.secret, nil
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("error validating token: %w", err)
+	}
+
+	if claims, ok := t.Claims.(*claims); ok {
+		return claims.Email, nil
+	}
+
+	return "", fmt.Errorf("error validating token")
 }
 
 func withAuth(c *APIController, next func(w http.ResponseWriter, r *http.Request) (int, error)) func(w http.ResponseWriter, r *http.Request) (int, error) {
@@ -71,7 +101,7 @@ func withAuth(c *APIController, next func(w http.ResponseWriter, r *http.Request
 			return http.StatusUnauthorized, fmt.Errorf("%s", http.StatusText(http.StatusUnauthorized))
 		}
 
-		_, err := parseJwtToken(token, []byte(c.supabase.Secret))
+		_, err := c.auther.verifyAccessToken(token)
 		if err != nil {
 			return http.StatusUnauthorized, fmt.Errorf("%s", http.StatusText(http.StatusUnauthorized))
 		}
@@ -82,26 +112,6 @@ func withAuth(c *APIController, next func(w http.ResponseWriter, r *http.Request
 	return fn
 }
 
-func parseJwtToken(token string, secret []byte) (email string, err error) {
-	t, err := jwt.ParseWithClaims(token, &claims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return secret, nil
-	})
-
-	if err != nil {
-		return "", fmt.Errorf("error validating token: %v", err)
-	}
-
-	if claims, ok := t.Claims.(*claims); ok {
-		return claims.Email, nil
-	}
-
-	return "", fmt.Errorf("error parsing token: %v", err)
-}
-
 func withCourse(c *APIController, next func(w http.ResponseWriter, r *http.Request, course canvas.Course) (int, error)) func(w http.ResponseWriter, r *http.Request) (int, error) {
 	fn := func(w http.ResponseWriter, r *http.Request) (int, error) {
 		courseID, err := strconv.Atoi(chi.URLParam(r, "course_id"))
@@ -109,7 +119,7 @@ func withCourse(c *APIController, next func(w http.ResponseWriter, r *http.Reque
 			return http.StatusBadRequest, fmt.Errorf("invalid course id")
 		}
 
-		course, code, err := c.canvas.GetCourseByID(courseID)
+		course, code, err := c.canvasClient.GetCourseByID(r.Context(), courseID)
 		if err != nil {
 			return code, err
 		}
@@ -127,7 +137,7 @@ func withUser(c *APIController, next func(w http.ResponseWriter, r *http.Request
 			return http.StatusBadRequest, fmt.Errorf("invalid user id")
 		}
 
-		user, code, err := c.canvas.GetUserByID(userID)
+		user, code, err := c.canvasClient.GetUserByID(r.Context(), userID)
 		if err != nil {
 			return code, err
 		}

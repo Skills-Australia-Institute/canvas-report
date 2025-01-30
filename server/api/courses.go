@@ -30,7 +30,7 @@ func (c *APIController) GetCoursesByAccountID(w http.ResponseWriter, r *http.Req
 
 	types := []canvas.CourseEnrollmentType{canvas.StudentCourseEnrollment}
 
-	results, code, err := c.canvas.GetCoursesByAccountID(accountID, "", types)
+	results, code, err := c.canvasClient.GetCoursesByAccountID(r.Context(), accountID, "", types)
 	if err != nil {
 		return code, err
 	}

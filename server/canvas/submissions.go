@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -41,7 +41,7 @@ type Submission struct {
 	} `json:"assignment"`
 }
 
-func (c *Canvas) GetSubmissionsByCourseID(courseID int, studentID int, submissionWorkflowState SubmissionWorkflowState) (results []Submission, code int, err error) {
+func (c *CanvasClient) GetSubmissionsByCourseID(ctx context.Context, courseID int, studentID int, submissionWorkflowState SubmissionWorkflowState) (results []Submission, code int, err error) {
 	params := url.Values{}
 
 	params.Add("page", "1")
@@ -53,38 +53,24 @@ func (c *Canvas) GetSubmissionsByCourseID(courseID int, studentID int, submissio
 	requestUrl := fmt.Sprintf("%s/courses/%d/students/submissions?%s", c.baseUrl, courseID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching submissions of course: %d and student: %d", courseID, studentID)
+			return nil, code, err
 		}
 
 		submissions := []Submission{}
-
-		if err := json.Unmarshal(body, &submissions); err != nil {
+		if err := json.Unmarshal(data, &submissions); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, submissions...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 		if nextUrl == "" {
 			break
 		}

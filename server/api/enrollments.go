@@ -53,7 +53,7 @@ func (c *APIController) GetEnrollmentResultsByCourse(w http.ResponseWriter, r *h
 
 	types := []canvas.EnrollmentType{canvas.StudentEnrollment}
 
-	enrollments, code, err := c.canvas.GetEnrollmentsByCourseID(courseID, states, types)
+	enrollments, code, err := c.canvasClient.GetEnrollmentsByCourseID(r.Context(), courseID, states, types)
 	if err != nil {
 		return code, err
 	}
@@ -94,12 +94,12 @@ func (c *APIController) GetEnrollmentsResultsByUser(w http.ResponseWriter, r *ht
 
 	coursesMap := make(map[int]canvas.Course)
 
-	enrollments, code, err := c.canvas.GetEnrollmentsByUserID(user.ID, states)
+	enrollments, code, err := c.canvasClient.GetEnrollmentsByUserID(r.Context(), user.ID, states)
 	if err != nil {
 		return code, err
 	}
 
-	courses, code, err := c.canvas.GetCoursesByUserID(user.ID)
+	courses, code, err := c.canvasClient.GetCoursesByUserID(r.Context(), user.ID)
 	if err != nil {
 		return code, err
 	}
@@ -126,7 +126,7 @@ func (c *APIController) GetEnrollmentsResultsByUser(w http.ResponseWriter, r *ht
 			result.Account = course.Account.Name
 
 		} else {
-			course, code, err := c.canvas.GetCourseByID(enrollment.CourseID)
+			course, code, err := c.canvasClient.GetCourseByID(r.Context(), enrollment.CourseID)
 			if err != nil {
 				return code, err
 			}
@@ -139,7 +139,7 @@ func (c *APIController) GetEnrollmentsResultsByUser(w http.ResponseWriter, r *ht
 		}
 
 		if result.Section == "" {
-			section, code, err := c.canvas.GetSectionByID(enrollment.CourseSectionID)
+			section, code, err := c.canvasClient.GetSectionByID(r.Context(), enrollment.CourseSectionID)
 			if err != nil {
 				return code, err
 			}

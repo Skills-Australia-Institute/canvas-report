@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -29,7 +29,7 @@ const (
 	GradingStandardCourseContext  GradingStandardContext = "courses"
 )
 
-func (c *Canvas) GetGradingStandardsByContext(context GradingStandardContext, contextID int) (results []GradingStandard, code int, err error) {
+func (c *CanvasClient) GetGradingStandardsByContext(ctx context.Context, context GradingStandardContext, contextID int) (results []GradingStandard, code int, err error) {
 	params := url.Values{}
 
 	params.Add("per_page", strconv.Itoa(c.pageSize))
@@ -37,38 +37,24 @@ func (c *Canvas) GetGradingStandardsByContext(context GradingStandardContext, co
 	requestUrl := fmt.Sprintf("%s/%s/%d/grading_standards?%s", c.baseUrl, context, contextID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching grading standards by %s context with id: %d", context, contextID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		gradingStandards := []GradingStandard{}
-
-		if err := json.Unmarshal(body, &gradingStandards); err != nil {
+		if err := json.Unmarshal(data, &gradingStandards); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, gradingStandards...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break

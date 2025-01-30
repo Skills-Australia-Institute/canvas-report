@@ -9,62 +9,56 @@ import (
 	"time"
 )
 
-type Canvas struct {
-	baseUrl     string
-	accessToken string
-	pageSize    int
-	client      *http.Client
-	httpClient  *canvasClient
-	HtmlUrl     string
+type CanvasClient struct {
+	baseUrl    string
+	pageSize   int
+	httpClient *httpClient
+	HtmlUrl    string
 }
 
-type canvasClient struct {
+type httpClient struct {
 	accessToken string
 	client      *http.Client
 }
 
-func newCanvasClient(accessToken string) *canvasClient {
+func newHttpClient(accessToken string) *httpClient {
 	client := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: 15 * time.Second,
 	}
 
-	return &canvasClient{
+	return &httpClient{
 		accessToken: accessToken,
 		client:      client,
 	}
 }
 
-func (c *canvasClient) do(req *http.Request) ([]byte, error) {
+func (c *httpClient) do(req *http.Request) (data []byte, link string, code int, err error) {
 	bearer := "Bearer " + c.accessToken
 	req.Header.Add("Authorization", bearer)
 
 	res, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, "", http.StatusInternalServerError, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("request unsuccessful")
+		return nil, "", res.StatusCode, fmt.Errorf("unsuccessful request: %s", req.URL.RequestURI())
 	}
 
-	body, err := io.ReadAll(res.Body)
+	data, err = io.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, "", http.StatusInternalServerError, err
 	}
 
-	return body, nil
+	return data, res.Header.Get("Link"), http.StatusOK, nil
 }
 
-func NewCanvas(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canvas {
-	return &Canvas{
-		baseUrl:     baseUrl,
-		accessToken: accessToken,
-		pageSize:    pageSize,
-		client: &http.Client{
-			Timeout: time.Second * 15,
-		},
-		httpClient: newCanvasClient(accessToken),
+func NewCanvasClient(baseUrl string, accessToken string, pageSize int, htmlUrl string) *CanvasClient {
+	return &CanvasClient{
+		baseUrl:    baseUrl,
+		pageSize:   pageSize,
+		httpClient: newHttpClient(accessToken),
 		HtmlUrl:    htmlUrl,
 	}
 }

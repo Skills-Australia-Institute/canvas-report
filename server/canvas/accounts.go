@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/guregu/null/v5"
@@ -17,32 +17,20 @@ type Account struct {
 	WorkflowState   string   `json:"workflow_state"`
 }
 
-func (c *Canvas) GetAccountByID(accountID int) (account Account, code int, err error) {
+func (c *CanvasClient) GetAccountByID(ctx context.Context, accountID int) (account Account, code int, err error) {
 	requestUrl := fmt.Sprintf("%s/accounts/%d", c.baseUrl, accountID)
 
-	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
-	if err != nil {
-		return account, http.StatusInternalServerError, err
-	}
-	bearer := "Bearer " + c.accessToken
-	req.Header.Add("Authorization", bearer)
-
-	res, err := c.client.Do(req)
-	if err != nil {
-		return account, http.StatusInternalServerError, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return account, res.StatusCode, fmt.Errorf("error fetching account: %d", accountID)
-	}
-
-	body, err := io.ReadAll(res.Body)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 	if err != nil {
 		return account, http.StatusInternalServerError, err
 	}
 
-	if err := json.Unmarshal(body, &account); err != nil {
+	data, _, code, err := c.httpClient.do(req)
+	if err != nil {
+		return account, code, err
+	}
+
+	if err := json.Unmarshal(data, &account); err != nil {
 		return account, http.StatusInternalServerError, err
 	}
 

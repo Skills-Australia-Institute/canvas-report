@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -49,7 +49,7 @@ type GradeChangeLogUser struct {
 	Name string `json:"name"`
 }
 
-func (c *Canvas) GetGradeChangeLogsByGraderID(graderID int, startTime, endTime string) (results []GradeChangeLog, code int, err error) {
+func (c *CanvasClient) GetGradeChangeLogsByGraderID(ctx context.Context, graderID int, startTime, endTime string) (results []GradeChangeLog, code int, err error) {
 	params := url.Values{}
 
 	params.Add("per_page", strconv.Itoa(c.pageSize))
@@ -59,38 +59,24 @@ func (c *Canvas) GetGradeChangeLogsByGraderID(graderID int, startTime, endTime s
 	requestUrl := fmt.Sprintf("%s/audit/grade_change/graders/%d?%s", c.baseUrl, graderID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching grade change logs of grader: %d", graderID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		var log GradeChangeLog
-
-		if err := json.Unmarshal(body, &log); err != nil {
+		if err := json.Unmarshal(data, &log); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, log)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break
