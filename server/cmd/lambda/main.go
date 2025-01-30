@@ -49,7 +49,7 @@ func init() {
 
 	canvasHtmlUrl := strings.TrimSuffix(canvasBaseUrl, "/api/v1")
 
-	canvas := canvas.New(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl)
+	canvasClient := canvas.NewCanvasClient(canvasBaseUrl, canvasAccessToken, canvasPageSize, canvasHtmlUrl)
 
 	supabaseBaseUrl := os.Getenv("SUPABASE_BASE_URL")
 	if supabaseBaseUrl == "" {
@@ -66,12 +66,12 @@ func init() {
 		log.Panic("missing env: SUPABASE_JWT_SECRET")
 	}
 
-	supabase, err := supabase.New(supabaseBaseUrl, supabasePublicAnonKey, supabaseJwtSecret)
+	supabaseClient, err := supabase.NewSupabaseClient(supabaseBaseUrl, supabasePublicAnonKey, supabaseJwtSecret)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	controller := api.NewAPIController(canvas, supabase, validate)
+	controller := api.NewAPIController(canvasClient, supabaseClient, []byte(supabaseJwtSecret))
 
 	router := api.NewRouter(controller, webUrl)
 

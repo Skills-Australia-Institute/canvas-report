@@ -4,7 +4,6 @@ import { CSVLink } from 'react-csv';
 import { getAssignmentsResultsByUserID } from '../../canvas/assignments';
 import Callout from '../../components/callout';
 import Loading from '../../components/loading';
-import { useSupabase } from '../../hooks/supabase';
 import { User } from '../../supabase/users';
 import { getDateTimeString, getFormattedName } from '../../utils';
 
@@ -17,11 +16,10 @@ export function AssignmentsResultsByUser({
   user,
   ungraded,
 }: IAssignmentsResults) {
-  const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'assignments-results'],
     queryFn: ({ signal }: { signal: AbortSignal }) =>
-      getAssignmentsResultsByUserID(signal, supabase, user.id),
+      getAssignmentsResultsByUserID(signal, user.id),
   });
   const name = getFormattedName(user.name);
   const filterData = ungraded

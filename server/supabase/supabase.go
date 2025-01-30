@@ -2,12 +2,12 @@ package supabase
 
 import "github.com/supabase-community/postgrest-go"
 
-type Supabase struct {
+type SupabaseClient struct {
 	client *postgrest.Client
-	Secret string
+	secret string
 }
 
-func New(baseUrl, publicAnonKey string, secret string) (*Supabase, error) {
+func NewSupabaseClient(baseUrl, publicAnonKey string, secret string) (*SupabaseClient, error) {
 	baseUrl = baseUrl + "/rest/v1"
 
 	client := postgrest.NewClient(baseUrl, "canvas", map[string]string{
@@ -17,9 +17,9 @@ func New(baseUrl, publicAnonKey string, secret string) (*Supabase, error) {
 		return nil, client.ClientError
 	}
 
-	supabase := &Supabase{
+	supabase := &SupabaseClient{
 		client: client,
-		Secret: secret,
+		secret: secret,
 	}
 
 	return supabase, nil

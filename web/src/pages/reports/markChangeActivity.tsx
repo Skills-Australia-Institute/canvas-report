@@ -247,14 +247,13 @@ function GradeChangeLogsTable({
   const endTime = new Date(et);
   endTime.setDate(endTime.getDate() + 1); // incremented end time to make it inclusive
 
-  const supabase = useSupabase();
   const intervals = getWeekIntervals(startTime, endTime);
   const { result, isAllSuccess, errors, isLoading, successCount } = useQueries({
     queries: intervals.map(({ startTime, endTime }) => {
       return {
         queryKey: ['users', grader.id, 'grade-change-logs', startTime, endTime],
         queryFn: ({ signal }: { signal: AbortSignal }) =>
-          getGradeChangeLogs(signal, supabase, grader.id, startTime, endTime),
+          getGradeChangeLogs(signal, grader.id, startTime, endTime),
       };
     }),
     combine: (results) => {

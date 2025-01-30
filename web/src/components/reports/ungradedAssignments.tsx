@@ -19,7 +19,6 @@ import {
 import { Course } from '../../canvas/courses';
 import Callout from '../../components/callout';
 import { APP } from '../../constants';
-import { useSupabase } from '../../hooks/supabase';
 import { Account } from '../../supabase/accounts';
 import { getDateTimeString, getFormattedName } from '../../utils';
 
@@ -31,7 +30,6 @@ export default function UngradedAssignments({
   account,
   courses,
 }: IUngradedAssignments) {
-  const supabase = useSupabase();
   const { result, isAllSuccess, successCount, errors } = useQueries({
     queries: courses.map((course) => {
       return {
@@ -39,7 +37,6 @@ export default function UngradedAssignments({
         queryFn: ({ signal }: { signal: AbortSignal }) =>
           getUngradedAssignmentsByCourseID(
             signal,
-            supabase,
             course.id,
             course.name,
             course.account.name

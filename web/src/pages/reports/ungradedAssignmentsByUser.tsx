@@ -180,11 +180,10 @@ interface UngradedAssignmentsByUserProps {
 export function UngradedAssignmentsByUser({
   user,
 }: UngradedAssignmentsByUserProps) {
-  const supabase = useSupabase();
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'ungraded-assignments'],
     queryFn: ({ signal }: { signal: AbortSignal }) =>
-      getUngradedAssignmentsByUserID(signal, supabase, user.id),
+      getUngradedAssignmentsByUserID(signal, user.id),
   });
   const name = getFormattedName(user.name);
 

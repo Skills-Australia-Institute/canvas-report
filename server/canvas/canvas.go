@@ -1,29 +1,65 @@
 package canvas
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
 )
 
-type Canvas struct {
-	baseUrl     string
-	accessToken string
-	pageSize    int
-	client      *http.Client
-	HtmlUrl     string
+type CanvasClient struct {
+	baseUrl    string
+	pageSize   int
+	httpClient *httpClient
+	HtmlUrl    string
 }
 
-func New(baseUrl string, accessToken string, pageSize int, htmlUrl string) *Canvas {
-	return &Canvas{
-		baseUrl:     baseUrl,
+type httpClient struct {
+	accessToken string
+	client      *http.Client
+}
+
+func newHttpClient(accessToken string) *httpClient {
+	client := &http.Client{
+		Timeout: 15 * time.Second,
+	}
+
+	return &httpClient{
 		accessToken: accessToken,
-		pageSize:    pageSize,
-		client: &http.Client{
-			Timeout: time.Second * 15,
-		},
-		HtmlUrl: htmlUrl,
+		client:      client,
+	}
+}
+
+func (c *httpClient) do(req *http.Request) (data []byte, link string, code int, err error) {
+	bearer := "Bearer " + c.accessToken
+	req.Header.Add("Authorization", bearer)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return nil, "", http.StatusInternalServerError, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, "", res.StatusCode, fmt.Errorf("unsuccessful request: %s", req.URL.RequestURI())
+	}
+
+	data, err = io.ReadAll(res.Body)
+	if err != nil {
+		return nil, "", http.StatusInternalServerError, err
+	}
+
+	return data, res.Header.Get("Link"), http.StatusOK, nil
+}
+
+func NewCanvasClient(baseUrl string, accessToken string, pageSize int, htmlUrl string) *CanvasClient {
+	return &CanvasClient{
+		baseUrl:    baseUrl,
+		pageSize:   pageSize,
+		httpClient: newHttpClient(accessToken),
+		HtmlUrl:    htmlUrl,
 	}
 }
 

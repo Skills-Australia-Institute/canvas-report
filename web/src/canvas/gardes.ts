@@ -1,4 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { Semaphore } from 'async-mutex';
 import { axios } from '../axios';
 
@@ -21,22 +20,15 @@ const gradeChangeLogSemaphore = new Semaphore(10);
 
 export const getGradeChangeLogs = async (
   signal: AbortSignal,
-  supabase: SupabaseClient,
   graderID: number,
   startTime: Date,
   endTime: Date
 ) => {
   try {
     const data = await gradeChangeLogSemaphore.runExclusive(async () => {
-      const accessToken = (await supabase.auth.getSession()).data.session
-        ?.access_token;
-
       const { data, status } = await axios(
         `/users/${graderID}/grade-change-logs`,
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
           signal: signal,
           params: {
             start_time: startTime.toDateString(),

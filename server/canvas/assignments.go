@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -40,6 +40,12 @@ type Assignment struct {
 	GradingType                string                `json:"grading_type"`
 	OmitFromFinalGrade         bool                  `json:"omit_from_final_grade"`
 	WorkflowState              string                `json:"workflow_state"`
+	Overrides                  []struct {
+		CourseSectionID null.Int    `json:"course_section_id"`
+		DueAt           null.String `json:"due_at"`
+		LockAt          null.String `json:"lock_at"`
+		UnlockAt        null.String `json:"unlock_at"`
+	} `json:"overrides"`
 }
 
 type SectionNeedsGrading struct {
@@ -76,7 +82,31 @@ type AssignmentDate struct {
 	Base     bool     `json:"base"`
 }
 
-func (c *Canvas) GetAssignmentsDataOfUserByCourseID(userID, courseID int) (results []AssignmentData, code int, err error) {
+func (c *CanvasClient) GetAssignmentByID(ctx context.Context, assignmentID, courseID int, includeOverrides bool) (assignment Assignment, code int, err error) {
+	requestUrl := fmt.Sprintf("%s/courses/%d/assignments/%d", c.baseUrl, courseID, assignmentID)
+
+	if includeOverrides {
+		requestUrl += "?include[]=overrides"
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
+	if err != nil {
+		return assignment, http.StatusInternalServerError, err
+	}
+
+	data, _, code, err := c.httpClient.do(req)
+	if err != nil {
+		return assignment, code, err
+	}
+
+	if err := json.Unmarshal(data, &assignment); err != nil {
+		return assignment, http.StatusInternalServerError, err
+	}
+
+	return assignment, http.StatusOK, nil
+}
+
+func (c *CanvasClient) GetAssignmentsDataOfUserByCourseID(ctx context.Context, userID, courseID int) (results []AssignmentData, code int, err error) {
 	params := url.Values{}
 
 	params.Add("per_page", strconv.Itoa(c.pageSize))
@@ -84,37 +114,24 @@ func (c *Canvas) GetAssignmentsDataOfUserByCourseID(userID, courseID int) (resul
 	requestUrl := fmt.Sprintf("%s/courses/%d/analytics/users/%d/assignments?%s", c.baseUrl, courseID, userID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching assignment results of user: %d and course: %d", userID, courseID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		ad := []AssignmentData{}
-		if err := json.Unmarshal(body, &ad); err != nil {
+		if err := json.Unmarshal(data, &ad); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, ad...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break
@@ -126,7 +143,7 @@ func (c *Canvas) GetAssignmentsDataOfUserByCourseID(userID, courseID int) (resul
 	return results, http.StatusOK, nil
 }
 
-func (c *Canvas) GetAssignmentsByCourseID(courseID int, searchTerm string, bucket AssignmentBucket, needsGradingCountBySection bool) (results []Assignment, code int, err error) {
+func (c *CanvasClient) GetAssignmentsByCourseID(ctx context.Context, courseID int, searchTerm string, bucket AssignmentBucket, needsGradingCountBySection bool) (results []Assignment, code int, err error) {
 	if len(searchTerm) == 1 {
 		return nil, http.StatusBadRequest, fmt.Errorf("assignment search term is less than 2 characters")
 	}
@@ -151,38 +168,24 @@ func (c *Canvas) GetAssignmentsByCourseID(courseID int, searchTerm string, bucke
 	requestUrl := fmt.Sprintf("%s/courses/%d/assignments?%s", c.baseUrl, courseID, params.Encode())
 
 	for {
-		req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, requestUrl, nil)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
-		bearer := "Bearer " + c.accessToken
-		req.Header.Add("Authorization", bearer)
-
-		res, err := c.client.Do(req)
+		data, link, code, err := c.httpClient.do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, err
-		}
-
-		if res.StatusCode != http.StatusOK {
-			return nil, res.StatusCode, fmt.Errorf("error fetching assignments of course: %d", courseID)
-		}
-
-		body, err := io.ReadAll(res.Body)
-		res.Body.Close()
-		if err != nil {
-			return nil, http.StatusInternalServerError, err
+			return nil, code, err
 		}
 
 		assignments := []Assignment{}
-
-		if err := json.Unmarshal(body, &assignments); err != nil {
+		if err := json.Unmarshal(data, &assignments); err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
 
 		results = append(results, assignments...)
 
-		nextUrl := getNextUrl(res.Header.Get("Link"))
+		nextUrl := getNextUrl(link)
 
 		if nextUrl == "" {
 			break

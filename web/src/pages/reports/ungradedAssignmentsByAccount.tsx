@@ -7,7 +7,6 @@ import Loading from '../../components/loading';
 import UngradedAssignments from '../../components/reports/ungradedAssignments';
 import { useSupabase } from '../../hooks/supabase';
 import { Account, getAccounts } from '../../supabase/accounts';
-import { supabase } from '../../supabase/supabase';
 
 export default function UngradedAssignmentsByAccountPage() {
   const supabase = useSupabase();
@@ -88,7 +87,7 @@ export default function UngradedAssignmentsByAccountPage() {
 function UngradedAssignmentsContainer({ account }: { account: Account }) {
   const { isLoading, error, data } = useQuery({
     queryKey: ['accounts', account.id, 'courses'],
-    queryFn: () => getCoursesByAccountID(supabase, account.id),
+    queryFn: ({ signal }) => getCoursesByAccountID(signal, account.id),
   });
 
   if (isLoading) {

@@ -16,7 +16,6 @@ import {
   UngradedAssignmentWithAccountCourseInfo,
 } from '../../canvas/assignments';
 import { APP } from '../../constants';
-import { useSupabase } from '../../hooks/supabase';
 import { getDateTimeString, getFormattedName } from '../../utils';
 import Callout from '../callout';
 import Loading from '../loading';
@@ -30,13 +29,11 @@ export default function UngradedAssignmentByCourse({
   courseName: string;
   accountName: string;
 }) {
-  const supabase = useSupabase();
   const { data, error, isLoading } = useQuery({
     queryKey: ['courses', courseID, 'ungraded-assignments'],
     queryFn: ({ signal }: { signal: AbortSignal }) =>
       getUngradedAssignmentsByCourseID(
         signal,
-        supabase,
         courseID,
         courseName,
         accountName

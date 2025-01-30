@@ -10,20 +10,19 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/go-playground/validator/v10"
 )
 
 type APIController struct {
-	canvas   *canvas.Canvas
-	supabase *supabase.Supabase
-	validate *validator.Validate
+	canvasClient   *canvas.CanvasClient
+	supabaseClient *supabase.SupabaseClient
+	auther         *auther
 }
 
-func NewAPIController(canvas *canvas.Canvas, supabase *supabase.Supabase, validate *validator.Validate) *APIController {
+func NewAPIController(canvasClient *canvas.CanvasClient, supabaseClient *supabase.SupabaseClient, secret []byte) *APIController {
 	return &APIController{
-		canvas:   canvas,
-		supabase: supabase,
-		validate: validate,
+		canvasClient:   canvasClient,
+		supabaseClient: supabaseClient,
+		auther:         newAuther(secret),
 	}
 }
 
