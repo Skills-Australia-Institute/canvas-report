@@ -1,4 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { Semaphore } from 'async-mutex';
 import { axios } from '../axios';
 import { Course } from '../supabase/courses';
@@ -18,17 +17,12 @@ export interface EnrollmentResult {
 }
 
 export const getEnrollmentsResultsByUserID = async (
-  supabase: SupabaseClient,
+  signal: AbortSignal,
   userID: number
 ) => {
   try {
-    const accessToken = (await supabase.auth.getSession()).data.session
-      ?.access_token;
-
     const { data } = await axios.get(`/users/${userID}/enrollments-results`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      signal: signal,
     });
 
     return data as EnrollmentResult[];
@@ -41,7 +35,6 @@ const getEnrollmentsResultsByCourseSemaphore = new Semaphore(10);
 
 export const getEnrollmentsResultsByCourse = async (
   signal: AbortSignal,
-  supabase: SupabaseClient,
   course: Course
 ) => {
   try {
@@ -51,15 +44,9 @@ export const getEnrollmentsResultsByCourse = async (
           return [];
         }
 
-        const accessToken = (await supabase.auth.getSession()).data.session
-          ?.access_token;
-
         const { data, status } = await axios.get(
           `/courses/${course.id}/enrollments-results`,
           {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
             signal: signal,
             params: {
               course_name: course.name,

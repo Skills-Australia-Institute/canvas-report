@@ -1,4 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { Semaphore } from 'async-mutex';
 import { axios } from '../axios';
 import { Course } from './courses';
@@ -73,7 +72,6 @@ const ungradedAssignmentsByCourseIDSemaphore = new Semaphore(10);
 
 export const getUngradedAssignmentsByCourseID = async (
   signal: AbortSignal,
-  supabase: SupabaseClient,
   courseID: number,
   courseName: string,
   accountName: string
@@ -81,15 +79,9 @@ export const getUngradedAssignmentsByCourseID = async (
   try {
     const data = await ungradedAssignmentsByCourseIDSemaphore.runExclusive(
       async () => {
-        const accessToken = (await supabase.auth.getSession()).data.session
-          ?.access_token;
-
         const { data, status } = await axios(
           `/courses/${courseID}/ungraded-assignments`,
           {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
             signal: signal,
             params: {
               course_name: courseName,
@@ -116,17 +108,10 @@ export const getUngradedAssignmentsByCourseID = async (
 
 export const getAssignmentsResultsByUserID = async (
   signal: AbortSignal,
-  supabase: SupabaseClient,
   userID: number
 ) => {
   try {
-    const accessToken = (await supabase.auth.getSession()).data.session
-      ?.access_token;
-
     const { data } = await axios.get(`/users/${userID}/assignments-results`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
       signal: signal,
     });
 
@@ -138,17 +123,10 @@ export const getAssignmentsResultsByUserID = async (
 
 export const getUngradedAssignmentsByUserID = async (
   signal: AbortSignal,
-  supabase: SupabaseClient,
   userID: number
 ) => {
   try {
-    const accessToken = (await supabase.auth.getSession()).data.session
-      ?.access_token;
-
     const { data } = await axios.get(`/users/${userID}/ungraded-assignments`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
       signal: signal,
     });
 
@@ -160,19 +138,12 @@ export const getUngradedAssignmentsByUserID = async (
 
 export const getUngradedAssignmentsByAccountID = async (
   signal: AbortSignal,
-  supabase: SupabaseClient,
   accountID: number
 ) => {
   try {
-    const accessToken = (await supabase.auth.getSession()).data.session
-      ?.access_token;
-
     const { data, status } = await axios(
       `/accounts/${accountID}/ungraded-assignments`,
       {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
         signal: signal,
       }
     );
@@ -193,26 +164,19 @@ const ungradedAssignmentsByCoursesSemaphore = new Semaphore(10);
 
 export const getUngradedAssignmentsByCourses = async (
   signal: AbortSignal,
-  supabase: SupabaseClient,
   courses: Course[],
   ids: string
 ) => {
   try {
     const data = await ungradedAssignmentsByCoursesSemaphore.runExclusive(
       async () => {
-        const accessToken = (await supabase.auth.getSession()).data.session
-          ?.access_token;
-
         const { data, status } = await axios<UngradedAssignment[]>(
           `/courses/ungraded-assignments`,
           {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
+            signal: signal,
             params: {
               ids: ids,
             },
-            signal: signal,
           }
         );
 

@@ -1,4 +1,3 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { axios } from '../axios';
 import { Account } from './accounts';
 import { Section } from './sections';
@@ -22,17 +21,12 @@ export interface Course {
 }
 
 export const getCoursesByAccountID = async (
-  supabase: SupabaseClient,
+  signal: AbortSignal,
   accountID: number
 ) => {
   try {
-    const accessToken = (await supabase.auth.getSession()).data.session
-      ?.access_token;
-
     const { data } = await axios(`/accounts/${accountID}/courses`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      signal: signal,
     });
 
     return data as Course[];

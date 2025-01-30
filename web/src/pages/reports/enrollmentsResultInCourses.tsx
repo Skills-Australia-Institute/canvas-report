@@ -191,14 +191,13 @@ function CourseSelect({ searchTerm }: CourseSelectProps) {
 }
 
 function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
-  const supabase = useSupabase();
   const [sortBy, setSortBy] = useState<SortBy>('section-asc');
   const { result, isAllSuccess, successCount, errors } = useQueries({
     queries: courses.map((course) => {
       return {
         queryKey: ['courses', course.id, 'enrollments-results'],
         queryFn: ({ signal }: { signal: AbortSignal }) =>
-          getEnrollmentsResultsByCourse(signal, supabase, course),
+          getEnrollmentsResultsByCourse(signal, course),
       };
     }),
     combine: (results) => {

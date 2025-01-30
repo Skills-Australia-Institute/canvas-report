@@ -36,9 +36,9 @@ export default function Account() {
     data: courses,
   } = useQuery({
     queryKey: ['accounts', accountID, 'courses'],
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       if (accountID) {
-        return getCoursesByAccountID(supabase, Number(accountID));
+        return getCoursesByAccountID(signal, Number(accountID));
       }
     },
     enabled: !!accountID,

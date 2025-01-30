@@ -16,7 +16,6 @@ import {
 } from '../../canvas/enrollments';
 import Callout from '../../components/callout';
 import Loading from '../../components/loading';
-import { useSupabase } from '../../hooks/supabase';
 import { User } from '../../supabase/users';
 import { getDateTimeString, getFormattedName } from '../../utils';
 
@@ -35,11 +34,10 @@ type SortBy =
 export default function EnrollmentsResultsByUser({
   user,
 }: IEnrollmentsResults) {
-  const supabase = useSupabase();
   const [sortBy, setSortBy] = useState<SortBy>('section-asc');
   const { isLoading, error, data } = useQuery({
     queryKey: ['users', user.id, 'enrollments-results'],
-    queryFn: () => getEnrollmentsResultsByUserID(supabase, user.id),
+    queryFn: ({ signal }) => getEnrollmentsResultsByUserID(signal, user.id),
   });
   const name = getFormattedName(user.name);
 
