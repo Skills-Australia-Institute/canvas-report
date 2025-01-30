@@ -84,11 +84,7 @@ func (c *APIController) GetEnrollmentResultsByCourse(w http.ResponseWriter, r *h
 }
 
 func (c *APIController) GetEnrollmentsResultsByUser(w http.ResponseWriter, r *http.Request, user canvas.User) (int, error) {
-	states := []canvas.EnrollmentState{}
-
-	for _, state := range r.URL.Query()["state[]"] {
-		states = append(states, canvas.EnrollmentState(state))
-	}
+	states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
 
 	results := []EnrollmentResult{}
 

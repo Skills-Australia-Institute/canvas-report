@@ -209,7 +209,7 @@ export default function EnrollmentsResultsByUser({
                   <Table.Cell>{d.current_score}</Table.Cell>
                   <Table.Cell>
                     <Badge
-                      color={d.enrollment_state === 'active' ? 'green' : 'teal'}
+                      color={d.enrollment_state === 'active' ? 'blue' : 'green'}
                     >
                       {d.enrollment_state}
                     </Badge>
