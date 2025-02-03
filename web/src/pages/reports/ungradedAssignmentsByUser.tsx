@@ -19,7 +19,12 @@ import { useDebounce } from '../../hooks/debounce';
 import { useSupabase } from '../../hooks/supabase';
 import { SupabaseUserContext } from '../../providers/supabaseUser';
 import { getUsersBySearchTerm, User } from '../../supabase/users';
-import { getDateTimeString, getFormattedName } from '../../utils';
+import {
+  getAssignmentStatusColor,
+  getDateTimeString,
+  getEnrollmentStatusColor,
+  getFormattedName,
+} from '../../utils';
 
 export default function StudentUngradedAssignmentsPage() {
   const { user: student } = useContext(SupabaseUserContext);
@@ -268,15 +273,7 @@ export function UngradedAssignmentsByUser({
                   </Table.Cell>
                   <Table.Cell>
                     {d.course_name !== 'Total' && (
-                      <Badge
-                        color={
-                          d.status === 'on_time'
-                            ? 'blue'
-                            : d.status === 'late'
-                            ? 'red'
-                            : 'gray'
-                        }
-                      >
+                      <Badge color={getAssignmentStatusColor(d.status)}>
                         {d.status}
                       </Badge>
                     )}
@@ -288,9 +285,7 @@ export function UngradedAssignmentsByUser({
                   <Table.Cell>
                     {d.course_name !== 'Total' && (
                       <Badge
-                        color={
-                          d.enrollment_state === 'active' ? 'green' : 'blue'
-                        }
+                        color={getEnrollmentStatusColor(d.enrollment_state)}
                       >
                         {d.enrollment_state}
                       </Badge>

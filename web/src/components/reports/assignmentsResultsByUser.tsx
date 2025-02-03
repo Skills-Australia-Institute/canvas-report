@@ -5,7 +5,12 @@ import { getAssignmentsResultsByUserID } from '../../canvas/assignments';
 import Callout from '../../components/callout';
 import Loading from '../../components/loading';
 import { User } from '../../supabase/users';
-import { getDateTimeString, getFormattedName } from '../../utils';
+import {
+  getAssignmentStatusColor,
+  getDateTimeString,
+  getEnrollmentStatusColor,
+  getFormattedName,
+} from '../../utils';
 
 interface IAssignmentsResults {
   user: User;
@@ -106,15 +111,7 @@ export function AssignmentsResultsByUser({
                   </Table.Cell>
                   <Table.Cell>
                     {d.course_name !== 'Total' && (
-                      <Badge
-                        color={
-                          d.status === 'on_time'
-                            ? 'blue'
-                            : d.status === 'late'
-                            ? 'red'
-                            : 'gray'
-                        }
-                      >
+                      <Badge color={getAssignmentStatusColor(d.status)}>
                         {d.status}
                       </Badge>
                     )}
@@ -126,9 +123,7 @@ export function AssignmentsResultsByUser({
                   <Table.Cell>
                     {d.course_name !== 'Total' && (
                       <Badge
-                        color={
-                          d.enrollment_state === 'active' ? 'green' : 'blue'
-                        }
+                        color={getEnrollmentStatusColor(d.enrollment_state)}
                       >
                         {d.enrollment_state}
                       </Badge>

@@ -29,7 +29,7 @@ import { useDebounce } from '../../hooks/debounce';
 import { useSupabase } from '../../hooks/supabase';
 import { SupabaseCoursesContext } from '../../providers/supabaseCourses';
 import { Course, getCoursesBySearchTerm } from '../../supabase/courses';
-import { getDateTimeString } from '../../utils';
+import { getDateTimeString, getEnrollmentStatusColor } from '../../utils';
 
 export default function EnrollmentsResultInCoursesPage() {
   const { courses } = useContext(SupabaseCoursesContext);
@@ -471,15 +471,7 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
                   </a>
                 </Table.Cell>
                 <Table.Cell className="max-w-sm">
-                  <Badge
-                    color={
-                      d.enrollment_state === 'active'
-                        ? 'green'
-                        : d.enrollment_state === 'completed'
-                        ? 'cyan'
-                        : 'gray'
-                    }
-                  >
+                  <Badge color={getEnrollmentStatusColor(d.enrollment_state)}>
                     {d.enrollment_state}
                   </Badge>
                 </Table.Cell>
