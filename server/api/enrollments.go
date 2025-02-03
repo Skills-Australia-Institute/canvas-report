@@ -47,7 +47,7 @@ func (c *APIController) GetEnrollmentResultsByCourse(w http.ResponseWriter, r *h
 		return http.StatusBadRequest, err
 	}
 
-	results := []EnrollmentResult{}
+	results := make([]EnrollmentResult, 0)
 
 	states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
 
@@ -86,14 +86,14 @@ func (c *APIController) GetEnrollmentResultsByCourse(w http.ResponseWriter, r *h
 func (c *APIController) GetEnrollmentsResultsByUser(w http.ResponseWriter, r *http.Request, user canvas.User) (int, error) {
 	states := []canvas.EnrollmentState{canvas.ActiveEnrollment, canvas.CompletedEnrollment}
 
-	results := []EnrollmentResult{}
-
-	coursesMap := make(map[int]canvas.Course)
+	results := make([]EnrollmentResult, 0)
 
 	enrollments, code, err := c.canvasClient.GetEnrollmentsByUserID(r.Context(), user.ID, states)
 	if err != nil {
 		return code, err
 	}
+
+	coursesMap := make(map[int]canvas.Course, len(enrollments))
 
 	courses, code, err := c.canvasClient.GetCoursesByUserID(r.Context(), user.ID)
 	if err != nil {

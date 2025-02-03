@@ -72,7 +72,7 @@ func (c *APIController) GetGradeChangeLogsByGraderID(w http.ResponseWriter, r *h
 
 	assignmentsCache := make(map[int]*GradeChangeLogAssignment)
 
-	logs := []GradeChangeLog{}
+	logs := make([]GradeChangeLog, 0)
 
 	for _, result := range results {
 		var wg sync.WaitGroup
