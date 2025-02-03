@@ -43,3 +43,29 @@ export const getYearMonthDay = (date: Date) => {
 
   return `${year}-${month}-${day}`;
 };
+
+export function getAssignmentStatusColor(
+  status: string
+): 'green' | 'amber' | 'amber' | 'red' | 'gray' {
+  if (status === 'on_time') {
+    return 'green';
+  } else if (status === 'late') {
+    return 'amber';
+  } else if (status === 'missing') {
+    return 'red';
+  } else {
+    return 'gray';
+  }
+}
+
+export function getEnrollmentStatusColor(
+  status: string
+): 'green' | 'blue' | 'gray' {
+  if (status === 'active') {
+    return 'blue';
+  } else if (status === 'completed') {
+    return 'green';
+  } else {
+    return 'gray';
+  }
+}

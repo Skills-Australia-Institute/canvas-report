@@ -17,7 +17,11 @@ import {
 import Callout from '../../components/callout';
 import Loading from '../../components/loading';
 import { User } from '../../supabase/users';
-import { getDateTimeString, getFormattedName } from '../../utils';
+import {
+  getDateTimeString,
+  getEnrollmentStatusColor,
+  getFormattedName,
+} from '../../utils';
 
 interface IEnrollmentsResults {
   user: User;
@@ -208,9 +212,7 @@ export default function EnrollmentsResultsByUser({
                   <Table.Cell>{d.current_grade}</Table.Cell>
                   <Table.Cell>{d.current_score}</Table.Cell>
                   <Table.Cell>
-                    <Badge
-                      color={d.enrollment_state === 'active' ? 'blue' : 'green'}
-                    >
+                    <Badge color={getEnrollmentStatusColor(d.enrollment_state)}>
                       {d.enrollment_state}
                     </Badge>
                   </Table.Cell>
