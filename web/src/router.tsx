@@ -1,9 +1,11 @@
 import { PropsWithChildren, useContext } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import NotFound from './components/notFound';
+import { ReportsPath } from './constants';
 import { useAuth } from './hooks/auth';
 import Account from './pages/account';
 import Accounts from './pages/accounts';
+import ActionsPage from './pages/actions';
 import Course from './pages/course';
 import Courses from './pages/courses';
 import Dashboard from './pages/dashboard';
@@ -11,7 +13,7 @@ import ForgotPassword from './pages/forgotPassword';
 import Login from './pages/login';
 import NotFoundPage from './pages/notFound';
 import Profile from './pages/profile';
-import Reports, { reportsPath } from './pages/reports';
+import Reports from './pages/reports';
 import AdditionalAttemptAssigments from './pages/reports/additionalAttemptAssignments';
 import StudentAssignmentsResultPage from './pages/reports/assignmentsResultByUser';
 import StudentEnrollmentsResultPage from './pages/reports/enrollmentsResultByUser';
@@ -75,7 +77,12 @@ export const router = createBrowserRouter([
         errorElement: <NotFoundPage />,
       },
       {
-        path: `reports/${reportsPath.MarkChangeActivity}`,
+        path: 'actions',
+        element: <ActionsPage />,
+        errorElement: <NotFound />,
+      },
+      {
+        path: `reports/${ReportsPath.MarkChangeActivity}`,
         element: (
           <RequireComplianceRole>
             <SupabaseUserProvider>
@@ -85,7 +92,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: `reports/${reportsPath.AdditionalAttemptAssignments}`,
+        path: `reports/${ReportsPath.AdditionalAttemptAssignments}`,
         element: (
           <RequireComplianceRole>
             <AdditionalAttemptAssigments />
@@ -93,7 +100,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: `reports/${reportsPath.StudentEnrollmentsResult}`,
+        path: `reports/${ReportsPath.StudentEnrollmentsResult}`,
         element: (
           <SupabaseUserProvider>
             <StudentEnrollmentsResultPage />
@@ -101,7 +108,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: `reports/${reportsPath.StudentAssignmentsResult}`,
+        path: `reports/${ReportsPath.StudentAssignmentsResult}`,
         element: (
           <SupabaseUserProvider>
             <StudentAssignmentsResultPage />
@@ -109,7 +116,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: `reports/${reportsPath.StudentUngradedAssignments}`,
+        path: `reports/${ReportsPath.StudentUngradedAssignments}`,
         element: (
           <SupabaseUserProvider>
             <StudentUngradedAssignmentsPage />
@@ -117,7 +124,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: `reports/${reportsPath.UngradedAssignments}`,
+        path: `reports/${ReportsPath.UngradedAssignments}`,
         element: (
           <RequireComplianceRole>
             <UngradedAssignmentsByAccountPage />
@@ -125,7 +132,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: `reports/${reportsPath.CoursesEnrollmentsResult}`,
+        path: `reports/${ReportsPath.CoursesEnrollmentsResult}`,
         element: (
           <SupabaseCoursesProvider>
             <EnrollmentsResultInCoursesPage />

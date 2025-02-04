@@ -50,3 +50,21 @@ export enum AppRole {
   Compliance = 'Compliance',
   StudentServices = 'Student Services',
 }
+
+// User has access to their value and higher values.
+export const AppRoleValue = new Map<AppRole, number>([
+  [AppRole.Superadmin, 4],
+  [AppRole.Admin, 3],
+  [AppRole.Compliance, 2],
+  [AppRole.StudentServices, 1],
+]);
+
+export const ReportsPath = {
+  MarkChangeActivity: 'mark-change-activity',
+  AdditionalAttemptAssignments: 'additional-attempt-assignments',
+  StudentEnrollmentsResult: 'student-enrollments-result',
+  StudentAssignmentsResult: 'student-assignments-result',
+  StudentUngradedAssignments: 'student-ungraded-assignments',
+  UngradedAssignments: 'ungraded-assignments',
+  CoursesEnrollmentsResult: 'courses-enrollments-result',
+};
