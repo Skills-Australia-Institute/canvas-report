@@ -5,6 +5,7 @@ import {
   GearIcon,
   PersonIcon,
   ReaderIcon,
+  RocketIcon,
 } from '@radix-ui/react-icons';
 import { Avatar, Flex, IconProps, Text, Tooltip } from '@radix-ui/themes';
 import toast from 'react-hot-toast';
@@ -33,6 +34,11 @@ const navs = [
     title: 'Reports',
     path: '/reports',
     icon: ReaderIcon,
+  },
+  {
+    title: 'Actions',
+    path: '/actions',
+    icon: RocketIcon,
   },
 ];
 

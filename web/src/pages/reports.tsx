@@ -1,15 +1,7 @@
 import { Button, Text } from '@radix-ui/themes';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { AppRole } from '../constants';
+import { AppRole, AppRoleValue, ReportsPath } from '../constants';
 import { useAuth } from '../hooks/auth';
-
-// User has access to their value and higher values
-const AppRoleValue = new Map<AppRole, number>([
-  [AppRole.Superadmin, 4],
-  [AppRole.Admin, 3],
-  [AppRole.Compliance, 2],
-  [AppRole.StudentServices, 1],
-]);
 
 interface ReportActionProps {
   title: string;
@@ -18,54 +10,44 @@ interface ReportActionProps {
   access?: AppRole;
 }
 
-export const reportsPath = {
-  MarkChangeActivity: 'mark-change-activity',
-  AdditionalAttemptAssignments: 'additional-attempt-assignments',
-  StudentEnrollmentsResult: 'student-enrollments-result',
-  StudentAssignmentsResult: 'student-assignments-result',
-  StudentUngradedAssignments: 'student-ungraded-assignments',
-  UngradedAssignments: 'ungraded-assignments',
-  CoursesEnrollmentsResult: 'courses-enrollments-result',
-};
-
 const reports: ReportActionProps[] = [
   {
     title: 'Ungraded Assignments',
     description: 'View ungraded assignments of an account',
-    path: reportsPath.UngradedAssignments,
+    path: ReportsPath.UngradedAssignments,
     access: AppRole.Compliance,
   },
   {
     title: 'Mark Change Activity',
     description: 'Mark change activities by trainer in their courses',
-    path: reportsPath.MarkChangeActivity,
+    path: ReportsPath.MarkChangeActivity,
     access: AppRole.Compliance,
   },
   {
     title: 'Additional Attempt Assignments',
     description: 'View additional attempt assignments',
-    path: reportsPath.AdditionalAttemptAssignments,
+    path: ReportsPath.AdditionalAttemptAssignments,
     access: AppRole.Compliance,
   },
   {
     title: 'Student Enrollments Result',
     description: `View student's all enrollments result`,
-    path: reportsPath.StudentEnrollmentsResult,
+    path: ReportsPath.StudentEnrollmentsResult,
   },
   {
     title: 'Student Assignments Result',
     description: `View student's all assignments result`,
-    path: reportsPath.StudentAssignmentsResult,
+    path: ReportsPath.StudentAssignmentsResult,
   },
   {
     title: 'Student Ungraded Assignments',
     description: `View student's all ungraded assignments`,
-    path: reportsPath.StudentUngradedAssignments,
+    path: ReportsPath.StudentUngradedAssignments,
   },
   {
     title: 'Courses Enrollments Result',
     description: `View courses'student enrollments result`,
-    path: reportsPath.CoursesEnrollmentsResult,
+    path: ReportsPath.CoursesEnrollmentsResult,
   },
 ];
 

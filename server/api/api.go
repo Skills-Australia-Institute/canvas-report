@@ -31,7 +31,7 @@ func NewRouter(c *APIController, webUrl string) *chi.Mux {
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{webUrl},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Origin", "X-Requested-With", "Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		AllowCredentials: false,
 		MaxAge:           300,
@@ -55,6 +55,9 @@ func NewRouter(c *APIController, webUrl string) *chi.Mux {
 
 		r.Get("/accounts/{account_id}/courses", withError(withAuth(c, c.GetCoursesByAccountID)))
 		r.Get("/accounts/{account_id}/ungraded-assignments", withError(withAuth(c, c.GetUngradedAssignmentsByAccountID)))
+
+		r.Delete("/users/{user_id}/sessions", withError(withAuth(c, c.TerminateUserSessions)))
+		r.Delete("/users/mobile_sessions", withError(withAuth(c, c.TerminateMobileSessions)))
 
 		r.Get("/hello", hello)
 	})
