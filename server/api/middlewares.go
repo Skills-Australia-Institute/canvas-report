@@ -39,6 +39,8 @@ func withError(next func(w http.ResponseWriter, r *http.Request) (int, error)) h
 			http.Error(w, string(jsonErr), code)
 			return
 		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 
 	return fn
