@@ -77,13 +77,17 @@ type SortBy =
   | 'name-asc'
   | 'name-desc'
   | 'section-asc'
-  | 'section-desc';
+  | 'section-desc'
+  | 'available-from-asc'
+  | 'available-from-desc'
+  | 'grading-asc'
+  | 'grading-desc';
 
 const UngradedAssignmentsTable = ({
   data,
   courseName,
 }: UngradedAssignmentsTableProps) => {
-  const [sortBy, setSortBy] = useState<SortBy>('section-asc');
+  const [sortBy, setSortBy] = useState<SortBy>('available-from-asc');
 
   const sorted = sort(data, sortBy);
   const perthData = sorted.filter(
@@ -167,11 +171,11 @@ const UngradedAssignmentsTable = ({
                         <span>Course</span>
 
                         {sortBy === 'course-asc' && (
-                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
 
                         {sortBy === 'course-desc' && (
-                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                          <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
                       </Flex>
                     </div>
@@ -205,11 +209,11 @@ const UngradedAssignmentsTable = ({
                         <span>Assignment</span>
 
                         {sortBy === 'name-asc' && (
-                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
 
                         {sortBy === 'name-desc' && (
-                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                          <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
                       </Flex>
                     </div>
@@ -243,17 +247,92 @@ const UngradedAssignmentsTable = ({
                         <span>Section</span>
 
                         {sortBy === 'section-asc' && (
-                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
 
                         {sortBy === 'section-desc' && (
-                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                          <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
                       </Flex>
                     </div>
                   </Tooltip>
                 </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Needs grading</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  <Tooltip
+                    content={`Click to sort by available date ${
+                      sortBy === 'available-from-asc'
+                        ? 'descending'
+                        : sortBy === 'available-from-desc'
+                        ? 'ascending'
+                        : 'ascending'
+                    }`}
+                  >
+                    <div className="inline-block">
+                      <Flex
+                        align="center"
+                        gap="1"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          if (sortBy === 'available-from-asc') {
+                            setSortBy('available-from-desc');
+                          } else if (sortBy === 'available-from-desc') {
+                            setSortBy('available-from-asc');
+                          } else {
+                            setSortBy('available-from-asc');
+                          }
+                        }}
+                      >
+                        <span>Available</span>
+
+                        {sortBy === 'available-from-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
+                        )}
+
+                        {sortBy === 'available-from-desc' && (
+                          <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
+                        )}
+                      </Flex>
+                    </div>
+                  </Tooltip>
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  <Tooltip
+                    content={`Click to sort by grading number ${
+                      sortBy === 'grading-asc'
+                        ? 'descending'
+                        : sortBy === 'grading-desc'
+                        ? 'ascending'
+                        : 'ascending'
+                    }`}
+                  >
+                    <div className="inline-block">
+                      <Flex
+                        align="center"
+                        gap="1"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          if (sortBy === 'grading-asc') {
+                            setSortBy('grading-desc');
+                          } else if (sortBy === 'grading-desc') {
+                            setSortBy('grading-asc');
+                          } else {
+                            setSortBy('grading-asc');
+                          }
+                        }}
+                      >
+                        <span>Grading</span>
+
+                        {sortBy === 'grading-asc' && (
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
+                        )}
+
+                        {sortBy === 'grading-desc' && (
+                          <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
+                        )}
+                      </Flex>
+                    </div>
+                  </Tooltip>
+                </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Teachers</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Gradebook</Table.ColumnHeaderCell>
               </Table.Row>
@@ -264,12 +343,17 @@ const UngradedAssignmentsTable = ({
                   <Table.Cell className="max-w-sm">{a.course_name}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.name}</Table.Cell>
                   <Table.Cell className="max-w-sm">{a.section}</Table.Cell>
+                  <Table.Cell>
+                    {a.unlock_at &&
+                      new Date(a.unlock_at).toLocaleString('en-AU')}
+                  </Table.Cell>
                   <Table.Cell>{a.needs_grading_section}</Table.Cell>
                   <Table.Cell className="max-w-sm">
                     <div className="flex gap-2 flex-wrap">
-                      {a.teachers.split(';').map((t, i) => (
-                        <Badge key={t + i}>{t}</Badge>
-                      ))}
+                      {a.teachers !== '' &&
+                        a.teachers
+                          .split(';')
+                          .map((t, i) => <Badge key={t + i}>{t}</Badge>)}
                     </div>
                   </Table.Cell>
                   <Table.Cell>
@@ -360,6 +444,26 @@ function sort(data: UngradedAssignmentWithAccountCourseInfo[], by: SortBy) {
       return sorted.sort((a, b) => a.section.localeCompare(b.section));
     case 'section-desc':
       return sorted.sort((a, b) => b.section.localeCompare(a.section));
+    case 'available-from-asc':
+      return sorted.sort((a, b) => {
+        const aTime = a.unlock_at ? new Date(a.unlock_at).getTime() : -Infinity;
+        const bTime = b.unlock_at ? new Date(b.unlock_at).getTime() : -Infinity;
+        return aTime - bTime;
+      });
+    case 'available-from-desc':
+      return sorted.sort((a, b) => {
+        const aTime = a.unlock_at ? new Date(a.unlock_at).getTime() : -Infinity;
+        const bTime = b.unlock_at ? new Date(b.unlock_at).getTime() : -Infinity;
+        return bTime - aTime;
+      });
+    case 'grading-asc':
+      return sorted.sort(
+        (a, b) => a.needs_grading_section - b.needs_grading_section
+      );
+    case 'grading-desc':
+      return sorted.sort(
+        (a, b) => b.needs_grading_section - a.needs_grading_section
+      );
     default:
       return sorted;
   }
