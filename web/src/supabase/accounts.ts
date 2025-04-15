@@ -37,7 +37,7 @@ export const getAccountByID = async (supabase: SupabaseClient, id: number) => {
       .single();
 
     if (error) {
-      throw new Error(error.message);
+      throw new Error('Account not found.');
     }
 
     return data as Account;

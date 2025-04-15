@@ -76,7 +76,7 @@ export const getCourseByID = async (supabase: SupabaseClient, id: number) => {
     const course = data as Course;
 
     if (isEmpty(course)) {
-      throw new Error('course not found');
+      throw new Error('Course not found.');
     }
 
     return course;

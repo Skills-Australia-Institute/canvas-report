@@ -168,7 +168,7 @@ resource "aws_api_gateway_resource" "root" {
   path_part   = "{proxy+}"
 }
 
-resource "aws_api_gateway_method" "proxy" {
+resource "aws_api_gateway_method" "get" {
   rest_api_id   = aws_api_gateway_rest_api.gw.id
   resource_id   = aws_api_gateway_resource.root.id
   http_method   = "GET"
@@ -177,11 +177,34 @@ resource "aws_api_gateway_method" "proxy" {
     "method.request.path.proxy" = true
   }
 }
-
-resource "aws_api_gateway_integration" "lambda_integration" {
+resource "aws_api_gateway_integration" "get_integration" {
   rest_api_id             = aws_api_gateway_rest_api.gw.id
   resource_id             = aws_api_gateway_resource.root.id
-  http_method             = aws_api_gateway_method.proxy.http_method
+  http_method             = aws_api_gateway_method.get.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.function.invoke_arn
+
+  timeout_milliseconds = 29000
+  request_parameters = {
+    "integration.request.path.proxy" = "method.request.path.proxy"
+  }
+}
+
+resource "aws_api_gateway_method" "delete" {
+  rest_api_id   = aws_api_gateway_rest_api.gw.id
+  resource_id   = aws_api_gateway_resource.root.id
+  http_method   = "DELETE"
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
+}
+
+resource "aws_api_gateway_integration" "delete_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.gw.id
+  resource_id             = aws_api_gateway_resource.root.id
+  http_method             = aws_api_gateway_method.delete.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.function.invoke_arn
@@ -232,7 +255,7 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
 
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT,DELETE'",
     "method.response.header.Access-Control-Allow-Origin"  = "'${var.web_url}'"
   }
 
@@ -244,7 +267,8 @@ resource "aws_api_gateway_integration_response" "options_integration_response" {
 
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on = [
-    aws_api_gateway_integration.lambda_integration,
+    aws_api_gateway_integration.get_integration,
+    aws_api_gateway_integration.delete_integration,
     aws_api_gateway_integration.options_integration,
   ]
 
