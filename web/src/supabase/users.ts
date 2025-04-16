@@ -27,7 +27,7 @@ export const getUserByID = async (supabase: SupabaseClient, id: number) => {
       .single();
 
     if (error) {
-      throw new Error('user not found');
+      throw new Error('User not found');
     }
 
     return data as User;

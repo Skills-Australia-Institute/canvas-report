@@ -108,12 +108,12 @@ export default function EnrollmentsResultsByUser({
                       >
                         <span>Account</span>
                         {sortBy === 'account-asc' && (
-                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
 
                         {sortBy === 'account-desc' && (
                           <ArrowDownIcon
-                            className="cursor-pointer text-blue-500"
+                            className="cursor-pointer text-blue-500 w-4 h-4"
                             fontSize="20"
                           />
                         )}
@@ -149,11 +149,11 @@ export default function EnrollmentsResultsByUser({
                         <span>Course</span>
 
                         {sortBy === 'course-asc' && (
-                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
 
                         {sortBy === 'course-desc' && (
-                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                          <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
                       </Flex>
                     </div>
@@ -187,11 +187,11 @@ export default function EnrollmentsResultsByUser({
                         <span>Section</span>
 
                         {sortBy === 'section-asc' && (
-                          <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                          <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
 
                         {sortBy === 'section-desc' && (
-                          <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                          <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                         )}
                       </Flex>
                     </div>
@@ -232,9 +232,9 @@ export default function EnrollmentsResultsByUser({
         )}
       </ScrollArea>
       <div className="mt-4 border-t pt-4">
-        {data && (
+        {sorted && (
           <CSVLink
-            data={data}
+            data={sorted}
             headers={headers}
             filename={`${name}-enrollments_results-${getDateTimeString()}`}
           >
