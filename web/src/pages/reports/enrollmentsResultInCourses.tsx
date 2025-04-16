@@ -289,11 +289,11 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
                       <span>SIS ID</span>
 
                       {sortBy === 'sis-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
 
                       {sortBy === 'sis-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
                     </Flex>
                   </div>
@@ -327,11 +327,11 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
                       <span>Name</span>
 
                       {sortBy === 'name-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
 
                       {sortBy === 'name-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
                     </Flex>
                   </div>
@@ -365,11 +365,11 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
                       <span>Account</span>
 
                       {sortBy === 'account-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
 
                       {sortBy === 'account-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
                     </Flex>
                   </div>
@@ -403,11 +403,11 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
                       <span>Course</span>
 
                       {sortBy === 'course-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
 
                       {sortBy === 'course-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
                     </Flex>
                   </div>
@@ -441,11 +441,11 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
                       <span>Section</span>
 
                       {sortBy === 'section-asc' && (
-                        <ArrowUpIcon className="cursor-pointer text-blue-500" />
+                        <ArrowUpIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
 
                       {sortBy === 'section-desc' && (
-                        <ArrowDownIcon className="cursor-pointer text-blue-500" />
+                        <ArrowDownIcon className="cursor-pointer text-blue-500 w-4 h-4" />
                       )}
                     </Flex>
                   </div>
@@ -489,9 +489,9 @@ function EnrollmentsResultInCourses({ courses }: { courses: Course[] }) {
             color="green"
           />
         )}
-        {isAllSuccess && (
+        {isAllSuccess && sorted && (
           <CSVLink
-            data={data}
+            data={sorted}
             headers={headers}
             filename={`courses_enrollments_result-${getDateTimeString()}`}
           >
